@@ -55,7 +55,7 @@ function wplf_submission_custom_columns( $column, $post_id ) {
 
   if($column === 'form') {
     if( $form_id = get_post_meta($post_id, 'form_id', true) ) {
-      echo '<a href="' . get_edit_post_link( $form_id, '' ) . '">' . $form_id . '</a>';
+      echo '<a href="' . get_edit_post_link( $form_id, '' ) . '" target="_blank">' . $form_id . '</a>';
     }
   }
 
