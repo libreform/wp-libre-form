@@ -40,3 +40,62 @@ function wplf_register_form_cpt() {
   register_post_type( 'wplf-form', $args );
 }
 
+
+/**
+ * Disable TinyMCE editor for forms, which are simple HTML things
+ */
+add_filter( 'user_can_richedit', 'wplf_disable_tinymce_for_forms' );
+function wplf_disable_tinymce_for_forms( $default ) {
+
+  global $post;
+
+  // only for this cpt
+  if ( 'wplf-form' == get_post_type( $post ) ) {
+    return false;
+  }
+
+  return $default;
+}
+
+
+/**
+ * Include custom JS on the edit screen
+ */
+add_action( 'admin_enqueue_scripts', 'wplf_edit_form_js', 10, 1 );
+function wplf_edit_form_js( $hook ) {
+
+  global $post;
+
+  // make sure we're on the correct view
+  if ( $hook != 'post-new.php' && $hook != 'post.php' ) {
+    return;
+  }
+
+  // only for this cpt
+  if ( 'wplf-form' != $post->post_type ) {     
+    return;
+  }
+
+  // enqueue the custom JS for this view
+  wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-edit-form.js', dirname(__FILE__) ) );
+}
+
+
+/**
+ * Pre-populate form editor with default content
+ */
+add_filter( 'default_content', 'wplf_default_form_content' );
+function wplf_default_form_content( $content, $post ) {
+
+  // only for this cpt
+  if ( 'wplf-form' == $_GET['post_type'] ) {
+    ob_start();
+?>
+<input type="text" placeholder="example@email.com">
+<input type="submit" value="Submit">
+<?php
+    $content = ob_get_clean();
+  }
+
+  return $content;
+}
