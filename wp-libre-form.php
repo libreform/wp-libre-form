@@ -31,3 +31,5 @@
 
 */
 
+require_once 'inc/wplf-form.php';
+require_once 'inc/wplf-submissions.php';
