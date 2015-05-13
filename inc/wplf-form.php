@@ -57,7 +57,6 @@ function wplf_disable_tinymce_for_forms( $default ) {
   return $default;
 }
 
-
 /**
  * Include custom JS on the edit screen
  */
@@ -77,7 +76,7 @@ function wplf_edit_form_js( $hook ) {
   }
 
   // enqueue the custom JS for this view
-  wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-edit-form.js', dirname(__FILE__) ) );
+  wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname(__FILE__) ) );
 }
 
 
@@ -91,7 +90,7 @@ function wplf_default_form_content( $content, $post ) {
   if ( 'wplf-form' == $_GET['post_type'] ) {
     ob_start();
 ?>
-<input type="text" placeholder="example@email.com">
+<input type="text" name="email" placeholder="example@email.com">
 <input type="submit" value="Submit">
 <?php
     $content = ob_get_clean();
@@ -99,3 +98,33 @@ function wplf_default_form_content( $content, $post ) {
 
   return $content;
 }
+
+
+/**
+ * Custom column display for Form CPT in edit.php
+ */
+add_action( 'manage_posts_custom_column' , 'wplf_form_custom_columns', 10, 2 );
+function wplf_form_custom_columns( $column, $post_id ) {
+
+  if($column === 'shortcode') {
+    echo '<pre>[libre-form id="' . $post_id . '"]</pre>';
+  }
+
+}
+
+/**
+ * Custom columns in edit.php for Forms
+ */
+add_filter('manage_edit-wplf-form_columns' , 'wplf_form_edit_columns', 100, 1);
+function wplf_form_edit_columns( $columns ) {
+
+  $new_columns = array(
+    'cb' => $columns['cb'],
+    'title' => $columns['title'],
+    'shortcode' => __( 'Shortcode', 'wp-libre-form' ),
+    'date' => $columns['date'],
+
+  );
+  return $new_columns;
+}
+

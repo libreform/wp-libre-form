@@ -40,3 +40,41 @@ function wplf_register_submission_cpt() {
   register_post_type( 'wplf-submission', $args );
 }
 
+
+/**
+ * Custom column display for Submission CPT in edit.php
+ */
+add_action( 'manage_posts_custom_column' , 'wplf_submission_custom_columns', 10, 2 );
+function wplf_submission_custom_columns( $column, $post_id ) {
+
+  if($column === 'referrer') {
+    if( $referrer = get_post_meta($post_id, 'referrer', true) ) {
+      echo '<a href="' . esc_url( $referrer ) . '">' . $referrer . '</a>';
+    }
+  }
+
+  if($column === 'form') {
+    if( $form_id = get_post_meta($post_id, 'form_id', true) ) {
+      echo '<a href="' . get_edit_post_link( $form_id, '' ) . '">' . $form_id . '</a>';
+    }
+  }
+
+}
+
+/**
+ * Custom columns in edit.php for Forms
+ */
+add_filter('manage_edit-wplf-submission_columns' , 'wplf_submission_edit_columns', 100, 1);
+function wplf_submission_edit_columns( $columns ) {
+
+  $new_columns = array(
+    'cb' => $columns['cb'],
+    'title' => $columns['title'],
+    'referrer' => __( 'Referrer', 'wp-libre-form' ),
+    'form' => __( 'Form', 'wp-libre-form' ),
+    'date' => $columns['date'],
+  );
+  return $new_columns;
+
+}
+
