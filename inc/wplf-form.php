@@ -66,7 +66,7 @@ function wplf_edit_form_js( $hook ) {
   global $post;
 
   // make sure we're on the correct view
-  if ( $hook != 'post-new.php' && $hook != 'post.php' ) {
+  if ( 'post-new.php' != $hook && 'post.php' != $hook ) {
     return;
   }
 
@@ -84,10 +84,17 @@ function wplf_edit_form_js( $hook ) {
  * Pre-populate form editor with default content
  */
 add_filter( 'default_content', 'wplf_default_form_content' );
-function wplf_default_form_content( $content, $post ) {
+function wplf_default_form_content( $content ) {
+
+  global $pagenow;
+
+  // only on post.php screen
+  if ( 'post-new.php' != $pagenow && 'post.php' != $pagenow ) {
+    return $content;
+  }
 
   // only for this cpt
-  if ( 'wplf-form' == $_GET['post_type'] ) {
+  if ( isset( $_GET['post_type'] ) && 'wplf-form' === $_GET['post_type'] ) {
     ob_start();
 ?>
 <input type="text" name="email" placeholder="example@email.com">
@@ -112,6 +119,7 @@ function wplf_form_custom_columns( $column, $post_id ) {
 
 }
 
+
 /**
  * Custom columns in edit.php for Forms
  */
@@ -126,5 +134,95 @@ function wplf_form_edit_columns( $columns ) {
 
   );
   return $new_columns;
+}
+
+
+/**
+ * Add meta box to show fields in form
+ */
+add_action( 'add_meta_boxes', 'wplf_add_meta_box_form' );
+function wplf_add_meta_box_form() {
+
+  // Messages meta box
+  add_meta_box(
+    'wplf-messages',
+    __( 'Success Message', 'wp-libre-form' ),
+    'wplf_admin_display_thank_you',
+    'wplf-form',
+    'normal',
+    'high'
+  );
+
+  // Form Fields meta box
+  add_meta_box(
+    'wplf-fields',
+    __( 'Form fields', 'wp-libre-form' ),
+    'wplf_admin_display_form_fields',
+    'wplf-form',
+    'side'
+  );
+}
+
+
+/**
+ * Meta box callback for fields meta box
+ */
+function wplf_admin_display_thank_you( $post ) {
+  // get post meta
+  $meta = get_post_meta( $post->ID );
+  $message = isset( $meta['_wplf_thank_you'] ) ? $meta['_wplf_thank_you'][0] : _x( 'Thank you! :)', 'Default success message', 'wp-libre-form' );
+?>
+<p>
+<?php wp_editor( $message, 'wplf_thank_you', array(
+  'wpautop' => true,
+  'media_buttons' => true,
+  'textarea_name' => 'wplf_thank_you',
+  'textarea_rows' => 6,
+  'teeny' => true
+  )); ?>
+</p>
+<?php
+  wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
+}
+
+/**
+ * Meta box callback for form fields meta box
+ */
+function wplf_admin_display_form_fields() {
+?>
+  <p>Woo!</p>
+<?php
+}
+
+
+/**
+ * Handles saving our post meta
+ */
+add_action( 'save_post', 'wplf_save_form_meta' );
+function wplf_save_form_meta( $post_id ) {
+
+  // verify nonce
+  if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
+    return;
+  } 
+  else if ( ! wp_verify_nonce( $_POST['wplf_form_meta_nonce'], 'wplf_form_meta' ) ) {
+    return;
+  }
+
+  // only for this cpt
+  if ( !isset( $_POST['post_type'] ) || 'wplf-form' != $_POST['post_type'] ) {
+    return;
+  }
+
+  // check permissions.
+  if ( ! current_user_can( 'edit_post', $post_id ) ) {
+    return;
+  }
+
+  if ( isset( $_POST['wplf_thank_you'] ) ) {
+    // save to post meta
+    update_post_meta( $post_id, '_wplf_thank_you', sanitize_text_field( $_POST['wplf_thank_you'] ) );
+  }
+
 }
 

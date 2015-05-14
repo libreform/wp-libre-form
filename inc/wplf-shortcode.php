@@ -6,12 +6,22 @@
 add_shortcode( 'libre-form', 'wplf_form_shortcode_handler' );
 function wplf_form_shortcode_handler($attributes, $content = null) {
 
-  global $post;
-
-  extract( shortcode_atts( array(
+  $attributes = shortcode_atts( array(
     'id' => null,
     'xclass' => '',
-  ), $attributes ) );
+  ), $attributes );
+
+  // display form
+  return wplf_form( $attributes['id'], $attributes['xclass'] );
+}
+
+
+/**
+ * The function we display the form with
+ */
+function wplf_form( $id , $xclass = '') {
+
+  global $post;
 
   if( $form = get_post( $id ) ) {
     ob_start();
@@ -29,4 +39,3 @@ function wplf_form_shortcode_handler($attributes, $content = null) {
   // return nothing if the form doesn't exist
   return '';
 }
-

@@ -38,7 +38,7 @@ function wplf_ajax_submit_handler() {
   if( $return->ok ) {
 
     // the title is the value of whatever the first field was in the form
-    $post_title = array_shift( array_values( $_POST ) );
+    $post_title = $_POST['referrer'];
 
     // create submission post
     $post_id = wp_insert_post( array(
@@ -60,8 +60,8 @@ function wplf_ajax_submit_handler() {
     $return->submission_id = $post_id;
     $return->submission_title = $post_title;
 
-    // TODO: get response from $form post meta insead of this placeholder
-    $return->message = "<p>Thank you!</p>";
+    // return the success message for the form
+    $return->message = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
 
   }
 
