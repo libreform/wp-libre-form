@@ -213,7 +213,7 @@ function wplf_admin_display_form_fields( $post ) {
 ?>
 <p><?php _e('Fields marked with * are required', 'wp-libre-form'); ?></p>
 <div class="wplf-form-field-container">
-  <div class="wplf-form-field widget-top"><div class="widget-title"><h4>name</h4></div></div>
+<!--  <div class="wplf-form-field widget-top"><div class="widget-title"><h4>name</h4></div></div> -->
 </div>
 <input type="hidden" name="wplf_fields" id="wplf_fields">
 <input type="hidden" name="wplf_required" id="wplf_required">
