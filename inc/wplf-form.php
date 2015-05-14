@@ -97,10 +97,20 @@ function wplf_default_form_content( $content ) {
   if ( isset( $_GET['post_type'] ) && 'wplf-form' === $_GET['post_type'] ) {
     ob_start();
 ?>
-<input type="text" name="email" placeholder="example@email.com">
+<!-- You may build any standard HTML5 form below! -->
+<label for="name">Please enter your name</label>
+<input type="text" name="name" placeholder="John Doe">
+
+<label for="email">Please enter your email address</label>
+<input type="email" name="email" placeholder="example@email.com" required>
+
+<label for="email">Write your message below</label>
+<textarea name="message" rows="5" placeholder="I wanted to ask about..."></textarea>
+
 <input type="submit" value="Submit">
 <?php
-    $content = ob_get_clean();
+    $content = esc_textarea( ob_get_clean() );
+
   }
 
   return $content;
@@ -190,7 +200,12 @@ function wplf_admin_display_thank_you( $post ) {
  */
 function wplf_admin_display_form_fields() {
 ?>
-  <p>Woo!</p>
+<p></p>
+<div class="wplf-form-field-container">
+  <div class="wplf-form-field widget-top"><div class="widget-title"><h4>name</h4></div></div>
+</div>
+<input type="hidden" name="wplf_fields" id="wplf_fields">
+<input type="hidden" name="wplf_required" id="wplf_required">
 <?php
 }
 
@@ -219,9 +234,19 @@ function wplf_save_form_meta( $post_id ) {
     return;
   }
 
+  // save success message
   if ( isset( $_POST['wplf_thank_you'] ) ) {
-    // save to post meta
     update_post_meta( $post_id, '_wplf_thank_you', sanitize_text_field( $_POST['wplf_thank_you'] ) );
+  }
+
+  // save fields
+  if ( isset( $_POST['wplf_fields'] ) ) {
+    update_post_meta( $post_id, '_wplf_fields', sanitize_text_field( $_POST['wplf_fields'] ) );
+  }
+
+  // save required fields
+  if ( isset( $_POST['wplf_required'] ) ) {
+    update_post_meta( $post_id, '_wplf_required', sanitize_text_field( $_POST['wplf_required'] ) );
   }
 
 }

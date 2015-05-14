@@ -16,18 +16,44 @@ $(document).ready(function() {
     // get all fields from form
     var $fields = $form.find('input, textarea, select');
 
-    // get all required fields from form
-    var $required;
+    // store input names in an array
+    var fields = [];
+    var required = [];
+
+    $('.wplf-form-field-container').html('');
     $fields.each(function(e) {
-      if( $(this).prop('required') ) {
-        console.log('required: ' + $(this).prop('name'));
-      } 
+      if( $(this).prop('name') ) {
+
+        // visual representation of the field in a meta box
+        var $fieldbox = $( 
+          '<div class="wplf-form-field widget-top"><div class="widget-title"><h4>' +  $(this).prop('name') + '</h4></div></div>'
+        );
+
+        if( $(this).prop('required') ) {
+          // mark as required field for validation
+          $fieldbox.addClass('required');
+          $fieldbox.find('h4').append('*');
+
+          // add name to required array
+          required.push( $(this).prop('name') ); 
+        } 
+
+        // add name to fields array
+        fields.push( $(this).prop('name') ); 
+
+        // display field names in a meta box
+        $('.wplf-form-field-container').append($fieldbox);
+      }
     });
 
-    console.log($fields);
+    // save field array in a hidden input
+    $('input#wplf_fields').val( fields.join() );
+    $('input#wplf_required').val( required.join() );
+
   }
   
-  $('#content').blur(parseFields);
+  $('#content').bind('input propertychange', parseFields);
+  parseFields();
 
 });
 })(jQuery);
