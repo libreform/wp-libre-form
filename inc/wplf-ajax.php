@@ -27,15 +27,14 @@ function wplf_ajax_submit_handler() {
   $return = new stdClass();
   $return->ok = 1;
 
-  // check that form_id exists
-  if( ! isset($_POST['_form_id']) || ! $form = get_post( $_POST['_form_id'] ) ) {
-    $return->ok = 0;
-    $return->error = "Form id ${_POST['_form_id']} doesn't exist!";
-  }
-
-  // TODO: field validation
+  // validate form fields
+  // see wplf-form-validation.php
+  $return = apply_filters( 'wplf_validate_submission', $return );
 
   if( $return->ok ) {
+
+    // form existance has  already been validated via filters
+    $form = get_post( $_POST['_form_id'] );
 
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
@@ -73,7 +72,7 @@ function wplf_ajax_submit_handler() {
     $return->submission_title = $post_title;
 
     // return the success message for the form
-    $return->message = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
+    $return->success = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
 
   }
 

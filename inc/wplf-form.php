@@ -167,13 +167,13 @@ function wplf_add_meta_box_form() {
   // Form Fields meta box
   add_meta_box(
     'wplf-fields',
-    __( 'Form Fields', 'wp-libre-form' ),
+    __( 'Form Fields Detected', 'wp-libre-form' ),
     'wplf_admin_display_form_fields',
     'wplf-form',
     'side'
   );
 
-  // Form Fields meta box
+  // Submission title format meta box
   add_meta_box(
     'wplf-title-format',
     __( 'Submission Title Format', 'wp-libre-form' ),

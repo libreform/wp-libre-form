@@ -1,5 +1,5 @@
 /**
- * Custom JS on the edit screen for the from cpt
+ * Custom JS on the edit screen for the form cpt
  */
 (function($) {
 $(document).ready(function() {

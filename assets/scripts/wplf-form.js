@@ -14,13 +14,26 @@ $(document).ready(function() {
     // add class to enable css changes to indicate ajax loading 
     $form.addClass('sending');
 
+    // reset errors
+    $form.find('.wplf-error').remove();
+
     // submit form to ajax handler in admin-ajax.php
     $.post( ajax_object.ajax_url + '?action=wplf_submit', 
       $(this).serialize(), 
       function(response) {
         console.log(response);
-        $form.after(response.message);
-        $form.hide();
+        if( 'success' in response ) {
+          // show success message if one exists
+          $form.after(response.success);
+        } 
+        if( 'ok' in response && response.ok ) {
+          // submit succesful!
+          $form.remove();
+        }
+        if( 'error' in response ) {
+          // show error message in form
+          $form.append('<p class="wplf-error error">' + response.error + '</p>');
+        }
       }
     ).always(function() {
       // finished XHR request

@@ -34,4 +34,5 @@
 require_once 'inc/wplf-form.php';
 require_once 'inc/wplf-submissions.php';
 require_once 'inc/wplf-shortcode.php';
+require_once 'inc/wplf-form-validation.php';
 require_once 'inc/wplf-ajax.php';
