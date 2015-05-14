@@ -97,17 +97,18 @@ function wplf_default_form_content( $content ) {
   if ( isset( $_GET['post_type'] ) && 'wplf-form' === $_GET['post_type'] ) {
     ob_start();
 ?>
-<!-- You may build any standard HTML5 form below! -->
 <label for="name">Please enter your name</label>
 <input type="text" name="name" placeholder="John Doe">
 
-<label for="email">Please enter your email address</label>
+<label for="email">Please enter your email address (required)</label>
 <input type="email" name="email" placeholder="example@email.com" required>
 
-<label for="email">Write your message below</label>
-<textarea name="message" rows="5" placeholder="I wanted to ask about..."></textarea>
+<label for="email">Write your message below (required)</label>
+<textarea name="message" rows="5" placeholder="I wanted to ask about..." required></textarea>
 
 <input type="submit" value="Submit">
+
+<!-- Any valid HTML form can be used here! -->
 <?php
     $content = esc_textarea( ob_get_clean() );
 
@@ -166,8 +167,17 @@ function wplf_add_meta_box_form() {
   // Form Fields meta box
   add_meta_box(
     'wplf-fields',
-    __( 'Form fields', 'wp-libre-form' ),
+    __( 'Form Fields', 'wp-libre-form' ),
     'wplf_admin_display_form_fields',
+    'wplf-form',
+    'side'
+  );
+
+  // Form Fields meta box
+  add_meta_box(
+    'wplf-title-format',
+    __( 'Submission Title Format', 'wp-libre-form' ),
+    'wplf_admin_display_title_format',
     'wplf-form',
     'side'
   );
@@ -183,7 +193,7 @@ function wplf_admin_display_thank_you( $post ) {
   $message = isset( $meta['_wplf_thank_you'] ) ? $meta['_wplf_thank_you'][0] : _x( 'Thank you! :)', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
-<?php wp_editor( $message, 'wplf_thank_you', array(
+<?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
   'wpautop' => true,
   'media_buttons' => true,
   'textarea_name' => 'wplf_thank_you',
@@ -195,17 +205,34 @@ function wplf_admin_display_thank_you( $post ) {
   wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
 }
 
+
 /**
  * Meta box callback for form fields meta box
  */
-function wplf_admin_display_form_fields() {
+function wplf_admin_display_form_fields( $post ) {
 ?>
-<p></p>
+<p><?php _e('Fields marked with * are required', 'wp-libre-form'); ?></p>
 <div class="wplf-form-field-container">
   <div class="wplf-form-field widget-top"><div class="widget-title"><h4>name</h4></div></div>
 </div>
 <input type="hidden" name="wplf_fields" id="wplf_fields">
 <input type="hidden" name="wplf_required" id="wplf_required">
+<?php
+}
+
+
+/**
+ * Meta box callback for submission title format
+ */
+function wplf_admin_display_title_format( $post ) {
+  // get post meta
+  $meta = get_post_meta( $post->ID );
+  $default = _x( '%name% <%email%>', 'Default submission title format', 'wp-libre-form' );
+  $format = isset( $meta['_wplf_title_format'] ) ? $meta['_wplf_title_format'][0] : $default;
+?>
+<p><?php _e('Submissions from this form will use this formatting in their title.', 'wp-libre-form'); ?></p>
+<p><?php _e('You may use any field values enclosed in "%" markers.', 'wp-libre-form');?></p>
+<p><input type="text" name="wplf_title_format" value="<?php echo esc_attr( $format ); ?>" placeholder="<?php echo esc_attr( $default ); ?>" class="code" style="width:100%"></p>
 <?php
 }
 
@@ -247,6 +274,11 @@ function wplf_save_form_meta( $post_id ) {
   // save required fields
   if ( isset( $_POST['wplf_required'] ) ) {
     update_post_meta( $post_id, '_wplf_required', sanitize_text_field( $_POST['wplf_required'] ) );
+  }
+
+  // save title format
+  if ( isset( $_POST['wplf_title_format'] ) ) {
+    update_post_meta( $post_id, '_wplf_title_format', esc_html( $_POST['wplf_title_format'] ) );
   }
 
 }

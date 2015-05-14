@@ -23,13 +23,14 @@ function wplf_form( $id , $xclass = '') {
 
   global $post;
 
-  if( $form = get_post( $id ) ) {
+  if( 'publish' === get_post_status( $id )) {
+    $form = get_post( $id );
     ob_start();
 ?>
 <form class="libre-form libre-form-' . $id . ' ' . $xclass . '">
   <?php echo apply_filters( 'the_content', $form->post_content ); ?>
   <input type="hidden" name="referrer" value="<?php echo get_permalink( $post->ID ); ?>">
-  <input type="hidden" name="form_id" value="<?php echo $id; ?>">
+  <input type="hidden" name="_form_id" value="<?php echo $id; ?>">
 </form>
 <?php
     $output = ob_get_clean();
@@ -39,3 +40,4 @@ function wplf_form( $id , $xclass = '') {
   // return nothing if the form doesn't exist
   return '';
 }
+

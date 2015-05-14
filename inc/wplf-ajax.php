@@ -28,9 +28,9 @@ function wplf_ajax_submit_handler() {
   $return->ok = 1;
 
   // check that form_id exists
-  if( ! isset($_POST['form_id']) || ! $form = get_post( $_POST['form_id'] ) ) {
+  if( ! isset($_POST['_form_id']) || ! $form = get_post( $_POST['_form_id'] ) ) {
     $return->ok = 0;
-    $return->error = "Form id ${_POST['form_id']} not found.";
+    $return->error = "Form id ${_POST['_form_id']} doesn't exist!";
   }
 
   // TODO: field validation
@@ -38,7 +38,19 @@ function wplf_ajax_submit_handler() {
   if( $return->ok ) {
 
     // the title is the value of whatever the first field was in the form
-    $post_title = $_POST['referrer'];
+    $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
+
+    // substitute the %..% tags with field values
+    $post_title = $title_format;
+
+    preg_match_all('/%(.+?)%/', $post_title, $toks);
+    foreach($toks[1] as $tok) {
+      $replace = '';
+      if( array_key_exists( $tok, $_POST ) ) {
+        $replace = $_POST[$tok];
+      }
+      $post_title = preg_replace('/%.+?%/', $replace, $post_title, 1);
+    }
 
     // create submission post
     $post_id = wp_insert_post( array(
