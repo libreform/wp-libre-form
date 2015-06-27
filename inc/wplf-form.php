@@ -29,6 +29,7 @@ function wplf_register_form_cpt() {
     'exclude_from_search'=> true,
     'show_ui'            => true,
     'show_in_menu'       => true,
+	'menu_icon'          => 'dashicons-feedback',
     'query_var'          => false,
     'capability_type'    => 'post',
     'has_archive'        => false,

@@ -28,6 +28,7 @@ function wplf_register_submission_cpt() {
     'publicly_queryable' => false,
     'show_ui'            => true,
     'show_in_menu'       => true,
+	'menu_icon'          => 'dashicons-archive',
     'query_var'          => false,
     'rewrite'            => null,
     'capability_type'    => 'post',
