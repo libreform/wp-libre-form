@@ -15,7 +15,7 @@ function wplf_register_submission_cpt() {
     'new_item'           => __( 'New Submission', 'wp-libre-form' ),
     'edit_item'          => __( 'Edit Submission', 'wp-libre-form' ),
     'view_item'          => __( 'View Submission', 'wp-libre-form' ),
-    'all_items'          => __( 'All Submissions', 'wp-libre-form' ),
+    'all_items'          => __( 'Submissions', 'wp-libre-form' ),
     'search_items'       => __( 'Search Submissions', 'wp-libre-form' ),
     'parent_item_colon'  => __( 'Parent Submissions:', 'wp-libre-form' ),
     'not_found'          => __( 'No submissions found.', 'wp-libre-form' ),
@@ -27,7 +27,7 @@ function wplf_register_submission_cpt() {
     'public'             => false,
     'publicly_queryable' => false,
     'show_ui'            => true,
-    'show_in_menu'       => true,
+    'show_in_menu'       => 'edit.php?post_type=wplf-form',
 	'menu_icon'          => 'dashicons-archive',
     'query_var'          => false,
     'rewrite'            => null,
@@ -79,4 +79,5 @@ function wplf_submission_edit_columns( $columns ) {
   return $new_columns;
 
 }
+
 
