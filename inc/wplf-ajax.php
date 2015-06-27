@@ -9,7 +9,7 @@ function wplf_maybe_enqueue_frontend_script() {
   global $post;
 
   // only enqueue script if current post contains a form
-  if( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'libre-form') ) {
+  if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
     wp_enqueue_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array( 'jquery' ) );
     wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
   }

@@ -24,12 +24,12 @@ function wplf_register_form_cpt() {
 
   $args = array(
     'labels'             => $labels,
-    'public'             => false,
-    'publicly_queryable' => false,
+    'public'             => true,
+    'publicly_queryable' => true,
+    'exclude_from_search'=> true,
     'show_ui'            => true,
     'show_in_menu'       => true,
     'query_var'          => false,
-    'rewrite'            => null,
     'capability_type'    => 'post',
     'has_archive'        => false,
     'hierarchical'       => false,
@@ -263,7 +263,7 @@ function wplf_save_form_meta( $post_id ) {
 
   // save success message
   if ( isset( $_POST['wplf_thank_you'] ) ) {
-    update_post_meta( $post_id, '_wplf_thank_you', sanitize_text_field( $_POST['wplf_thank_you'] ) );
+    update_post_meta( $post_id, '_wplf_thank_you', wp_kses_post( $_POST['wplf_thank_you'] ) );
   }
 
   // save fields
@@ -281,5 +281,17 @@ function wplf_save_form_meta( $post_id ) {
     update_post_meta( $post_id, '_wplf_title_format', esc_html( $_POST['wplf_title_format'] ) );
   }
 
+}
+
+/**
+ * Use the shortcode for previewing forms
+ */
+add_filter('the_content', 'wplf_maybe_use_form_shortcode');
+function wplf_maybe_use_form_shortcode( $content ) {
+  global $post;
+  if( isset($post->post_type) && $post->post_type === 'wplf-form') {
+    return wplf_form( $post->ID );
+  }
+  return $content;
 }
 

@@ -16,6 +16,7 @@ function wplf_form_shortcode_handler($attributes, $content = null) {
 }
 
 
+
 /**
  * The function we display the form with
  */
@@ -28,7 +29,7 @@ function wplf_form( $id , $xclass = '') {
     ob_start();
 ?>
 <form class="libre-form libre-form-' . $id . ' ' . $xclass . '">
-  <?php echo apply_filters( 'the_content', $form->post_content ); ?>
+  <?php echo apply_filters( 'wplf_form', $form->post_content ); ?>
   <input type="hidden" name="referrer" value="<?php echo get_permalink( $post->ID ); ?>">
   <input type="hidden" name="_form_id" value="<?php echo $id; ?>">
 </form>
@@ -41,3 +42,13 @@ function wplf_form( $id , $xclass = '') {
   return '';
 }
 
+/**
+ * Same default filters as the_content, but we don't want to use the_content for the form output
+ */
+add_filter( 'wplf_form', 'wptexturize' );
+add_filter( 'wplf_form', 'convert_smilies' );
+add_filter( 'wplf_form', 'convert_chars'  );
+add_filter( 'wplf_form', 'wpautop' );
+add_filter( 'wplf_form', 'shortcode_unautop' );
+add_filter( 'wplf_form', 'prepend_attachment' );
+add_filter( 'wplf_form', 'capital_P_dangit', 11 );
