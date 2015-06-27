@@ -126,7 +126,7 @@ add_action( 'manage_posts_custom_column' , 'wplf_form_custom_columns', 10, 2 );
 function wplf_form_custom_columns( $column, $post_id ) {
 
   if($column === 'shortcode') {
-    echo '<pre>[libre-form id="' . $post_id . '"]</pre>';
+    echo '<code>[libre-form id="' . $post_id . '"]</code>';
   }
 
 }
