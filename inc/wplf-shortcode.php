@@ -28,7 +28,7 @@ function wplf_form( $id , $xclass = '') {
     $form = get_post( $id );
     ob_start();
 ?>
-<form class="libre-form libre-form-' . $id . ' ' . $xclass . '">
+  <form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>">
   <?php echo apply_filters( 'wplf_form', $form->post_content ); ?>
   <input type="hidden" name="referrer" value="<?php echo get_permalink( $post->ID ); ?>">
   <input type="hidden" name="_form_id" value="<?php echo $id; ?>">
