@@ -35,7 +35,13 @@ function wplf_register_form_cpt() {
     'has_archive'        => false,
     'hierarchical'       => false,
     'menu_position'      => null,
-    'supports'           => array( 'title', 'editor', 'author', 'revisions' )
+    'supports'           => array(
+      'title',
+      'editor',
+      'author',
+      'revisions',
+      'custom-fields',
+    ),
   );
 
   register_post_type( 'wplf-form', $args );
@@ -72,7 +78,7 @@ function wplf_edit_form_js( $hook ) {
   }
 
   // only for this cpt
-  if ( 'wplf-form' != $post->post_type ) {     
+  if ( 'wplf-form' != $post->post_type ) {
     return;
   }
 
@@ -174,6 +180,15 @@ function wplf_add_meta_box_form() {
     'side'
   );
 
+  // Email on submit
+  add_meta_box(
+    'wplf-submit-email',
+    __( 'Emails', 'wp-libre-form' ),
+    'wplf_admin_display_submit_email',
+    'wplf-form',
+    'side'
+  );
+
   // Submission title format meta box
   add_meta_box(
     'wplf-title-format',
@@ -221,6 +236,24 @@ function wplf_admin_display_form_fields( $post ) {
 <?php
 }
 
+/**
+ * Meta box callback for submit email meta box
+ */
+function wplf_admin_display_submit_email( $post ) {
+  // get post meta
+  $meta = get_post_meta( $post->ID );
+  $email_enabled = isset( $meta['_wplf_email_copy_enabled'] ) ? $meta['_wplf_email_copy_enabled'][0] : true;
+  $email_copy_to = isset( $meta['_wplf_email_copy_to'] ) ? $meta['_wplf_email_copy_to'][0] : '';
+?>
+<p>
+  <label for="wplf_email_copy_enabled">
+    <input type="checkbox" <?php echo $email_enabled ? 'checked="checked"' : ''; ?> id="wplf_email_copy_enabled" name="wplf_email_copy_enabled">
+    <?php _e( 'Send an email copy when a form is submitted?' ); ?>
+  </label>
+</p>
+<p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%;display:none"></p>
+<?php
+}
 
 /**
  * Meta box callback for submission title format
@@ -247,7 +280,7 @@ function wplf_save_form_meta( $post_id ) {
   // verify nonce
   if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
     return;
-  } 
+  }
   else if ( ! wp_verify_nonce( $_POST['wplf_form_meta_nonce'], 'wplf_form_meta' ) ) {
     return;
   }
@@ -275,6 +308,19 @@ function wplf_save_form_meta( $post_id ) {
   // save required fields
   if ( isset( $_POST['wplf_required'] ) ) {
     update_post_meta( $post_id, '_wplf_required', sanitize_text_field( $_POST['wplf_required'] ) );
+  }
+
+  // save email copy enabled state
+  if ( isset( $_POST['wplf_email_copy_enabled'] ) ) {
+    update_post_meta( $post_id, '_wplf_email_copy_enabled', $_POST['wplf_email_copy_enabled'] === 'on' );
+  }
+  else {
+    update_post_meta( $post_id, '_wplf_email_copy_enabled', false );
+  }
+
+  // save email copy
+  if ( isset( $_POST['wplf_email_copy_to'] ) ) {
+    update_post_meta( $post_id, '_wplf_email_copy_to', sanitize_text_field( $_POST['wplf_email_copy_to'] ) );
   }
 
   // save title format

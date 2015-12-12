@@ -62,8 +62,8 @@ function wplf_ajax_submit_handler() {
     ));
 
     // add submission data as meta values
-    foreach($_POST as $key => $value) {
-      if(!is_array($value)) {
+    foreach( $_POST as $key => $value ) {
+      if( !is_array($value) ) {
         add_post_meta($post_id, $key, sanitize_text_field( $value ), true);
       }
       else {

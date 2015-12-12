@@ -3,7 +3,6 @@
  */
 (function($) {
 $(document).ready(function() {
-
   function parseFields() {
 
     // get editor content
@@ -25,7 +24,7 @@ $(document).ready(function() {
       if( $(this).prop('name') ) {
 
         // visual representation of the field in a meta box
-        var $fieldbox = $( 
+        var $fieldbox = $(
           '<div class="wplf-form-field widget-top"><div class="widget-title"><h4>' +  $(this).prop('name') + '</h4></div></div>'
         );
 
@@ -35,11 +34,11 @@ $(document).ready(function() {
           $fieldbox.find('h4').append('*');
 
           // add name to required array
-          required.push( $(this).prop('name') ); 
-        } 
+          required.push( $(this).prop('name') );
+        }
 
         // add name to fields array
-        fields.push( $(this).prop('name') ); 
+        fields.push( $(this).prop('name') );
 
         // display field names in a meta box
         $('.wplf-form-field-container').append($fieldbox);
@@ -51,9 +50,20 @@ $(document).ready(function() {
     $('input#wplf_required').val( required.join() );
 
   }
-  
+
   $('#content').bind('input propertychange', parseFields);
   parseFields();
+
+  // display email copy field if the feature is enabled
+  function toggleEmailCopy() {
+    if( $('input[name="wplf_email_copy_enabled"]:checked').length > 0 ) {
+      $('input[name="wplf_email_copy_to"]').show();
+    } else {
+      $('input[name="wplf_email_copy_to"]').hide();
+    }
+  }
+  $('input[name="wplf_email_copy_enabled"]').change(toggleEmailCopy);
+  toggleEmailCopy();
 
 });
 })(jQuery);
