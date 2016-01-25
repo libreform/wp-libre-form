@@ -28,14 +28,14 @@ function wplf_register_submission_cpt() {
     'publicly_queryable' => false,
     'show_ui'            => true,
     'show_in_menu'       => 'edit.php?post_type=wplf-form',
-	'menu_icon'          => 'dashicons-archive',
+    'menu_icon'          => 'dashicons-archive',
     'query_var'          => false,
     'rewrite'            => null,
     'capability_type'    => 'post',
     'has_archive'        => false,
     'hierarchical'       => false,
     'menu_position'      => null,
-    'supports'           => array( 'custom-fields' )
+    'supports'           => array( 'title', 'custom-fields' )
   );
 
   register_post_type( 'wplf-submission', $args );
