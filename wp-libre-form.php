@@ -14,7 +14,7 @@
  * Go ahead, just look at the code! :)
  */
 
-/** Copyright 2015 Seravo Oy
+/** Copyright 2016 Seravo Oy
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License, version 3, as
@@ -31,8 +31,40 @@
 
 */
 
-require_once 'inc/wplf-form.php';
-require_once 'inc/wplf-submissions.php';
-require_once 'inc/wplf-shortcode.php';
-require_once 'inc/wplf-form-validation.php';
-require_once 'inc/wplf-ajax.php';
+if ( !class_exists('WP_Libre_Form')) :
+
+class WP_Libre_Form {
+  public static $instance;
+
+  public static function init() {
+    if ( is_null( self::$instance ) ) {
+      self::$instance = new WP_Libre_Form();
+    }
+    return self::$instance;
+  }
+
+  private function __construct() {
+    //require 'vendor/autoload.php';
+
+    add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
+
+    require_once 'inc/wplf-form.php';
+    require_once 'inc/wplf-submissions.php';
+    require_once 'inc/wplf-shortcode.php';
+    require_once 'inc/wplf-form-validation.php';
+    require_once 'inc/wplf-ajax.php';
+  }
+
+  /**
+   * Load our plugin textdomain
+   */
+  public static function load_our_textdomain() {
+    load_plugin_textdomain( 'wplf', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
+  }
+}
+
+endif;
+
+// init the plugin
+$wplf = WP_Libre_Form::init();
+

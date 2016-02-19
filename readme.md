@@ -24,6 +24,12 @@ Features:
 ### Editing a Form
 ![Form edit](/assets/screenshot-1.png)
 
+### Submissions view
+![Submissions](/assets/screenshot-2.png)
+
+### Single Submission
+![Submissions](/assets/screenshot-2.png)
+
 ## Filter / Action API
 
 ### Action: wplf_post_validate_submission
