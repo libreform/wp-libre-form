@@ -49,7 +49,7 @@ class WP_Libre_Form {
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
 
     require_once 'classes/class-cpt-wplf-form.php';
-    $wplf_form = CPT_WPLF_Form::init();
+    CPT_WPLF_Form::init();
 
     require_once 'inc/wplf-submissions.php';
 
@@ -69,5 +69,5 @@ class WP_Libre_Form {
 endif;
 
 // init the plugin
-$wplf = WP_Libre_Form::init();
+WP_Libre_Form::init();
 
