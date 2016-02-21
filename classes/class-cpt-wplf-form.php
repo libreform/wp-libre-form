@@ -193,6 +193,16 @@ class CPT_WPLF_Form {
    * Add meta box to show fields in form
    */
   function add_meta_boxes_cpt() {
+    // Shortcode meta box
+    add_meta_box(
+      'wplf-shortcode',
+      __( 'Shortcode', 'wp-libre-form' ),
+      array( $this, 'metabox_shortcode' ),
+      'wplf-form',
+      'normal',
+      'high'
+    );
+
     // Messages meta box
     add_meta_box(
       'wplf-messages',
@@ -231,6 +241,15 @@ class CPT_WPLF_Form {
     );
   }
 
+
+  /**
+   * Meta box callback for shortcode meta box
+   */
+  function metabox_shortcode( $post ) {
+?>
+<p><code>[libre-form id="<?php echo $post->ID; ?>"]</code></p>
+<?php
+  }
 
   /**
    * Meta box callback for fields meta box
@@ -350,12 +369,12 @@ class CPT_WPLF_Form {
 
     // save email copy
     if ( isset( $_POST['wplf_email_copy_to'] ) ) {
-      update_post_meta( $post_id, '_wplf_email_copy_to', sanitize_text_field( $_POST['wplf_email_copy_to'] ) );
+      update_post_meta( $post_id, '_wplf_email_copy_to', sanitize_email( $_POST['wplf_email_copy_to'] ) );
     }
 
     // save title format
     if ( isset( $_POST['wplf_title_format'] ) ) {
-      update_post_meta( $post_id, '_wplf_title_format', esc_html( $_POST['wplf_title_format'] ) );
+      update_post_meta( $post_id, '_wplf_title_format', $_POST['wplf_title_format'] );
     }
   }
 
