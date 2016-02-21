@@ -48,9 +48,12 @@ class WP_Libre_Form {
 
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
 
-    require_once 'inc/wplf-form.php';
+    require_once 'classes/class-cpt-wplf-form.php';
+    $wplf_form = CPT_WPLF_Form::init();
+
     require_once 'inc/wplf-submissions.php';
-    require_once 'inc/wplf-shortcode.php';
+
+    //require_once 'inc/wplf-shortcode.php';
     require_once 'inc/wplf-form-validation.php';
     require_once 'inc/wplf-ajax.php';
   }
