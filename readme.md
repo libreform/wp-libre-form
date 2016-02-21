@@ -41,8 +41,11 @@ WordPress.org plugin directory coming soon...
 ### Editing a Form
 ![Form edit](/assets/screenshot-1.png)
 
-### Submissions view
+### Form displayed in the default Twentysixteen theme
 ![Submissions](/assets/screenshot-2.png)
+
+### Submissions view
+![Submissions](/assets/screenshot-3.png)
 
 ## Filter / Action API
 

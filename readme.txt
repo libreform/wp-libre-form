@@ -24,7 +24,9 @@ None yet.
 
 == Screenshots ==
 
-None yet.
+1. Editing a Form
+2. Form displayed in the default Twentysixteen theme
+3. Submissions view
 
 == Changelog ==
 
