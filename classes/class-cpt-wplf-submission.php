@@ -147,6 +147,57 @@ class CPT_WPLF_Submission {
 
     return $query;
   }
+
+  /**
+   * Add meta box to show fields in form
+   */
+  function add_meta_boxes_cpt() {
+    // Shortcode meta box
+    add_meta_box(
+      'wplf-shortcode',
+      __( 'Submission', 'wp-libre-form' ),
+      array( $this, 'metabox_submission' ),
+      'wplf-submission',
+      'normal',
+      'high'
+    );
+  }
+
+  /**
+   * The submission metabox callback
+   */
+  function metabox_submission() {
+    global $post;
+    $postmeta = get_post_meta( $post->ID );
+    $fields = array_keys( $postmeta );
+?>
+<p>
+  <table class="wp-list-table widefat striped">
+    <thead>
+      <tr>
+        <th><strong><?php _e( 'Field', 'wp-libre-form' ); ?></strong></th>
+        <th><strong><?php _e( 'Value', 'wp-libre-form' ); ?></strong></th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach( $fields as $field ) : ?>
+        <?php if( '_' != $field[0]  ) : ?>
+        <?php $value = $postmeta[ $field ][0]; ?>
+        <tr>
+          <th><strong><?php echo $field; ?></strong></th>
+          <?php if( strlen( $value ) > 60 ) : ?>
+          <td><textarea style="width:100%" readonly><?php echo $value; ?></textarea></td>
+          <?php else : ?>
+          <td><input style="width:100%" type="text" value="<?php echo $value; ?>" readonly></td>
+          <?php endif; ?>
+        </tr>
+        <?php endif; ?>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</p>
+<?php
+  }
 }
 
 endif;

@@ -20,12 +20,14 @@ function wplf_send_email_copy( $return ) {
     $subject = wp_sprintf( __('New submission from %s', 'wp-libre-form'), $referrer );
     $content = wp_sprintf( __('Form "%s" (ID %d) was submitted with values below: ', 'wp-libre-form'), $form_title, $form_id ) . "\n\n";
     foreach( $_POST as $key => $value ) {
+      if( '_' !== $key[0] ) {
+        continue;
+      }
       if( $key === 'referrer' ) {
         $key = __( 'referrer', 'wp-libre-form' );
       }
-      if( $key != '_form_id' ) {
-        $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
-      }
+
+      $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
     }
     wp_mail( $to, $subject, $content );
   }
