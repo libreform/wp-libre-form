@@ -5,7 +5,6 @@
  */
 add_filter( 'wplf_validate_submission', 'wplf_validate_form_exists' );
 function wplf_validate_form_exists( $return ) {
-
   // skip this validation if submission has already failed
   if( ! $return->ok ) {
     return $return;
@@ -24,7 +23,6 @@ function wplf_validate_form_exists( $return ) {
  */
 add_filter( 'wplf_validate_submission', 'wplf_validate_required_empty' );
 function wplf_validate_required_empty( $return ) {
-
   // skip this validation if submission has already failed
   if( ! $return->ok ) {
     return $return;
@@ -38,8 +36,9 @@ function wplf_validate_required_empty( $return ) {
       $fields_empty[] = $key;
     }
   }
+  $fields_empty = array_filter( $fields_empty ); // get rid of the empty keys
 
-  if( !empty( $fields_empty ) ) {
+  if( ! empty( $fields_empty ) ) {
     $return->ok = 0;
     $return->error = __('Required fields are missing.', 'wp-libre-form');
     $return->fields_empty = $fields_empty;
