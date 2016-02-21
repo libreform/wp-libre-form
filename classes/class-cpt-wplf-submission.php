@@ -118,7 +118,7 @@ class CPT_WPLF_Submission {
 ?>
 <label for="filter-by-form" class="screen-reader-text">Filter by form</label>
 <select name="form" id="filter-by-form">
-  <option value="0"><?php _e('All Forms'); ?></option>
+  <option value="0"><?php _e('All Forms', 'wp-libre-form'); ?></option>
   <?php foreach( $forms as $form ) : ?>
   <option value="<?php echo $form->ID; ?>" <?php echo isset( $_REQUEST['form'] ) && $_REQUEST['form'] == $form->ID ? 'selected' : ''; ?>><?php echo $form->post_title; ?></option>
   <?php endforeach; ?>
