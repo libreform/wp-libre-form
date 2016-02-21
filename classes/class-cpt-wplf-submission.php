@@ -40,7 +40,6 @@ class CPT_WPLF_Submission {
       'view_item'          => __( 'View Submission', 'wp-libre-form' ),
       'all_items'          => __( 'Submissions', 'wp-libre-form' ),
       'search_items'       => __( 'Search Submissions', 'wp-libre-form' ),
-      'parent_item_colon'  => __( 'Parent Submissions:', 'wp-libre-form' ),
       'not_found'          => __( 'No submissions found.', 'wp-libre-form' ),
       'not_found_in_trash' => __( 'No submissions found in Trash.', 'wp-libre-form' )
     );

@@ -60,7 +60,6 @@ class CPT_WPLF_Form {
       'view_item'          => __( 'View Form', 'wp-libre-form' ),
       'all_items'          => __( 'All Forms', 'wp-libre-form' ),
       'search_items'       => __( 'Search Forms', 'wp-libre-form' ),
-      'parent_item_colon'  => __( 'Parent Forms:', 'wp-libre-form' ),
       'not_found'          => __( 'No forms found.', 'wp-libre-form' ),
       'not_found_in_trash' => __( 'No forms found in Trash.', 'wp-libre-form' )
     );

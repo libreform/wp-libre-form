@@ -8,7 +8,7 @@
  * Author URI: https://github.com/anttiviljami/
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl.html
- * Text Domain: wplf
+ * Text Domain: wp-libre-form
  *
  * This plugin is a simple html form maker for WordPress.
  */
@@ -62,7 +62,7 @@ class WP_Libre_Form {
    * Load our plugin textdomain
    */
   public static function load_our_textdomain() {
-    load_plugin_textdomain( 'wplf', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
+    load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
   }
 }
 
