@@ -142,18 +142,18 @@ class CPT_WPLF_Form {
 
       // default content starts here:
 ?>
-<label for="name">Please enter your name</label>
-<input type="text" name="name" placeholder="John Doe">
+<label for="name"><?php _e( 'Please enter your name', 'wp-libre-form' ); ?></label>
+<input type="text" name="name" placeholder="<?php _ex( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>">
 
-<label for="email">Please enter your email address (required)</label>
-<input type="email" name="email" placeholder="example@email.com" required>
+<label for="email"><?php _e( 'Please enter your email address', 'wp-libre-form' ); ?> <?php _e( '(required)', 'wp-libre-form' ); ?></label>
+<input type="email" name="email" placeholder="<?php _ex( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required>
 
-<label for="message">Write your message below (required)</label>
-<textarea name="message" rows="5" placeholder="I wanted to ask about..." required></textarea>
+<label for="message"><?php _e( 'Write your message below', 'wp-libre-form' ); ?> <?php _e( '(required)', 'wp-libre-form' ); ?></label>
+<textarea name="message" rows="5" placeholder="<?php _ex( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea>
 
-<input type="submit" value="Submit">
+<button type="submit"><?php _e( 'Submit', 'wp-libre-form' ); ?></button>
 
-<!-- Any valid HTML form can be used here! -->
+<!-- <?php _ex( 'Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wp-libre-form' ); ?> -->
 <?php
       $content = esc_textarea( ob_get_clean() );
     }
@@ -290,7 +290,7 @@ class CPT_WPLF_Form {
   function meta_box_title_format( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
-    $default = _x( '%name% <%email%>', 'Default submission title format', 'wp-libre-form' );
+    $default = '%name% <%email%>'; // default submission title format
     $format = isset( $meta['_wplf_title_format'] ) ? $meta['_wplf_title_format'][0] : $default;
 ?>
 <p><?php _e('Submissions from this form will use this formatting in their title.', 'wp-libre-form'); ?></p>

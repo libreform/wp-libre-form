@@ -1,123 +1,160 @@
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-02-21 16:36+0100\n"
-"PO-Revision-Date: 2016-02-21 16:36+0100\n"
+"POT-Creation-Date: 2016-02-21 17:20+0100\n"
+"PO-Revision-Date: 2016-02-21 17:20+0100\n"
+"Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
+"Language: nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.6\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-libre-form.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
-"Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
-"Language: nb\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: classes/class-cpt-wplf-form.php:52
+#: classes/class-cpt-wplf-form.php:53
 msgctxt "post type general name"
 msgid "Forms"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:53
+#: classes/class-cpt-wplf-form.php:54
 msgctxt "post type singular name"
 msgid "Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:54
+#: classes/class-cpt-wplf-form.php:55
 msgctxt "admin menu"
 msgid "Forms"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:55
+#: classes/class-cpt-wplf-form.php:56
 msgctxt "add new on admin bar"
 msgid "Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:56
+#: classes/class-cpt-wplf-form.php:57
 msgctxt "form"
 msgid "New Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:57
+#: classes/class-cpt-wplf-form.php:58
 msgid "Add New Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:58
+#: classes/class-cpt-wplf-form.php:59
 msgid "New Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:59
+#: classes/class-cpt-wplf-form.php:60
 msgid "Edit Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:60
+#: classes/class-cpt-wplf-form.php:61
 msgid "View Form"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:61
+#: classes/class-cpt-wplf-form.php:62
 msgid "All Forms"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:62
+#: classes/class-cpt-wplf-form.php:63
 msgid "Search Forms"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:63
+#: classes/class-cpt-wplf-form.php:64
 msgid "No forms found."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:64
+#: classes/class-cpt-wplf-form.php:65
 msgid "No forms found in Trash."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:171
+#: classes/class-cpt-wplf-form.php:145
+msgid "Please enter your name"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:146
+msgctxt "Default placeholder name"
+msgid "John Doe"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:148
+msgid "Please enter your email address"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:148 classes/class-cpt-wplf-form.php:151
+msgid "(required)"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:149
+msgctxt "Default placeholder email"
+msgid "example@email.com"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:151
+msgid "Write your message below"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:152
+msgctxt "Default placeholder message"
+msgid "I wanted to ask about..."
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:154
+msgid "Submit"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:156
+msgctxt "The HTML comment at the end of the example form"
+msgid "Any valid HTML form can be used here!"
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:172
 msgid "Shortcode"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:195
+#: classes/class-cpt-wplf-form.php:196
 msgid "Success Message"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:205
+#: classes/class-cpt-wplf-form.php:206
 msgid "Form Fields Detected"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:214
+#: classes/class-cpt-wplf-form.php:215
 msgid "Emails"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:223
+#: classes/class-cpt-wplf-form.php:224
 msgid "Submission Title Format"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:237
+#: classes/class-cpt-wplf-form.php:238
 msgctxt "Default success message"
 msgid "Thank you! :)"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:258
+#: classes/class-cpt-wplf-form.php:259
 msgid "Fields marked with * are required"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:279
+#: classes/class-cpt-wplf-form.php:280
 msgid "Send an email copy when a form is submitted?"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:292
-msgctxt "Default submission title format"
-msgid "%name% <%email%>"
-msgstr ""
-
-#: classes/class-cpt-wplf-form.php:295
+#: classes/class-cpt-wplf-form.php:296
 msgid "Submissions from this form will use this formatting in their title."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:296
+#: classes/class-cpt-wplf-form.php:297
 msgid "You may use any field values enclosed in \"%\" markers."
 msgstr ""
 
