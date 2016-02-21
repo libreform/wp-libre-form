@@ -64,6 +64,13 @@ class WP_Libre_Form {
   public static function load_our_textdomain() {
     load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
   }
+
+  /**
+   * Public version of wplf_form
+   */
+  public function wplf_form( $id , $content = '', $xclass = '' ) {
+    return CPT_WPLF_Form::wplf_form($id, $content, $xclass);
+  }
 }
 
 endif;
