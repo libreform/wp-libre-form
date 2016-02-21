@@ -1,17 +1,16 @@
 <?php
 /**
  * Plugin name: WP Libre Form
- * Plugin URI: https://github.com/Seravo/wp-libre-form
- * Description: A better contact form builder and lead collector
+ * Plugin URI: https://github.com/anttiviljami/wp-libre-form
+ * Description: HTML form builder for WordPress
  * Version: 0.1
- * Author: Seravo Oy
- * Author: http://seravo.fi
+ * Author: @anttiviljami
+ * Author URI: https://github.com/anttiviljami/
  * License: GPLv3
+ * License URI: https://www.gnu.org/licenses/gpl.html
+ * Text Domain: wplf
  *
- * This plugin acts as a simple, no bullshit form maker for WordPress installations.
- * Everything is created with WordPress core functionality only, so it's beautiful.
- *
- * Go ahead, just look at the code! :)
+ * This plugin is a simple, no html form maker for WordPress.
  */
 
 /** Copyright 2016 Seravo Oy

@@ -15,9 +15,26 @@ Features:
 
 ## Installation
 
-1. Upload plugin to the /wp-content/plugins/ directory.
-2. Activate the plugin through the "Plugins" menu in WordPress.
-3. Installation done!
+### The Composer Way (preferred)
+
+Install the plugin via [Composer](https://getcomposer.org/)
+```
+composer require anttiviljami/wp-libre-form
+```
+
+Activate the plugin
+```
+wp plugin activate wp-libre-form
+```
+
+### The Old Fashioned Way
+
+1. [Download the plugin](https://github.com/anttiviljami/wp-libre-form/archive/master.zip)
+2. Upload to the plugin to /wp-content/plugins/ via the WordPress plugin uploader or your preferred method
+3. Activate the plugin
+
+WordPress.org plugin directory coming soon...
+
 
 ## Screenshots
 
@@ -25,9 +42,6 @@ Features:
 ![Form edit](/assets/screenshot-1.png)
 
 ### Submissions view
-![Submissions](/assets/screenshot-2.png)
-
-### Single Submission
 ![Submissions](/assets/screenshot-2.png)
 
 ## Filter / Action API
