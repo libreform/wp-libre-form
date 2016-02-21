@@ -185,7 +185,7 @@ class CPT_WPLF_Submission {
         <?php $value = $postmeta[ $field ][0]; ?>
         <tr>
           <th><strong><?php echo $field; ?></strong></th>
-          <?php if( strlen( $value ) > 60 ) : ?>
+          <?php if( strlen( $value ) > 60 || strpos( $value, "\n" ) ) : ?>
           <td><textarea style="width:100%" readonly><?php echo $value; ?></textarea></td>
           <?php else : ?>
           <td><input style="width:100%" type="text" value="<?php echo $value; ?>" readonly></td>
