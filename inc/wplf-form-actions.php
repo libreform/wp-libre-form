@@ -23,10 +23,6 @@ function wplf_send_email_copy( $return ) {
       if( '_' !== $key[0] ) {
         continue;
       }
-      if( $key === 'referrer' ) {
-        $key = __( 'referrer', 'wp-libre-form' );
-      }
-
       $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
     }
     wp_mail( $to, $subject, $content );
