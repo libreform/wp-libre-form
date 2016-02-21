@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-02-21 17:19+0100\n"
-"PO-Revision-Date: 2016-02-21 17:20+0100\n"
+"POT-Creation-Date: 2016-02-21 23:16+0100\n"
+"PO-Revision-Date: 2016-02-21 23:16+0100\n"
 "Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language: fi\n"
@@ -15,8 +15,8 @@ msgstr ""
 "X-Poedit-WPHeader: wp-libre-form.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
-"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
@@ -61,7 +61,7 @@ msgstr "Muokkaa lomaketta"
 msgid "View Form"
 msgstr "Näytä lomake"
 
-#: classes/class-cpt-wplf-form.php:62
+#: classes/class-cpt-wplf-form.php:62 classes/class-cpt-wplf-submission.php:121
 msgid "All Forms"
 msgstr "Kaikki lomakkeet"
 
@@ -77,154 +77,166 @@ msgstr "Lomakkeita ei löytynt."
 msgid "No forms found in Trash."
 msgstr "Roskakorissa ei ole lomakkeita."
 
-#: classes/class-cpt-wplf-form.php:145
+#: classes/class-cpt-wplf-form.php:148
 msgid "Please enter your name"
 msgstr "Kirjoita nimesi"
 
-#: classes/class-cpt-wplf-form.php:146
+#: classes/class-cpt-wplf-form.php:149
 msgctxt "Default placeholder name"
 msgid "John Doe"
 msgstr "Matti Meikäläinen"
 
-#: classes/class-cpt-wplf-form.php:148
+#: classes/class-cpt-wplf-form.php:151
 msgid "Please enter your email address"
 msgstr "Kirjoita sähköpostiosoitteesi"
 
-#: classes/class-cpt-wplf-form.php:148 classes/class-cpt-wplf-form.php:151
+#: classes/class-cpt-wplf-form.php:151 classes/class-cpt-wplf-form.php:154
 msgid "(required)"
 msgstr "(pakollinen)"
 
-#: classes/class-cpt-wplf-form.php:149
+#: classes/class-cpt-wplf-form.php:152
 msgctxt "Default placeholder email"
 msgid "example@email.com"
 msgstr "esimerkki@esimerkki.fi"
 
-#: classes/class-cpt-wplf-form.php:151
+#: classes/class-cpt-wplf-form.php:154
 msgid "Write your message below"
 msgstr "Kirjoita viestisi alle"
 
-#: classes/class-cpt-wplf-form.php:152
+#: classes/class-cpt-wplf-form.php:155
 msgctxt "Default placeholder message"
 msgid "I wanted to ask about..."
 msgstr "Halusin kysyä..."
 
-#: classes/class-cpt-wplf-form.php:154
+#: classes/class-cpt-wplf-form.php:157
 msgid "Submit"
 msgstr "Lähetä"
 
-#: classes/class-cpt-wplf-form.php:156
+#: classes/class-cpt-wplf-form.php:159
 msgctxt "The HTML comment at the end of the example form"
 msgid "Any valid HTML form can be used here!"
 msgstr "Tässä toimii mikä tahansa HTML-lomake!"
 
-#: classes/class-cpt-wplf-form.php:172
+#: classes/class-cpt-wplf-form.php:175 classes/class-cpt-wplf-form.php:212
 msgid "Shortcode"
 msgstr "Lyhytkoodi"
 
-#: classes/class-cpt-wplf-form.php:196
+#: classes/class-cpt-wplf-form.php:176 classes/class-cpt-wplf-submission.php:46
+msgid "Submissions"
+msgstr "Vastaukset"
+
+#: classes/class-cpt-wplf-form.php:222
 msgid "Success Message"
 msgstr "Onnistumisviesti"
 
-#: classes/class-cpt-wplf-form.php:206
+#: classes/class-cpt-wplf-form.php:232
 msgid "Form Fields Detected"
 msgstr "Lomakekentät"
 
-#: classes/class-cpt-wplf-form.php:215
+#: classes/class-cpt-wplf-form.php:241
 msgid "Emails"
 msgstr "Sähköpostit"
 
-#: classes/class-cpt-wplf-form.php:224
+#: classes/class-cpt-wplf-form.php:250
 msgid "Submission Title Format"
 msgstr "Nimi lähetetylle lomakkeelle"
 
-#: classes/class-cpt-wplf-form.php:238
+#: classes/class-cpt-wplf-form.php:273
 msgctxt "Default success message"
 msgid "Thank you! :)"
 msgstr "Kiitos! :)"
 
-#: classes/class-cpt-wplf-form.php:259
+#: classes/class-cpt-wplf-form.php:294
 msgid "Fields marked with * are required"
 msgstr "Tähdelliset * kentät on pakollisia"
 
-#: classes/class-cpt-wplf-form.php:280
+#: classes/class-cpt-wplf-form.php:315
 msgid "Send an email copy when a form is submitted?"
 msgstr "Lähetä kopio sähköpostiin kun lomake lähetetään?"
 
-#: classes/class-cpt-wplf-form.php:296
+#: classes/class-cpt-wplf-form.php:331
 msgid "Submissions from this form will use this formatting in their title."
 msgstr ""
 "Tähän lomakkeeseen lähetetyt vastaukset nimetään allaolevan kaavan "
 "mukaisesti."
 
-#: classes/class-cpt-wplf-form.php:297
+#: classes/class-cpt-wplf-form.php:332
 msgid "You may use any field values enclosed in \"%\" markers."
 msgstr ""
 "Voit käyttää otsikossa mitä tahansa kenttiä arvoja \"%\"-merkkien sisällä."
 
-#: classes/class-cpt-wplf-submission.php:32
+#: classes/class-cpt-wplf-submission.php:37
 msgctxt "post type general name"
 msgid "Submissions"
 msgstr "Vastaukset"
 
-#: classes/class-cpt-wplf-submission.php:33
+#: classes/class-cpt-wplf-submission.php:38
 msgctxt "post type singular name"
 msgid "Submission"
 msgstr "Vastaus"
 
-#: classes/class-cpt-wplf-submission.php:34
+#: classes/class-cpt-wplf-submission.php:39
 msgctxt "admin menu"
 msgid "Submissions"
 msgstr "Vastaukset"
 
-#: classes/class-cpt-wplf-submission.php:35
+#: classes/class-cpt-wplf-submission.php:40
 msgctxt "add new on admin bar"
 msgid "Submission"
 msgstr "Vastaus"
 
-#: classes/class-cpt-wplf-submission.php:36
+#: classes/class-cpt-wplf-submission.php:41
 msgctxt "submission"
 msgid "Add New"
 msgstr "Lisää uusi"
 
-#: classes/class-cpt-wplf-submission.php:37
+#: classes/class-cpt-wplf-submission.php:42
 msgid "Add New Submission"
 msgstr "Lisää uusi vastaus"
 
-#: classes/class-cpt-wplf-submission.php:38
+#: classes/class-cpt-wplf-submission.php:43
 msgid "New Submission"
 msgstr "Uusi vastaus"
 
-#: classes/class-cpt-wplf-submission.php:39
+#: classes/class-cpt-wplf-submission.php:44
 msgid "Edit Submission"
 msgstr "Muokkaa vastausta "
 
-#: classes/class-cpt-wplf-submission.php:40
+#: classes/class-cpt-wplf-submission.php:45
 msgid "View Submission"
 msgstr "Näytä vastaus"
 
-#: classes/class-cpt-wplf-submission.php:41
-msgid "Submissions"
-msgstr "Vastaukset"
-
-#: classes/class-cpt-wplf-submission.php:42
+#: classes/class-cpt-wplf-submission.php:47
 msgid "Search Submissions"
 msgstr "Etsi vastauksia"
 
-#: classes/class-cpt-wplf-submission.php:43
+#: classes/class-cpt-wplf-submission.php:48
 msgid "No submissions found."
 msgstr "Vastauksia ei löydy."
 
-#: classes/class-cpt-wplf-submission.php:44
+#: classes/class-cpt-wplf-submission.php:49
 msgid "No submissions found in Trash."
 msgstr "Roskakorissa ei ole vastauksia."
 
-#: classes/class-cpt-wplf-submission.php:91
+#: classes/class-cpt-wplf-submission.php:96
 msgid "Referrer"
 msgstr "Lähde"
 
-#: classes/class-cpt-wplf-submission.php:92
+#: classes/class-cpt-wplf-submission.php:97
 msgid "Form"
 msgstr "Lomake"
+
+#: classes/class-cpt-wplf-submission.php:158
+msgid "Submission"
+msgstr "Vastaus"
+
+#: classes/class-cpt-wplf-submission.php:178
+msgid "Field"
+msgstr "Kenttä"
+
+#: classes/class-cpt-wplf-submission.php:179
+msgid "Value"
+msgstr "Arvo"
 
 #: inc/wplf-form-actions.php:20
 #, php-format
@@ -235,10 +247,6 @@ msgstr "Uusi vastaus lomakkeesta %s"
 #, php-format
 msgid "Form \"%s\" (ID %d) was submitted with values below: "
 msgstr "Lomake \"%s\" (ID %d) lähetettiin seuraavilla arvoilla:"
-
-#: inc/wplf-form-actions.php:24
-msgid "referrer"
-msgstr "lähde"
 
 #: inc/wplf-form-validation.php:15
 #, php-format
@@ -268,6 +276,9 @@ msgstr "@anttiviljami"
 #. Author URI of the plugin/theme
 msgid "https://github.com/anttiviljami/"
 msgstr "https://github.com/anttiviljami/"
+
+#~ msgid "referrer"
+#~ msgstr "lähde"
 
 #~ msgctxt "Default submission title format"
 #~ msgid "%name% <%email%>"
