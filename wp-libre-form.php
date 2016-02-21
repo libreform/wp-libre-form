@@ -10,7 +10,7 @@
  * License URI: https://www.gnu.org/licenses/gpl.html
  * Text Domain: wplf
  *
- * This plugin is a simple, no html form maker for WordPress.
+ * This plugin is a simple html form maker for WordPress.
  */
 
 /** Copyright 2016 Seravo Oy
@@ -43,19 +43,19 @@ class WP_Libre_Form {
   }
 
   private function __construct() {
-    //require 'vendor/autoload.php';
-
-    add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
-
     require_once 'classes/class-cpt-wplf-form.php';
-    CPT_WPLF_Form::init();
-
     require_once 'classes/class-cpt-wplf-submission.php';
+    require_once 'inc/wplf-ajax.php';
+
+    // default functionality
+    require_once 'inc/wplf-form-actions.php';
+    require_once 'inc/wplf-form-validation.php';
+
+    // init our plugin classes
+    CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
 
-    //require_once 'inc/wplf-shortcode.php';
-    require_once 'inc/wplf-form-validation.php';
-    require_once 'inc/wplf-ajax.php';
+    add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
   }
 
   /**
