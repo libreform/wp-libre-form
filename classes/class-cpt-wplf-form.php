@@ -173,6 +173,7 @@ class CPT_WPLF_Form {
       'cb' => $columns['cb'],
       'title' => $columns['title'],
       'shortcode' => __( 'Shortcode', 'wp-libre-form' ),
+      'submissions' => __( 'Submissions', 'wp-libre-form' ),
       'date' => $columns['date'],
     );
     return $new_columns;
@@ -185,6 +186,18 @@ class CPT_WPLF_Form {
   function custom_columns_display_cpt( $column, $post_id ) {
     if( 'shortcode' === $column ) {
       echo '<code>[libre-form id="' . $post_id . '"]</code>';
+    }
+    if( 'submissions' === $column ) {
+      // count number of submissions
+      $submissions = get_posts( array(
+        'post_type' => 'wplf-submission',
+        'posts_per_page' => -1,
+        'meta_key' => '_form_id',
+        'meta_value' => $post_id,
+      ) );
+?>
+  <a href="<?php echo admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ); ?>"><?php echo count( $submissions ); ?></a>
+<?php
     }
   }
 

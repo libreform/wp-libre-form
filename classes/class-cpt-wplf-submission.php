@@ -22,9 +22,14 @@ class CPT_WPLF_Submission {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
 
+    // post.php view
+    add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
+
     // edit.php view
     add_filter( 'manage_edit-wplf-submission_columns' , array( $this, 'custom_columns_cpt' ), 100, 1);
     add_action( 'manage_posts_custom_column' , array( $this, 'custom_columns_display_cpt' ), 10, 2 );
+    add_action( 'restrict_manage_posts', array( $this, 'form_filter_dropdown' ) );
+    add_filter( 'pre_get_posts', array( $this, 'filter_by_form' ) );
   }
 
   public static function register_cpt() {
@@ -95,6 +100,53 @@ class CPT_WPLF_Submission {
     return $new_columns;
   }
 
+  /**
+   * Show a form filter in the edit.php view
+   */
+  function form_filter_dropdown() {
+    global $pagenow;
+
+    if( 'edit.php' != $pagenow ) {
+      return;
+    }
+
+    // TODO: put this in a transient
+    $forms = get_posts( array(
+      'post_per_page' => '-1',
+      'post_type' => 'wplf-form',
+    ) );
+?>
+<label for="filter-by-form" class="screen-reader-text">Filter by form</label>
+<select name="form" id="filter-by-form">
+  <option value="0"><?php _e('All Forms'); ?></option>
+  <?php foreach( $forms as $form ) : ?>
+  <option value="<?php echo $form->ID; ?>" <?php echo isset( $_REQUEST['form'] ) && $_REQUEST['form'] == $form->ID ? 'selected' : ''; ?>><?php echo $form->post_title; ?></option>
+  <?php endforeach; ?>
+</select>
+<?php
+  }
+
+  /**
+   * Filter by form in the edit.php view
+   */
+  function filter_by_form( $query ) {
+    global $pagenow;
+
+    if( 'edit.php' != $pagenow ) {
+      return $query;
+    }
+
+    if( $query->get( 'post_type' ) != 'wplf-submission' ) {
+      return $query;
+    }
+
+    if( isset( $_REQUEST['form'] ) && ! empty( $_REQUEST['form'] ) ) {
+      $query->set( 'meta_key', '_form_id' );
+      $query->set( 'meta_value', intval( $_REQUEST['form'] ) );
+    }
+
+    return $query;
+  }
 }
 
 endif;
