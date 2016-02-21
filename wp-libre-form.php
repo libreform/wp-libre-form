@@ -50,7 +50,8 @@ class WP_Libre_Form {
     require_once 'classes/class-cpt-wplf-form.php';
     CPT_WPLF_Form::init();
 
-    require_once 'inc/wplf-submissions.php';
+    require_once 'classes/class-cpt-wplf-submission.php';
+    CPT_WPLF_Submission::init();
 
     //require_once 'inc/wplf-shortcode.php';
     require_once 'inc/wplf-form-validation.php';

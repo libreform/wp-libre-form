@@ -1,6 +1,6 @@
 <?php
 
-if ( !class_exists('CPT_WPLF_Form')) :
+if ( !class_exists('CPT_WPLF_Form') ) :
 
 class CPT_WPLF_Form {
   /**
@@ -141,7 +141,7 @@ class CPT_WPLF_Form {
       ob_start();
 
       // default content starts here:
-    ?>
+?>
 <label for="name">Please enter your name</label>
 <input type="text" name="name" placeholder="John Doe">
 
@@ -154,7 +154,7 @@ class CPT_WPLF_Form {
 <input type="submit" value="Submit">
 
 <!-- Any valid HTML form can be used here! -->
-    <?php
+<?php
       $content = esc_textarea( ob_get_clean() );
     }
 
@@ -423,3 +423,4 @@ class CPT_WPLF_Form {
 }
 
 endif;
+
