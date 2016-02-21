@@ -1,13 +1,16 @@
 {
-    "name": "anttiviljami/wp-libre-form",
-    "description": "Easy native HTML5 forms for WordPress",
-    "type": "wordpress-plugin",
-    "license": "GPLv3",
-    "authors": [
-        {
-            "name": "Antti Kuosmanen",
-            "email": "antti@seravo.fi"
-        }
-    ],
-    "require": {}
+  "name": "anttiviljami/wp-libre-form",
+  "description": "Easy native HTML5 forms for WordPress",
+  "type": "wordpress-plugin",
+  "license": "GPLv3",
+  "authors": [
+    {
+      "name": "Antti Kuosmanen",
+      "email": "antti@seravo.fi",
+      "homepage": "https://github.com/anttiviljami"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0"
+  }
 }
