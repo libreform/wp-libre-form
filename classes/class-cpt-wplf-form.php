@@ -24,6 +24,7 @@ class CPT_WPLF_Form {
 
     // post.php / post-new.php view
     add_action( 'save_post', array( $this, 'save_cpt' ) );
+    add_filter( 'content_save_pre' , array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
 
@@ -357,6 +358,16 @@ class CPT_WPLF_Form {
 
 
   /**
+   * Strip <form> tags from the form content
+   *
+   * We apply <form> via the shortcode, you can't have nested forms anyway
+   */
+  function strip_form_tags( $content ) {
+    return preg_replace( '/<\/?form.*>/i', '', $content);
+  }
+
+
+  /**
    * The function we display the form with
    */
   function wplf_form( $id , $xclass = '') {
@@ -414,7 +425,7 @@ class CPT_WPLF_Form {
    */
   function use_shortcode_for_preview( $content ) {
     global $post;
-    if( isset($post->post_type) && $post->post_type === 'wplf-form') {
+    if( isset( $post->post_type ) && $post->post_type === 'wplf-form') {
       return $this->wplf_form( $post->ID );
     }
     return $content;
