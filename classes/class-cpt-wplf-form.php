@@ -370,16 +370,19 @@ class CPT_WPLF_Form {
   /**
    * The function we display the form with
    */
-  function wplf_form( $id , $xclass = '') {
+  function wplf_form( $id , $content = '', $xclass = '' ) {
     global $post;
 
     if( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
-      $form = get_post( $id );
+      if( empty( $content ) ) {
+        // you can override the content via a parameter
+        $content = get_post( $id )->post_content;
+      }
       ob_start();
 ?>
 <form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>">
-  <?php echo apply_filters( 'wplf_form', $form->post_content ); ?>
-  <input type="hidden" name="referrer" value="<?php echo get_permalink( $post->ID ); ?>">
+  <?php echo apply_filters( 'wplf_form', $content ); ?>
+  <input type="hidden" name="referrer" value="<?php echo get_the_permalink(); ?>">
   <input type="hidden" name="_form_id" value="<?php echo $id; ?>">
 </form>
 <?php
@@ -416,7 +419,7 @@ class CPT_WPLF_Form {
     ), $attributes );
 
     // display form
-    return $this->wplf_form( $attributes['id'], $attributes['xclass'] );
+    return $this->wplf_form( $attributes['id'], null, $attributes['xclass'] );
   }
 
 
@@ -426,7 +429,7 @@ class CPT_WPLF_Form {
   function use_shortcode_for_preview( $content ) {
     global $post;
     if( isset( $post->post_type ) && $post->post_type === 'wplf-form') {
-      return $this->wplf_form( $post->ID );
+      return $this->wplf_form( $post->ID, $content );
     }
     return $content;
   }
