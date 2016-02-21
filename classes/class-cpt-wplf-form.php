@@ -185,7 +185,9 @@ class CPT_WPLF_Form {
    */
   function custom_columns_display_cpt( $column, $post_id ) {
     if( 'shortcode' === $column ) {
-      echo '<code>[libre-form id="' . $post_id . '"]</code>';
+?>
+<input type="text" class="code" value='[libre-form id="<?php echo $post_id; ?>"]' readonly>
+<?php
     }
     if( 'submissions' === $column ) {
       // count number of submissions
@@ -260,7 +262,7 @@ class CPT_WPLF_Form {
    */
   function metabox_shortcode( $post ) {
 ?>
-<p><code>[libre-form id="<?php echo $post->ID; ?>"]</code></p>
+<p><input type="text" class="code" value='[libre-form id="<?php echo $post->ID; ?>"]' readonly></p>
 <?php
   }
 
