@@ -1,23 +1,6 @@
 <?php
 
 /**
- * Enqueue the front end JS
- */
-add_action( 'wp_enqueue_scripts', 'wplf_maybe_enqueue_frontend_script' );
-function wplf_maybe_enqueue_frontend_script() {
-
-  global $post;
-
-  // only enqueue script if current post contains a form
-  if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
-    wp_enqueue_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array( 'jquery' ) );
-    wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-  }
-
-}
-
-
-/**
  * Ajax handler for the form submissions
  */
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );

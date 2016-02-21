@@ -35,12 +35,11 @@ class CPT_WPLF_Form {
     add_filter( 'user_can_richedit', array( $this, 'disable_tinymce' ) );
 
     // front end
-    add_shortcode( 'libre-form', array( $this, 'wplf_form_shortcode_handler' ) );
+    add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
 
-    /**
-     * Same default filters as the_content, but we don't want to use the_content for the form output
-     */
+    // same default filters as the_content, but we don't want to use actual the_content for the form output
     add_filter( 'wplf_form', 'wptexturize' );
     add_filter( 'wplf_form', 'convert_smilies' );
     add_filter( 'wplf_form', 'convert_chars'  );
@@ -384,9 +383,23 @@ class CPT_WPLF_Form {
 
 
   /**
+   * Enqueue the front end JS
+   */
+  function maybe_enqueue_frontend_script() {
+    global $post;
+
+    // only enqueue script if current post contains a form in it
+    if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
+      wp_enqueue_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array( 'jquery' ) );
+      wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+    }
+  }
+
+
+  /**
    * Shortcode for displaying a Form
    */
-  function wplf_form_shortcode_handler($attributes, $content = null) {
+  function shortcode($attributes, $content = null) {
     $attributes = shortcode_atts( array(
       'id' => null,
       'xclass' => '',
