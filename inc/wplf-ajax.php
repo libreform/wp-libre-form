@@ -6,7 +6,6 @@
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
 function wplf_ajax_submit_handler() {
-
   $return = new stdClass();
   $return->ok = 1;
 

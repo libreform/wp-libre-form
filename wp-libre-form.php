@@ -27,10 +27,9 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
 
-*/
-
-if ( !class_exists('WP_Libre_Form')) :
+if ( ! class_exists( 'WP_Libre_Form' ) ) :
 
 class WP_Libre_Form {
   public static $instance;
@@ -56,20 +55,33 @@ class WP_Libre_Form {
     CPT_WPLF_Submission::init();
 
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
+
+    // flush rewrites on activation since we have slugs for our cpts
+    register_activation_hook( __FILE__, array( 'WP_Libre_Form', 'flush_rewrites' ) );
+    register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
+  }
+
+  /**
+   * Plugin activation hook
+   */
+  public static function flush_rewrites() {
+    CPT_WPLF_Form::register_cpt();
+    CPT_WPLF_Submission::register_cpt();
+    flush_rewrite_rules();
   }
 
   /**
    * Load our plugin textdomain
    */
   public static function load_our_textdomain() {
-    load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename(__FILE__) ) . '/lang/' );
+    load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
   }
 
   /**
    * Public version of wplf_form
    */
-  public function wplf_form( $id , $content = '', $xclass = '' ) {
-    return CPT_WPLF_Form::wplf_form($id, $content, $xclass);
+  public function wplf_form( $id, $content = '', $xclass = '' ) {
+    return CPT_WPLF_Form::wplf_form( $id, $content, $xclass );
   }
 }
 
@@ -77,4 +89,3 @@ endif;
 
 // init the plugin
 WP_Libre_Form::init();
-

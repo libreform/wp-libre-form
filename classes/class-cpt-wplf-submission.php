@@ -27,7 +27,7 @@ class CPT_WPLF_Submission {
     add_action( 'manage_posts_custom_column' , array( $this, 'custom_columns_display_cpt' ), 10, 2 );
   }
 
-  function register_cpt() {
+  public static function register_cpt() {
     $labels = array(
       'name'               => _x( 'Submissions', 'post type general name', 'wp-libre-form' ),
       'singular_name'      => _x( 'Submission', 'post type singular name', 'wp-libre-form' ),

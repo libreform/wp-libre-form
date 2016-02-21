@@ -48,7 +48,7 @@ class CPT_WPLF_Form {
     add_filter( 'wplf_form', 'shortcode_unautop' );
   }
 
-  function register_cpt() {
+  public static function register_cpt() {
     $labels = array(
       'name'               => _x( 'Forms', 'post type general name', 'wp-libre-form' ),
       'singular_name'      => _x( 'Form', 'post type singular name', 'wp-libre-form' ),
@@ -78,6 +78,9 @@ class CPT_WPLF_Form {
       'has_archive'        => false,
       'hierarchical'       => false,
       'menu_position'      => null,
+      'rewrite'            => array(
+        'slug' => 'libre-forms',
+      ),
       'supports'           => array(
         'title',
         'editor',
