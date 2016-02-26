@@ -75,13 +75,13 @@ class CPT_WPLF_Submission {
   function custom_columns_display_cpt( $column, $post_id ) {
     if( 'referrer' === $column ) {
       if( $referrer = get_post_meta($post_id, 'referrer', true) ) {
-        echo '<a href="' . esc_url( $referrer ) . '">' . $referrer . '</a>';
+        echo '<a href="' . esc_url_raw( $referrer ) . '">' . esc_url( $referrer ) . '</a>';
       }
     }
     if( 'form' === $column ) {
       if( $form_id = get_post_meta($post_id, '_form_id', true) ) {
         $form = get_post( $form_id );
-        echo '<a href="' . get_edit_post_link( $form_id, '' ) . '" target="_blank">' . $form->post_title . '</a>';
+        echo '<a href="' . get_edit_post_link( $form_id, '' ) . '" target="_blank">' . esc_html( $form->post_title ) . '</a>';
       }
     }
   }
@@ -186,9 +186,9 @@ class CPT_WPLF_Submission {
         <tr>
           <th><strong><?php echo $field; ?></strong></th>
           <?php if( strlen( $value ) > 60 || strpos( $value, "\n" ) ) : ?>
-          <td><textarea style="width:100%" readonly><?php echo $value; ?></textarea></td>
+          <td><textarea style="width:100%" readonly><?php echo esc_textarea( $value ); ?></textarea></td>
           <?php else : ?>
-          <td><input style="width:100%" type="text" value="<?php echo $value; ?>" readonly></td>
+          <td><input style="width:100%" type="text" value="<?php esc_attr_e( $value ); ?>" readonly></td>
           <?php endif; ?>
         </tr>
         <?php endif; ?>

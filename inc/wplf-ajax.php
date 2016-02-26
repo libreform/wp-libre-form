@@ -13,13 +13,12 @@ function wplf_ajax_submit_handler() {
   do_action('wplf_pre_validate_submission');
 
   // validate form fields
-  // see wplf-form-validation.php
+  // @see: wplf-form-validation.php
   $return = apply_filters( 'wplf_validate_submission', $return );
 
   if( $return->ok ) {
-
     // form existence has already been validated via filters
-    $form = get_post( $_POST['_form_id'] );
+    $form = get_post( intval( $_POST['_form_id'] ) );
 
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
@@ -31,7 +30,7 @@ function wplf_ajax_submit_handler() {
     foreach($toks[1] as $tok) {
       $replace = '';
       if( array_key_exists( $tok, $_POST ) ) {
-        $replace = $_POST[$tok];
+        $replace = sanitize_text_field( $_POST[$tok] );
       }
       $post_title = preg_replace('/%.+?%/', $replace, $post_title, 1);
     }

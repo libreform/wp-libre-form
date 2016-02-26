@@ -66,9 +66,11 @@ function my_email_thankyou( $return ) {
     return;
   }
 
-  $to = '"' . $_POST['name'] . '" <' . sanitize_email( $_POST['email'] ) . '>';
+  $name = sanitize_text_field( $_POST['name'] );
+  $email = sanitize_email( $_POST['email'] );
+  $to = '"' . $name . '" <' . $email . '>';
   $subject = __( 'Thank You For Submitting A Form' );
-  $content = wp_sprintf( __('Thanks, %s for clicking Submit on this glorious HTML5 Form!'), $_POST['name'] );
+  $content = wp_sprintf( __('Thanks, %s for clicking Submit on this glorious HTML5 Form!'), $name );
   wp_mail( $to, $subject, $content );
 }
 ```

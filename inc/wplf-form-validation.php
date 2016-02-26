@@ -10,7 +10,7 @@ function wplf_validate_form_exists( $return ) {
     return $return;
   }
 
-  if( ! isset($_POST['_form_id']) || 'publish' != get_post_status( $_POST['_form_id'] ) || 'wplf-form' != get_post_type( $_POST['_form_id'] ) ) {
+  if( ! isset( $_POST['_form_id'] ) || ! is_numeric( $_POST['_form_id'] ) || 'publish' != get_post_status( $_POST['_form_id'] ) || 'wplf-form' != get_post_type( $_POST['_form_id'] ) ) {
     $return->ok = 0;
     $return->error = sprintf( __("Form id %d doesn't exist!", 'wp-libre-form'), intval( $_POST['_form_id'] ) );
   }
