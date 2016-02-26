@@ -32,7 +32,7 @@ function wplf_validate_required_empty( $return ) {
   $required = explode( ',', get_post_meta( $_POST['_form_id'], '_wplf_required', true ) );
   $fields_empty = array();
   foreach( $required as $key ) {
-    if( ! array_key_exists( $key, $_POST ) || empty( trim( $_POST[$key] ) ) ) {
+    if( ! array_key_exists( $key, $_POST ) || empty( $_POST[$key] ) ) {
       $fields_empty[] = $key;
     }
   }

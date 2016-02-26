@@ -2,7 +2,7 @@
 /**
  * Plugin name: WP Libre Form
  * Plugin URI: https://github.com/anttiviljami/wp-libre-form
- * Description: HTML form builder for WordPress
+ * Description: A minimal HTML form builder for WordPress; made for developers
  * Version: 1.0
  * Author: @anttiviljami
  * Author URI: https://github.com/anttiviljami/

@@ -47,6 +47,9 @@ WordPress.org plugin directory coming soon...
 ### Submissions view
 ![Submissions](/assets/screenshot-3.png)
 
+### Single submission view
+![Submissions](/assets/screenshot-4.png)
+
 ## Filter / Action API
 
 ### Action: wplf_post_validate_submission
