@@ -26,11 +26,9 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 
 **Contributing**
 
-Please contribute to this project on Github
+Please contribute to this project on Github. Pull requests welcome!
 
 https://github.com/anttiviljami/wp-libre-form
-
-Pull requests welcome!
 
 == Installation ==
 

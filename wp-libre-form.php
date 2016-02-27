@@ -13,7 +13,7 @@
  * This plugin is a simple html form maker for WordPress.
  */
 
-/** Copyright 2016 Seravo Oy
+/** Copyright 2016 Antti Kuosmanen
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License, version 3, as

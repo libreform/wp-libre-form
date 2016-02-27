@@ -29,11 +29,13 @@ wp plugin activate wp-libre-form
 
 ### The Old Fashioned Way
 
+This plugin is available on the [official WordPress.org plugin directory](https://wordpress.org/plugins/wp-libre-form/).
+
+You can also install the plugin by directly uploading the zip file as instructed below:
+
 1. [Download the plugin](https://github.com/anttiviljami/wp-libre-form/archive/master.zip)
 2. Upload to the plugin to /wp-content/plugins/ via the WordPress plugin uploader or your preferred method
 3. Activate the plugin
-
-WordPress.org plugin directory coming soon...
 
 
 ## Screenshots
