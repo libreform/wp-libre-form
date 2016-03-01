@@ -13,6 +13,20 @@ Features:
 - Option to send a copy of submitted forms via email
 - Preview your forms
 
+## Screenshots
+
+### Editing a Form
+![Form edit](/assets/screenshot-1.png)
+
+### Form displayed in the default Twentysixteen theme
+![Submissions](/assets/screenshot-2.png)
+
+### Submissions view
+![Submissions](/assets/screenshot-3.png)
+
+### Single submission view
+![Submissions](/assets/screenshot-4.png)
+
 ## Installation
 
 ### The Composer Way (preferred)
@@ -36,21 +50,6 @@ You can also install the plugin by directly uploading the zip file as instructed
 1. [Download the plugin](https://github.com/anttiviljami/wp-libre-form/archive/master.zip)
 2. Upload to the plugin to /wp-content/plugins/ via the WordPress plugin uploader or your preferred method
 3. Activate the plugin
-
-
-## Screenshots
-
-### Editing a Form
-![Form edit](/assets/screenshot-1.png)
-
-### Form displayed in the default Twentysixteen theme
-![Submissions](/assets/screenshot-2.png)
-
-### Submissions view
-![Submissions](/assets/screenshot-3.png)
-
-### Single submission view
-![Submissions](/assets/screenshot-4.png)
 
 ## Filter / Action API
 
