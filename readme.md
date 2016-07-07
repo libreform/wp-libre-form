@@ -97,10 +97,6 @@ You can use the attribute xclass inside the shortcode to set own extra css class
 [libre-form id="1" xclass="extra"]
 ```
 
-```php
-wp_enqueue_script('wplf-form-js');
-wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-```
 
 ### Filter: wplf_validate_submission
 
