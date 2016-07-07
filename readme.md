@@ -79,6 +79,29 @@ function my_email_thankyou( $return ) {
 }
 ```
 
+### Use shortcodes outside post content
+
+By default, scripts are only loaded when the shortcode is within the content.
+If you use shortcodes outside the content, ex. custom fields or by `do_shortcode`, you need to manually enqueue the scripts for the submit to work.
+
+```php
+wp_enqueue_script('wplf-form-js');
+wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+```
+
+### Add own css classes to form output
+
+You can use the attribute xclass inside the shortcode to set own extra css classes.
+
+```
+[libre-form id="1" xclass="extra"]
+```
+
+```php
+wp_enqueue_script('wplf-form-js');
+wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+```
+
 ### Filter: wplf_validate_submission
 
 Used to add validation to your forms
