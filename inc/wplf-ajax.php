@@ -66,6 +66,7 @@ function wplf_ajax_submit_handler() {
 
     $return->submission_id = $post_id;
     $return->submission_title = $post_title;
+    $return->form_id = $form->ID;
 
     // return the success message for the form
     $return->success = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
