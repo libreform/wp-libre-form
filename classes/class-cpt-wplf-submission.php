@@ -107,6 +107,7 @@ class CPT_WPLF_Submission {
     global $pagenow;
 
     $allowed = array("wplf-submission"); // show filter on these post types (currently only one?)
+    $allowed = apply_filters("wplf-dropdown-filter", $allowed);
     $post_type = get_query_var("post_type");
 
     if( 'edit.php' != $pagenow || !in_array($post_type, $allowed)) {
