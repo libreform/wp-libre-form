@@ -10,6 +10,12 @@
 
 
 (function(){
+
+window.wplf = {
+  successCallbacks: [],
+  errorCallbacks: []
+};
+
 document.addEventListener("DOMContentLoaded", function(){
   [].forEach.call(document.querySelectorAll(".libre-form"), function(form){
 
@@ -46,12 +52,15 @@ document.addEventListener("DOMContentLoaded", function(){
           success.innerHTML = response.success;
 
           form.parentNode.insertBefore(success, form.nextSibling);
-
         }
 
         if( 'ok' in response && response.ok ) {
           // submit succesful!
           form.parentNode.removeChild(form);
+
+          window.wplf.successCallbacks.forEach(function(func){
+            func(response);
+          });
         }
 
         if( 'error' in response ) {
@@ -62,6 +71,10 @@ document.addEventListener("DOMContentLoaded", function(){
           error.textContent = response.error;
 
           form.appendChild(error);
+
+          window.wplf.errorCallbacks.forEach(function(func){
+            func(response);
+          });
         }
 
         form.classList.remove('sending');
