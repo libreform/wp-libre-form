@@ -89,6 +89,22 @@ wp_enqueue_script('wplf-form-js');
 wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 ```
 
+### Client side callbacks
+
+WP Libre Form supports client side callbacks after form submission using window.wplf object. Example usage:
+
+```
+window.wplf.successCallbacks.push(function(response){
+  alert("You succesfully submitted form " + response.form_id);
+});
+
+window.wplf.errorCallbacks.push(function(response){
+  alert("Form submission failed!");
+});
+```
+
+These callbacks are executed in the order they appear.
+
 ### Add own css classes to form output
 
 You can use the attribute xclass inside the shortcode to set own extra css classes.
