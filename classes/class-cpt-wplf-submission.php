@@ -114,11 +114,21 @@ class CPT_WPLF_Submission {
       return;
     }
 
-    // TODO: put this in a transient
-    $forms = get_posts( array(
-      'post_per_page' => '-1',
-      'post_type' => 'wplf-form',
-    ) );
+    $transient = get_transient("wplf-form-filter");
+
+    if($transient){
+      $forms = $transient;
+    }
+
+    else{
+      $forms = get_posts( array(
+        'post_per_page' => '-1',
+        'post_type' => 'wplf-form',
+      ) );
+
+      set_transient("wplf-form-filter", $forms, 15 *  MINUTE_IN_SECONDS);
+    }
+
 ?>
 <label for="filter-by-form" class="screen-reader-text">Filter by form</label>
 <select name="form" id="filter-by-form">
