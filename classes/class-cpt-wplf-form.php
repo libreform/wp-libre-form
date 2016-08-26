@@ -8,6 +8,8 @@ class CPT_WPLF_Form {
    */
   public static $instance;
 
+  public static $has_shortcode;
+
   public static function init() {
     if ( is_null( self::$instance ) ) {
       self::$instance = new CPT_WPLF_Form();
@@ -306,18 +308,62 @@ class CPT_WPLF_Form {
    * Meta box callback for submit email meta box
    */
   function metabox_submit_email( $post ) {
-    // get post meta
-    $meta = get_post_meta( $post->ID );
-    $email_enabled = isset( $meta['_wplf_email_copy_enabled'] ) ? $meta['_wplf_email_copy_enabled'][0] : true;
-    $email_copy_to = isset( $meta['_wplf_email_copy_to'] ) ? $meta['_wplf_email_copy_to'][0] : '';
+    $email_copy_to = get_post_meta( $post->ID, '_wplf_email_copy_to' );
+    $templates = get_post_meta( $post->ID, '_wplf_email_templates' );
 ?>
 <p>
-  <label for="wplf_email_copy_enabled">
-    <input type="checkbox" <?php echo $email_enabled ? 'checked="checked"' : ''; ?> id="wplf_email_copy_enabled" name="wplf_email_copy_enabled">
-    <?php _e( 'Send an email copy when a form is submitted?' ); ?>
-  </label>
+  <?php _e( 'Add email(s) to send a copy to when a form is submitted.' ); ?><br/>
 </p>
-<p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%;display:none"></p>
+<span class="wplf_emails">
+<?php
+  foreach ( isset( $email_copy_to[0] ) ? $email_copy_to[0] : array() as $idx => $email ):
+
+    if ( isset( $templates[0] ) && isset( $templates[0][$idx ] ) ) {
+      $template = $templates[0][ $idx ];
+    }
+    else {
+      $template = "";
+    }
+?>
+<p class="wplf_email_template"><input type="text" name="wplf_email_copy_to[]" value="<?php echo esc_attr( $email ); ?>" style="width:71%;" list="emails" /><a href="#TB_inline?width=600&height=800&inlineId=wplf_template_modal" class=" wplf_edit_template thickbox"><input type="button" class="button" value="✎" style="width:14%;" /></a><input type="button" class="button wplf_remove_email" value="🗑" style="width:14%;" /><input type="hidden" name="wplf_email_templates[]" value="<?php echo htmlentities( $template ); ?>" class="wplf_template_body" /></p>
+<?php
+  endforeach; 
+?>
+</span>
+<p style="margin-top: .6em; text-align: right;">
+  <input type="button" class="button wplf_add_email" value="➕" />
+</p>
+
+<p class="wplf_email_template wplf_placeholder" style="display:none"><input type="text" name="wplf_email_copy_to[]" list="emails" style="width:71%;" /><a href="#TB_inline?width=600&height=800&inlineId=wplf_template_modal" class="thickbox wplf_edit_template"><input type="button" class="button" value="✎" style="width:14%;" /></a><input type="button" class="button wplf_remove_email" value="🗑" style="width:14%;" /><input type="hidden" name="wplf_email_templates[]" class="wplf_template_body" />
+</p>
+
+<p>
+ <?php _e('You can use either an email address or one of your fields\' values here.'); ?>
+</p>
+<datalist id="emails"><option><?php echo get_option('admin_email'); ?></option></datalist>
+<div id="wplf_template_modal" style="display: none;">
+  <div>
+    <div id="wplf_template_modal_inner">
+      <p>
+        <label for="template_title"><b><?php _e('Email Subject'); ?></b></label>
+        <input type="text" name="template_title" size="30" autocomplete="off" style="width: 100%;" />
+      </p>
+
+      <p>
+        <label for="template_body"><b><?php _e('Email template'); ?></b></label>
+        <textarea name="template_body" style="width: 100%; height: 15em;"></textarea>
+      </p>
+
+      <p>
+        <?php _e('You can use any field\'s values on your template with %field% notation.'); ?>
+      </p>
+
+      <p>
+        <input type="button" class="button wplf_save_template" value="<?php _e('Save'); ?>" />
+      </p>
+    </div>
+  </div>
+</div>
 <?php
   }
 
@@ -375,16 +421,13 @@ class CPT_WPLF_Form {
     }
 
     // save email copy enabled state
-    if ( isset( $_POST['wplf_email_copy_enabled'] ) ) {
-      update_post_meta( $post_id, '_wplf_email_copy_enabled', $_POST['wplf_email_copy_enabled'] === 'on' );
-    }
-    else {
-      update_post_meta( $post_id, '_wplf_email_copy_enabled', false );
+    if ( isset( $_POST['wplf_email_templates'] ) ) {
+      update_post_meta( $post_id, '_wplf_email_templates', array_filter( $_POST['wplf_email_templates'] ) );
     }
 
     // save email copy
     if ( isset( $_POST['wplf_email_copy_to'] ) ) {
-      update_post_meta( $post_id, '_wplf_email_copy_to', sanitize_email( $_POST['wplf_email_copy_to'] ) );
+      update_post_meta( $post_id, '_wplf_email_copy_to', array_filter( $_POST['wplf_email_copy_to'] ) );
     }
 
     // save title format
@@ -448,10 +491,8 @@ class CPT_WPLF_Form {
     // register the script, but only enqueue it if the current post contains a form in it
     wp_register_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array( 'jquery' ) );
 
-    if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
       wp_enqueue_script( 'wplf-form-js' );
       wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-    }
   }
 
 
@@ -463,6 +504,8 @@ class CPT_WPLF_Form {
       'id' => null,
       'xclass' => '',
     ), $attributes );
+
+    self::$has_shortcode = true;
 
     // display form
     return $this->wplf_form( $attributes['id'], null, $attributes['xclass'] );

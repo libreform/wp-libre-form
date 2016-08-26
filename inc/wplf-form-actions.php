@@ -12,20 +12,48 @@ function wplf_send_email_copy( $return ) {
 
   $form_id = intval( $_POST['_form_id'] ); // _form_id is already validated and we know it exists by this point
   $form_title = esc_html( get_the_title( $form_id ) );
-  $form_meta = get_post_meta( $form_id );
+  $emails = get_post_meta( $form_id, "_wplf_email_copy_to" );
+  $templates = get_post_meta( $form_id, "_wplf_email_templates" );
   $referrer = esc_url_raw( $_POST['referrer'] );
 
-  if( isset($form_meta['_wplf_email_copy_enabled']) && $form_meta['_wplf_email_copy_enabled'][0] ) {
-    $to = isset($form_meta['_wplf_email_copy_to']) ? $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
-    $subject = wp_sprintf( __('New submission from %s', 'wp-libre-form'), $referrer );
-    $content = wp_sprintf( __('Form "%s" (ID %d) was submitted with values below: ', 'wp-libre-form'), $form_title, $form_id ) . "\n\n";
-    foreach( $_POST as $key => $value ) {
-      if( '_' === $key[0] ) {
-        continue;
+  if ( isset( $emails ) && count( $emails[0] ) ) {
+    foreach ( $emails[0] as $idx => $email ) {
+
+      $to = $email;
+
+      if ( isset( $templates ) && is_array( $templates[0] ) && isset( $templates[0][ $idx ] ) ) {
+        $template = $templates[0][ $idx ];
       }
-      $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
+      else {
+        $template = null;
+      }
+
+      if ( $template ) {
+        $template = $templates[0][ $idx ];
+
+        $json = json_decode( $template );
+
+        $subject = $json->title;
+        $content = $json->content;
+
+        $content = preg_replace_callback( "/%(.+)%/", "replace_field_tags", $content );
+      }
+      else {
+        $subject = wp_sprintf( __('New submission from %s', 'wp-libre-form'), $referrer );
+        $content = wp_sprintf( __('Form "%s" (ID %d) was submitted with values below: ', 'wp-libre-form'), $form_title, $form_id ) . "\n\n";
+        foreach( $_POST as $key => $value ) {
+          if( '_' === $key[0] ) {
+            continue;
+          }
+          $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
+        }
+      }
+
+      wp_mail( $to, $subject, $content );
     }
-    wp_mail( $to, $subject, $content );
   }
 }
 
+function replace_field_tags( $matches ) {
+  return isset( $_POST[ $matches[1] ] ) ? esc_html( $_POST[ $matches[1] ] ) : $matches[1];
+}
