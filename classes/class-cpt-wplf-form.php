@@ -393,7 +393,7 @@ class CPT_WPLF_Form {
         $emailArray = explode( ",", $emailField );
         foreach($emailArray as $email){
           $email = trim($email);
-          $email = sanitize_email( trim( $email ) ) . ", ";
+          $email = sanitize_email( $email ) . ", ";
           $to .= $email;
         }
         $to = rtrim( $to, ", " );
