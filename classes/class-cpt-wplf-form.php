@@ -384,7 +384,25 @@ class CPT_WPLF_Form {
 
     // save email copy
     if ( isset( $_POST['wplf_email_copy_to'] ) ) {
-      update_post_meta( $post_id, '_wplf_email_copy_to', sanitize_email( $_POST['wplf_email_copy_to'] ) );
+      $emailField = $_POST['wplf_email_copy_to'];
+      $to = '';
+
+      if( strpos( $emailField, "," ) > 0 ) {
+        // Intentional. Makes no sense if the first character is a comma, so pass it along as a single address.
+        // sanitize_email() should take care of the rest.
+        $emailArray = explode( ",", $emailField );
+        foreach($emailArray as $email){
+          $email = trim($email);
+          $email = sanitize_email( trim( $email ) ) . ", ";
+          $to .= $email;
+        }
+        $to = rtrim( $to, ", " );
+      }
+      else {
+        $to = sanitize_email( $emailField );
+      }
+
+      update_post_meta( $post_id, '_wplf_email_copy_to', $to );
     }
 
     // save title format
