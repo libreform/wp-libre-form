@@ -19,7 +19,16 @@ function wplf_send_email_copy( $return ) {
   if ( isset( $emails ) && count( $emails[0] ) ) {
     foreach ( $emails[0] as $idx => $email ) {
 
-      $to = $email;
+      if ( preg_match( "/%.+?%/", $email, $matches ) ) {
+        $to = preg_replace_callback( "/%.+?%/", "replace_field_tags", $email );
+      }
+      else {
+        $to = $email;
+      }
+
+      if ( ! filter_var( $to, FILTER_VALIDATE_EMAIL ) ) {
+        continue;
+      }
 
       if ( isset( $templates ) && is_array( $templates[0] ) && isset( $templates[0][ $idx ] ) ) {
         $template = $templates[0][ $idx ];
@@ -36,7 +45,8 @@ function wplf_send_email_copy( $return ) {
         $subject = $json->title;
         $content = $json->content;
 
-        $content = preg_replace_callback( "/%(.+)%/", "replace_field_tags", $content );
+        $subject = preg_replace_callback( "/%.+?%/", "replace_field_tags", $subject );
+        $content = preg_replace_callback( "/%.+?%/", "replace_field_tags", $content );
       }
       else {
         $subject = wp_sprintf( __('New submission from %s', 'wp-libre-form'), $referrer );
@@ -55,5 +65,7 @@ function wplf_send_email_copy( $return ) {
 }
 
 function replace_field_tags( $matches ) {
-  return isset( $_POST[ $matches[1] ] ) ? esc_html( $_POST[ $matches[1] ] ) : $matches[1];
+  $key = str_replace( "%", "", $matches[0] );
+
+  return isset( $_POST[ $key ] ) ? esc_html( $_POST[ $key ] ) : $key;
 }

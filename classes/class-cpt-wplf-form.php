@@ -80,6 +80,7 @@ class CPT_WPLF_Form {
       'has_archive'        => false,
       'hierarchical'       => false,
       'menu_position'      => null,
+      'map_meta_cap'       => true,
       'rewrite'            => array(
         'slug' => 'libre-forms',
       ),
@@ -316,7 +317,7 @@ class CPT_WPLF_Form {
 </p>
 <span class="wplf_emails">
 <?php
-  foreach ( isset( $email_copy_to[0] ) ? $email_copy_to[0] : array() as $idx => $email ):
+  foreach ( isset( $email_copy_to[0] ) && is_array( $email_copy_to[0] ) ? $email_copy_to[0] : array() as $idx => $email ):
 
     if ( isset( $templates[0] ) && isset( $templates[0][$idx ] ) ) {
       $template = $templates[0][ $idx ];
