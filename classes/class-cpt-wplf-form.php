@@ -8,8 +8,6 @@ class CPT_WPLF_Form {
    */
   public static $instance;
 
-  public static $has_shortcode;
-
   public static function init() {
     if ( is_null( self::$instance ) ) {
       self::$instance = new CPT_WPLF_Form();
@@ -339,7 +337,7 @@ class CPT_WPLF_Form {
 </p>
 
 <p>
- <?php _e('You can use either an email address or one of your fields\' values here.'); ?>
+ <?php _e('You can use either an email address or one of your fields\' values here with %field% notation.'); ?>
 </p>
 <datalist id="emails"><option><?php echo get_option('admin_email'); ?></option></datalist>
 <div id="wplf_template_modal" style="display: none;">
@@ -356,7 +354,11 @@ class CPT_WPLF_Form {
       </p>
 
       <p>
-        <?php _e('You can use any field\'s values on your template with %field% notation.'); ?>
+        <?php _e('You can use any field\'s values in your template or in the title with %field% notation.'); ?>
+      </p>
+
+      <p>
+        <?php _e('If you leave this empty, a default template will be used.'); ?>
       </p>
 
       <p>
@@ -492,8 +494,8 @@ class CPT_WPLF_Form {
     // register the script, but only enqueue it if the current post contains a form in it
     wp_register_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array( 'jquery' ) );
 
-      wp_enqueue_script( 'wplf-form-js' );
-      wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+    wp_enqueue_script( 'wplf-form-js' );
+    wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
   }
 
 
@@ -505,8 +507,6 @@ class CPT_WPLF_Form {
       'id' => null,
       'xclass' => '',
     ), $attributes );
-
-    self::$has_shortcode = true;
 
     // display form
     return $this->wplf_form( $attributes['id'], null, $attributes['xclass'] );

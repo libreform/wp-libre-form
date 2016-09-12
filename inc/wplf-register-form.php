@@ -1,6 +1,14 @@
 <?php
 // A function to register a form in the code.
 // 
+// You would probably want to use this code inside a plugin 
+// activation hook or something similar so that it wouldn't
+// be ran on every page load.
+// 
+// Note that if you change the contents of a field registered in
+// code in the admin panel, your changes will get overridden
+// whenever the register function is ran again.
+// 
 // Usage:
 // 
 // function register_libre_forms() {
@@ -30,7 +38,7 @@ function register_libre_form( $name, $args ) {
     } 
     
     if ( ! is_array( $args ) ) {
-        throw new Exception("'register_libre_form' must have an array as its argument.");
+        throw new Exception("'register_libre_form' must have an array as its second argument.");
     }
 
     if ( ! isset( $args["title"] ) ) {
@@ -41,7 +49,7 @@ function register_libre_form( $name, $args ) {
         throw new Exception("'form_html' is a mandatory argument for 'register_libre_form'.");   
     }
 
-    // Get fields and required fields from the provided HTML
+    // Get fields and required fields from the HTML provided
     $dom = new DOMDocument();
     
     libxml_use_internal_errors( true );
@@ -84,19 +92,9 @@ function register_libre_form( $name, $args ) {
     $exists = get_page_by_path( $name, OBJECT, "wplf-form" );
 
     if ( $exists ) {
-        $obj = (object)[
-            "content" => $exists->post_content,
-            "title" => $exists->post_title,
-            "emails" => get_post_meta( $exists->ID,"_wplf_email_copy_to" ),
-            "title_format" => get_post_meta( $exists->ID, "_wplf_title_format" ),
-            "thank_you" => get_post_meta( $exists->ID, "_wplf_thank_you" ),
-            "fields" => get_post_meta( $exists->ID, "_wplf_fields" ),
-            "required" => get_post_meta( $exists->ID, "_wplf_required" )
-        ];
+        $hash = get_post_meta( $exists->ID, "_wplf_form_hash", true );
 
         // Check the existing form against the hash of the new one. If they are the same, bail early.
-        $hash = sha1( serialize( $obj ) );
-
         if ( $form_hash == $hash ) {
             return false;
         }
@@ -124,6 +122,8 @@ function register_libre_form( $name, $args ) {
                 }
             }
 
+            update_post_meta( $exists->ID, "_wplf_form_hash", $form_hash );
+
             update_post_meta( $exists->ID, "_wplf_email_copy_to", $emails );
 
             update_post_meta( $exists->ID, '_wplf_email_templates', $templates );
@@ -145,6 +145,8 @@ function register_libre_form( $name, $args ) {
             "post_name" => $name,
             "post_content" => $args["form_html"]
         ]);
+
+        update_post_meta( $id, "_wplf_form_hash", $form_hash );
 
         update_post_meta( $id, "_wplf_email_copy_to", isset( $args["email"] ) ? $args["email"] : null );
 
