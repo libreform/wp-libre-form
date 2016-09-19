@@ -159,7 +159,8 @@ class CPT_WPLF_Form {
 
 <!-- <?php _ex( 'Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wp-libre-form' ); ?> -->
 <?php
-      $content = esc_textarea( ob_get_clean() );
+      //$content = esc_textarea( ob_get_clean() );
+      $content = ob_get_clean();
     }
 
     return $content;

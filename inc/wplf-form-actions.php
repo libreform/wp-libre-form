@@ -38,8 +38,6 @@ function wplf_send_email_copy( $return ) {
       }
 
       if ( $template ) {
-        $template = $templates[0][ $idx ];
-
         $json = json_decode( $template );
 
         $subject = $json->title;

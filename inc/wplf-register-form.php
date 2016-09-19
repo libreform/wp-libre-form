@@ -126,7 +126,7 @@ function register_libre_form( $name, $args ) {
 
             update_post_meta( $exists->ID, "_wplf_email_copy_to", $emails );
 
-            update_post_meta( $exists->ID, '_wplf_email_templates', $templates );
+            update_post_meta( $exists->ID, '_wplf_email_templates', wp_slash( $templates ) );
 
             update_post_meta( $exists->ID, "_wplf_title_format", isset( $args["title_format"] ) ? $args["title_format"] : null );
 
@@ -146,9 +146,27 @@ function register_libre_form( $name, $args ) {
             "post_content" => $args["form_html"]
         ]);
 
+        $emails = array();
+        $templates = array();
+
+        if ( isset( $args["emails"] ) && is_array( $args["emails"] ) ) {
+            foreach ( $args["emails"] as $email => $template ) {
+                $emails[] = $email;
+
+                if ( ! empty( $template ) && is_array( $template ) && count( $template ) == 2 ) {
+                    $templates[] = json_encode( $template, JSON_UNESCAPED_UNICODE );
+                }
+                else {
+                    $templates[] = "";
+                }
+            }
+        }
+
         update_post_meta( $id, "_wplf_form_hash", $form_hash );
 
-        update_post_meta( $id, "_wplf_email_copy_to", isset( $args["email"] ) ? $args["email"] : null );
+        update_post_meta( $id, "_wplf_email_copy_to", $emails );
+
+        update_post_meta( $id, '_wplf_email_templates', wp_slash( $templates ) );
 
         update_post_meta( $id, "_wplf_title_format", isset( $args["title_format"] ) ? $args["title_format"] : null );
 
