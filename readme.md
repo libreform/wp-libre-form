@@ -89,9 +89,9 @@ wp_enqueue_script('wplf-form-js');
 wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 ```
 
-### Add own css classes to form output
+### Add your own css classes to the form element
 
-You can use the attribute xclass inside the shortcode to set own extra css classes.
+You can use the xclass attribute inside the shortcode to add your own extra classes.
 
 ```
 [libre-form id="1" xclass="extra"]
@@ -120,6 +120,51 @@ function my_form_validation( $return ) {
     $return->ok = 0;
     $return->error = sprintf( __("I don't like Contact Form 7 so I won't accept your submission."), intval( $_POST['_form_id'] ) );
   }
+  return $return;
+}
+```
+
+### wplf_validate_submission example: Google ReCaptcha integration
+
+```php
+/**
+ * ReCaptcha for WP Libre Form
+ */
+add_filter( 'wplf_validate_submission', 'wplf_recaptcha' );
+function wplf_recaptcha( $return ) {
+  // skip this validation if submission has already failed
+  if( ! $return->ok ) {
+    return $return;
+  }
+
+  $form = get_post( (int) $_POST['_form_id'] );
+  if( false === strpos( $form->post_content, 'g-recaptcha' ) ) {
+    // this form doesn't have recaptcha
+    return $return;
+  }
+
+  $secret = 'XXXX'; // substitute with your own secret recaptcha key
+
+  $options = [
+    'http' => [
+      'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+      'method'  => 'POST',
+      'content' => http_build_query([
+        'secret' => $secret,
+        'response' => $_POST['g-recaptcha-response'],
+      ])
+    ],
+  ];
+  $context  = stream_context_create( $options );
+  $result = file_get_contents( 'https://www.google.com/recaptcha/api/siteverify', false, $context );
+
+  $captcha_obj = json_decode( $result );
+
+  if( false === $captcha_obj->success ) {
+    $return->ok = 0;
+    $return->error = sprintf( __("Please prove you're not a robot before submitting."), intval( $_POST['_form_id'] ) );
+  }
+
   return $return;
 }
 ```
