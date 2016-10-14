@@ -49,6 +49,7 @@ class WP_Libre_Form {
     // default functionality
     require_once 'inc/wplf-form-actions.php';
     require_once 'inc/wplf-form-validation.php';
+    require_once 'inc/wplf-register-form.php';
 
     // init our plugin classes
     CPT_WPLF_Form::init();
