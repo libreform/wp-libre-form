@@ -440,9 +440,16 @@ class CPT_WPLF_Form {
         // you can override the content via a parameter
         $content = get_post( $id )->post_content;
       }
+
+      $multipart = "";
+      // check if form contains file inputs
+      if(strpos($content, "type='file'") > -1 || strpos($content, "type=\"file\"") > -1){
+        $multipart = "enctype='multipart/form-data'";
+      }
+
       ob_start();
 ?>
-<form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>">
+<form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>" <?php echo $multipart; ?>>
   <?php echo apply_filters( 'wplf_form', $content ); ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
   <input type="hidden" name="_form_id" value="<?php esc_attr_e( $id ); ?>">
@@ -464,7 +471,7 @@ class CPT_WPLF_Form {
     global $post;
 
     // register the script, but only enqueue it if the current post contains a form in it
-    wp_register_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array( 'jquery' ) );
+    wp_register_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array() );
 
     if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
       wp_enqueue_script( 'wplf-form-js' );

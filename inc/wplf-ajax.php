@@ -18,6 +18,8 @@ function wplf_ajax_submit_handler() {
 
   if( $return->ok ) {
     // form existence has already been validated via filters
+
+
     $form = get_post( intval( $_POST['_form_id'] ) );
 
     // the title is the value of whatever the first field was in the form
@@ -52,8 +54,20 @@ function wplf_ajax_submit_handler() {
       }
     }
 
+    // handle files
+    foreach( $_FILES as $key => $file) {
+      // Is this enough security wise?
+      // Currenly only supports 1 file per input
+      $attach_id = media_handle_upload( $key, 0, array(), array( "test_form" => false ) );
+      add_post_meta( $post_id, $key, wp_get_attachment_url($attach_id) );
+      add_post_meta( $post_id, $key . "_attachment", $attach_id );
+    }
+
+
+
     $return->submission_id = $post_id;
     $return->submission_title = $post_title;
+    $return->form_id = $form->ID;
 
     // return the success message for the form
     $return->success = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
@@ -68,4 +82,3 @@ function wplf_ajax_submit_handler() {
   wp_send_json( $return );
   wp_die();
 }
-
