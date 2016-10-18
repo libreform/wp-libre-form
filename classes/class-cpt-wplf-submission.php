@@ -106,15 +106,29 @@ class CPT_WPLF_Submission {
   function form_filter_dropdown() {
     global $pagenow;
 
-    if( 'edit.php' != $pagenow ) {
+    $allowed = array("wplf-submission"); // show filter on these post types (currently only one?)
+    $allowed = apply_filters("wplf-dropdown-filter", $allowed);
+    $post_type = get_query_var("post_type");
+
+    if( 'edit.php' != $pagenow || !in_array($post_type, $allowed)) {
       return;
     }
 
-    // TODO: put this in a transient
-    $forms = get_posts( array(
-      'post_per_page' => '-1',
-      'post_type' => 'wplf-form',
-    ) );
+    $transient = get_transient("wplf-form-filter");
+
+    if($transient){
+      $forms = $transient;
+    }
+
+    else{
+      $forms = get_posts( array(
+        'post_per_page' => '-1',
+        'post_type' => 'wplf-form',
+      ) );
+
+      set_transient("wplf-form-filter", $forms, 15 *  MINUTE_IN_SECONDS);
+    }
+
 ?>
 <label for="filter-by-form" class="screen-reader-text">Filter by form</label>
 <select name="form" id="filter-by-form">
@@ -170,6 +184,7 @@ class CPT_WPLF_Submission {
     global $post;
     $postmeta = get_post_meta( $post->ID );
     $fields = array_keys( $postmeta );
+    $home_path = get_home_path();
 ?>
 <p>
   <table class="wp-list-table widefat striped">
@@ -182,9 +197,26 @@ class CPT_WPLF_Submission {
     <tbody>
       <?php foreach( $fields as $field ) : ?>
         <?php if( '_' != $field[0]  ) : ?>
-        <?php $value = $postmeta[ $field ][0]; ?>
+        <?php
+        $value = $postmeta[ $field ][0];
+        $possible_link = '';
+        $attachment_url = wp_get_attachment_url( $value ); // get_edit_post_link returns something awkward.
+
+        // Maybe add a filter for target="_blank"? Wouldn't enable by default.
+
+        if ( $attachment_url ) {
+          // If this is true, $value was a valid attachment_id.
+          // Caveat: if user enters a numeric value here, it could be interpreted as attachment.
+          $attachment_url = get_edit_post_link($value);
+          $possible_link = "<a href='$attachment_url' style='float: right;'>Edit attachment</a>";
+        } elseif ( file_exists( $home_path . substr( $value, 1 ) ) ) {
+          // This is bit less ambiguous. Check if there's a file, and if there is, get link for it.
+          $attachment_url = get_home_url() . $value;
+          $possible_link = "<a href='$attachment_url' style='float: right;'>Open file</a>";
+        }
+        ?>
         <tr>
-          <th><strong><?php echo $field; ?></strong></th>
+          <th><strong><?php echo $field; ?></strong> <?php echo $possible_link; ?></th>
           <?php if( strlen( $value ) > 60 || strpos( $value, "\n" ) ) : ?>
           <td><textarea style="width:100%" readonly><?php echo esc_textarea( $value ); ?></textarea></td>
           <?php else : ?>
@@ -201,4 +233,3 @@ class CPT_WPLF_Submission {
 }
 
 endif;
-
