@@ -184,6 +184,7 @@ class CPT_WPLF_Submission {
     global $post;
     $postmeta = get_post_meta( $post->ID );
     $fields = array_keys( $postmeta );
+    $home_path = get_home_path();
 ?>
 <p>
   <table class="wp-list-table widefat striped">
@@ -196,9 +197,24 @@ class CPT_WPLF_Submission {
     <tbody>
       <?php foreach( $fields as $field ) : ?>
         <?php if( '_' != $field[0]  ) : ?>
-        <?php $value = $postmeta[ $field ][0]; ?>
+        <?php
+        $value = $postmeta[ $field ][0];
+        $possible_link = '';
+        $attachment_url = wp_get_attachment_url( $value ); // get_edit_post_link returns something awkward.
+
+        // Check if there is a file in that directory. If there is display a link.
+        // Maybe add a filter for target="_blank"? Wouldn't enable by default.
+
+        if ( $attachment_url ) {
+          $attachment_url = get_edit_post_link($value);
+          $possible_link = "<a href='$attachment_url' style='float: right;'>Edit attachment</a>";
+        } elseif ( file_exists( $home_path . substr( $value, 1 ) ) ) {
+          $attachment_url = get_home_url() . $value;
+          $possible_link = "<a href='$attachment_url' style='float: right;'>Open file</a>";
+        }
+        ?>
         <tr>
-          <th><strong><?php echo $field; ?></strong></th>
+          <th><strong><?php echo $field; ?></strong> <?php echo $possible_link; ?></th>
           <?php if( strlen( $value ) > 60 || strpos( $value, "\n" ) ) : ?>
           <td><textarea style="width:100%" readonly><?php echo esc_textarea( $value ); ?></textarea></td>
           <?php else : ?>
