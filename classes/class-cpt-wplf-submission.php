@@ -202,13 +202,15 @@ class CPT_WPLF_Submission {
         $possible_link = '';
         $attachment_url = wp_get_attachment_url( $value ); // get_edit_post_link returns something awkward.
 
-        // Check if there is a file in that directory. If there is display a link.
         // Maybe add a filter for target="_blank"? Wouldn't enable by default.
 
         if ( $attachment_url ) {
+          // If this is true, $value was a valid attachment_id.
+          // Caveat: if user enters a numeric value here, it could be interpreted as attachment.
           $attachment_url = get_edit_post_link($value);
           $possible_link = "<a href='$attachment_url' style='float: right;'>Edit attachment</a>";
         } elseif ( file_exists( $home_path . substr( $value, 1 ) ) ) {
+          // This is bit less ambiguous. Check if there's a file, and if there is, get link for it.
           $attachment_url = get_home_url() . $value;
           $possible_link = "<a href='$attachment_url' style='float: right;'>Open file</a>";
         }
