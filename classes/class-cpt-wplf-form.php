@@ -452,6 +452,7 @@ class CPT_WPLF_Form {
 <form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>" <?php echo $multipart; ?>>
   <?php echo apply_filters( 'wplf_form', $content ); ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
+  <input type="hidden" name="_referrer_id" value="<?php echo get_the_id() ?>">
   <input type="hidden" name="_form_id" value="<?php esc_attr_e( $id ); ?>">
 </form>
 <?php
