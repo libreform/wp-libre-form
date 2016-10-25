@@ -31,7 +31,9 @@ function wplf_send_email_copy( $return ) {
     wp_mail(
       apply_filters( 'wplf_email_copy_to', $to ),
       apply_filters( 'wplf_email_copy_subject', $subject ),
-      apply_filters( 'wplf_email_copy_content', $content )
+      apply_filters( 'wplf_email_copy_content', $content ),
+      apply_filters( 'wplf_email_copy_headers', '' ),
+      apply_filters( 'wplf_email_copy_attachments', array() )
     );
   }
 }
