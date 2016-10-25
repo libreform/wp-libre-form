@@ -402,7 +402,11 @@ class CPT_WPLF_Form {
         $to = sanitize_email( $emailField );
       }
 
-      update_post_meta( $post_id, '_wplf_email_copy_to', $to );
+      if( !empty( $to ) ) {
+        update_post_meta( $post_id, '_wplf_email_copy_to', $to );
+      } else {
+        delete_post_meta( $post_id, '_wplf_email_copy_to' );
+      }
     }
 
     // save title format
