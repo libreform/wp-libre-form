@@ -23,12 +23,14 @@ class CPT_WPLF_Form {
     add_action( 'init', array( $this, 'register_cpt' ) );
 
     // post.php / post-new.php view
+    add_filter( 'get_sample_permalink_html', array( $this, 'modify_permalink_html' ), 10, 2 );
     add_action( 'save_post', array( $this, 'save_cpt' ) );
     add_filter( 'content_save_pre' , array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
 
     // edit.php view
+    add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
     add_filter( 'manage_edit-wplf-form_columns' , array( $this, 'custom_columns_cpt' ), 100, 1 );
     add_action( 'manage_posts_custom_column' , array( $this, 'custom_columns_display_cpt' ), 10, 2 );
 
@@ -37,6 +39,7 @@ class CPT_WPLF_Form {
 
     // front end
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
+    add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
 
@@ -92,6 +95,18 @@ class CPT_WPLF_Form {
     register_post_type( 'wplf-form', $args );
   }
 
+  /**
+   * Modify post.php permalink html to show notice if form isn't publicly visible.
+   */
+  function modify_permalink_html( $html, $post_id ) {
+    $publicly_visible = $this->get_publicly_visible_state( $post_id );
+
+    if( !$publicly_visible ) {
+      $html .= '<span>'.__( 'Form is not publicly visible', 'wp-libre-form' ).__( ', permalink will not work for visitors.', 'wp-libre-form' ).'</span>';
+    }
+
+    return $html;
+  }
 
   /**
    * Disable TinyMCE editor for forms, which are simple HTML things
@@ -164,6 +179,17 @@ class CPT_WPLF_Form {
     return $content;
   }
 
+  /**
+   * Remove view action in edit.php for forms
+   */
+  function remove_row_actions( $actions, $post ) {
+    $publicly_visible = $this->get_publicly_visible_state( $post->ID );
+
+    if( $post->post_type === 'wplf-form' && !$publicly_visible )
+      unset( $actions['view'] );
+
+    return $actions;
+  }
 
   /**
    * Custom columns in edit.php for Forms
@@ -254,6 +280,15 @@ class CPT_WPLF_Form {
       'wplf-form',
       'side'
     );
+
+    // Single form visibility for visitors
+    add_meta_box(
+      'wplf-visibility',
+      __( 'Visibility', 'wp-libre-form' ),
+      array( $this, 'meta_box_visibility' ),
+      'wplf-form',
+      'side'
+    );
   }
 
 
@@ -333,6 +368,23 @@ class CPT_WPLF_Form {
 <p><?php _e('Submissions from this form will use this formatting in their title.', 'wp-libre-form'); ?></p>
 <p><?php _e('You may use any field values enclosed in "%" markers.', 'wp-libre-form');?></p>
 <p><input type="text" name="wplf_title_format" value="<?php echo esc_attr( $format ); ?>" placeholder="<?php echo esc_attr( $default ); ?>" class="code" style="width:100%"></p>
+<?php
+  }
+
+  /**
+   * Meta box callback for single form visibility for visitors
+   */
+  function meta_box_visibility( $post ) {
+    // get post meta
+    $meta = get_post_meta( $post->ID );
+    $visible_for_visitors = $this->get_publicly_visible_state( $post->ID );
+?>
+<p>
+  <label for="wplf_is_publicly_visible">
+    <input type="checkbox" <?php echo $visible_for_visitors ? 'checked="checked"' : ''; ?> id="wplf_is_publicly_visible" name="wplf_is_publicly_visible">
+    <?php _e( 'Make this form publicly visible with direct link?', 'wp-libre-form' ); ?>
+  </label>
+</p>
 <?php
   }
 
@@ -416,6 +468,14 @@ class CPT_WPLF_Form {
       // should be fine to save the meta field without further sanitisaton
       update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
     }
+
+    // save publicly visible state
+    if ( isset( $_POST['wplf_is_publicly_visible'] ) ) {
+      update_post_meta( $post_id, '_wplf_is_publicly_visible', $_POST['wplf_is_publicly_visible'] === 'on' );
+    }
+    else {
+      update_post_meta( $post_id, '_wplf_is_publicly_visible', false );
+    }
   }
 
 
@@ -450,6 +510,17 @@ class CPT_WPLF_Form {
       ob_start();
 ?>
 <form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>" <?php echo $multipart; ?>>
+  <?php if( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) {
+    $publicly_visible = $this->get_publicly_visible_state( $id );
+    if( !$publicly_visible ) {
+?>
+      <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
+        <b style="color:#dc3232;"><?php _e( 'Form is not publicly visible', 'wp-libre-form' ) ?>.</b><br />
+        <?php _e( 'Subscriber or visitor will see a 404 error page instead of form.', 'wp-libre-form' ) ?>
+      </p>
+<?php
+    }
+  } ?>
   <?php echo apply_filters( 'wplf_form', $content ); ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
   <input type="hidden" name="_form_id" value="<?php esc_attr_e( $id ); ?>">
@@ -503,6 +574,34 @@ class CPT_WPLF_Form {
       return $this->wplf_form( $post->ID, $content );
     }
     return $content;
+  }
+
+  /**
+   * Set and show 404 page for visitors trying to see single form.
+   * And yes, it is a global $post. That's right.
+   */
+  function maybe_set_404_for_single_form() {
+    global $post;
+
+    if( !is_singular( 'wplf-form' ) )
+      return;
+
+    $publicly_visible = $this->get_publicly_visible_state( $post->ID );
+    if( $publicly_visible )
+      return;
+
+    if( !current_user_can( 'edit_post', $post->ID ) ) {
+      global $wp_query;
+      $wp_query->set_404();
+    }
+  }
+
+  /**
+   * Wrapper function to check if form is publicly visible.
+   */
+  function get_publicly_visible_state( $id ) {
+    $publicly_visible = get_post_meta( $id, '_wplf_is_publicly_visible', true );
+    return apply_filters( 'wplf-form-publicly-visible', $publicly_visible, $id );
   }
 }
 
