@@ -382,7 +382,7 @@ class CPT_WPLF_Form {
 <p>
   <label for="wplf_is_publicly_visible">
     <input type="checkbox" <?php echo $visible_for_visitors ? 'checked="checked"' : ''; ?> id="wplf_is_publicly_visible" name="wplf_is_publicly_visible">
-    <?php _e( 'Make this form publicly visible with direct link?', 'wp-libre-form' ); ?>
+    <?php _e( 'Make this form publicly visible with permalink?', 'wp-libre-form' ); ?>
   </label>
 </p>
 <?php

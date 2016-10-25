@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-02-21 23:16+0100\n"
-"PO-Revision-Date: 2016-02-21 23:16+0100\n"
-"Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
+"POT-Creation-Date: 2016-10-26 01:25+0300\n"
+"PO-Revision-Date: 2016-10-26 01:26+0300\n"
+"Last-Translator: Timi Wahalahti <timi@contrast.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-libre-form.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -20,150 +20,170 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: classes/class-cpt-wplf-form.php:53
+#: classes/class-cpt-wplf-form.php:56
 msgctxt "post type general name"
 msgid "Forms"
 msgstr "Lomakkeet"
 
-#: classes/class-cpt-wplf-form.php:54
+#: classes/class-cpt-wplf-form.php:57
 msgctxt "post type singular name"
 msgid "Form"
 msgstr "Lomake"
 
-#: classes/class-cpt-wplf-form.php:55
+#: classes/class-cpt-wplf-form.php:58
 msgctxt "admin menu"
 msgid "Forms"
 msgstr "Lomakkeet"
 
-#: classes/class-cpt-wplf-form.php:56
+#: classes/class-cpt-wplf-form.php:59
 msgctxt "add new on admin bar"
 msgid "Form"
 msgstr "Lomake"
 
-#: classes/class-cpt-wplf-form.php:57
+#: classes/class-cpt-wplf-form.php:60
 msgctxt "form"
 msgid "New Form"
 msgstr "Uusi lomake"
 
-#: classes/class-cpt-wplf-form.php:58
+#: classes/class-cpt-wplf-form.php:61
 msgid "Add New Form"
 msgstr "Luo uusi lomake"
 
-#: classes/class-cpt-wplf-form.php:59
+#: classes/class-cpt-wplf-form.php:62
 msgid "New Form"
 msgstr "Uusi lomake"
 
-#: classes/class-cpt-wplf-form.php:60
+#: classes/class-cpt-wplf-form.php:63
 msgid "Edit Form"
 msgstr "Muokkaa lomaketta"
 
-#: classes/class-cpt-wplf-form.php:61
+#: classes/class-cpt-wplf-form.php:64
 msgid "View Form"
 msgstr "Näytä lomake"
 
-#: classes/class-cpt-wplf-form.php:62 classes/class-cpt-wplf-submission.php:121
+#: classes/class-cpt-wplf-form.php:65 classes/class-cpt-wplf-submission.php:135
 msgid "All Forms"
 msgstr "Kaikki lomakkeet"
 
-#: classes/class-cpt-wplf-form.php:63
+#: classes/class-cpt-wplf-form.php:66
 msgid "Search Forms"
 msgstr "Etsi lomakkeita"
 
-#: classes/class-cpt-wplf-form.php:64
+#: classes/class-cpt-wplf-form.php:67
 msgid "No forms found."
 msgstr "Lomakkeita ei löytynt."
 
-#: classes/class-cpt-wplf-form.php:65
+#: classes/class-cpt-wplf-form.php:68
 msgid "No forms found in Trash."
 msgstr "Roskakorissa ei ole lomakkeita."
 
-#: classes/class-cpt-wplf-form.php:148
+#: classes/class-cpt-wplf-form.php:105 classes/class-cpt-wplf-form.php:518
+msgid "Form is not publicly visible"
+msgstr "Lomake ei näy julkisesti"
+
+#: classes/class-cpt-wplf-form.php:105
+msgid ", permalink will not work for visitors."
+msgstr ", eikä kestolinkki toimi käyttäjillä."
+
+#: classes/class-cpt-wplf-form.php:163
 msgid "Please enter your name"
 msgstr "Kirjoita nimesi"
 
-#: classes/class-cpt-wplf-form.php:149
+#: classes/class-cpt-wplf-form.php:164
 msgctxt "Default placeholder name"
 msgid "John Doe"
 msgstr "Matti Meikäläinen"
 
-#: classes/class-cpt-wplf-form.php:151
+#: classes/class-cpt-wplf-form.php:166
 msgid "Please enter your email address"
 msgstr "Kirjoita sähköpostiosoitteesi"
 
-#: classes/class-cpt-wplf-form.php:151 classes/class-cpt-wplf-form.php:154
+#: classes/class-cpt-wplf-form.php:166 classes/class-cpt-wplf-form.php:169
 msgid "(required)"
 msgstr "(pakollinen)"
 
-#: classes/class-cpt-wplf-form.php:152
+#: classes/class-cpt-wplf-form.php:167
 msgctxt "Default placeholder email"
 msgid "example@email.com"
 msgstr "esimerkki@esimerkki.fi"
 
-#: classes/class-cpt-wplf-form.php:154
+#: classes/class-cpt-wplf-form.php:169
 msgid "Write your message below"
 msgstr "Kirjoita viestisi alle"
 
-#: classes/class-cpt-wplf-form.php:155
+#: classes/class-cpt-wplf-form.php:170
 msgctxt "Default placeholder message"
 msgid "I wanted to ask about..."
 msgstr "Halusin kysyä..."
 
-#: classes/class-cpt-wplf-form.php:157
+#: classes/class-cpt-wplf-form.php:172
 msgid "Submit"
 msgstr "Lähetä"
 
-#: classes/class-cpt-wplf-form.php:159
+#: classes/class-cpt-wplf-form.php:174
 msgctxt "The HTML comment at the end of the example form"
 msgid "Any valid HTML form can be used here!"
 msgstr "Tässä toimii mikä tahansa HTML-lomake!"
 
-#: classes/class-cpt-wplf-form.php:175 classes/class-cpt-wplf-form.php:212
+#: classes/class-cpt-wplf-form.php:201 classes/class-cpt-wplf-form.php:240
 msgid "Shortcode"
 msgstr "Lyhytkoodi"
 
-#: classes/class-cpt-wplf-form.php:176 classes/class-cpt-wplf-submission.php:46
+#: classes/class-cpt-wplf-form.php:202 classes/class-cpt-wplf-submission.php:46
 msgid "Submissions"
 msgstr "Vastaukset"
 
-#: classes/class-cpt-wplf-form.php:222
+#: classes/class-cpt-wplf-form.php:250
 msgid "Success Message"
 msgstr "Onnistumisviesti"
 
-#: classes/class-cpt-wplf-form.php:232
+#: classes/class-cpt-wplf-form.php:260
 msgid "Form Fields Detected"
 msgstr "Lomakekentät"
 
-#: classes/class-cpt-wplf-form.php:241
+#: classes/class-cpt-wplf-form.php:269
 msgid "Emails"
 msgstr "Sähköpostit"
 
-#: classes/class-cpt-wplf-form.php:250
+#: classes/class-cpt-wplf-form.php:278
 msgid "Submission Title Format"
 msgstr "Nimi lähetetylle lomakkeelle"
 
-#: classes/class-cpt-wplf-form.php:273
+#: classes/class-cpt-wplf-form.php:287
+msgid "Visibility"
+msgstr "Näkyvyys"
+
+#: classes/class-cpt-wplf-form.php:310
 msgctxt "Default success message"
 msgid "Thank you! :)"
 msgstr "Kiitos! :)"
 
-#: classes/class-cpt-wplf-form.php:294
+#: classes/class-cpt-wplf-form.php:331
 msgid "Fields marked with * are required"
 msgstr "Tähdelliset * kentät on pakollisia"
 
-#: classes/class-cpt-wplf-form.php:315
+#: classes/class-cpt-wplf-form.php:352
 msgid "Send an email copy when a form is submitted?"
 msgstr "Lähetä kopio sähköpostiin kun lomake lähetetään?"
 
-#: classes/class-cpt-wplf-form.php:331
+#: classes/class-cpt-wplf-form.php:368
 msgid "Submissions from this form will use this formatting in their title."
 msgstr ""
 "Tähän lomakkeeseen lähetetyt vastaukset nimetään allaolevan kaavan "
 "mukaisesti."
 
-#: classes/class-cpt-wplf-form.php:332
+#: classes/class-cpt-wplf-form.php:369
 msgid "You may use any field values enclosed in \"%\" markers."
 msgstr ""
 "Voit käyttää otsikossa mitä tahansa kenttiä arvoja \"%\"-merkkien sisällä."
+
+#: classes/class-cpt-wplf-form.php:385
+msgid "Make this form publicly visible with permalink?"
+msgstr "Näytä lomake julkisesti kestolinkillä?"
+
+#: classes/class-cpt-wplf-form.php:519
+msgid "Subscriber or visitor will see a 404 error page instead of form."
+msgstr "Tilaaja tai käyttäjä näkee lomakkeen sijaan 404-virhesivun."
 
 #: classes/class-cpt-wplf-submission.php:37
 msgctxt "post type general name"
@@ -226,15 +246,15 @@ msgstr "Lähde"
 msgid "Form"
 msgstr "Lomake"
 
-#: classes/class-cpt-wplf-submission.php:158
+#: classes/class-cpt-wplf-submission.php:172
 msgid "Submission"
 msgstr "Vastaus"
 
-#: classes/class-cpt-wplf-submission.php:178
+#: classes/class-cpt-wplf-submission.php:193
 msgid "Field"
 msgstr "Kenttä"
 
-#: classes/class-cpt-wplf-submission.php:179
+#: classes/class-cpt-wplf-submission.php:194
 msgid "Value"
 msgstr "Arvo"
 
@@ -266,8 +286,8 @@ msgid "https://github.com/anttiviljami/wp-libre-form"
 msgstr "https://github.com/anttiviljami/wp-libre-form"
 
 #. Description of the plugin/theme
-msgid "HTML form builder for WordPress"
-msgstr "HTML form builder for WordPress"
+msgid "A minimal HTML form builder for WordPress; made for developers"
+msgstr "Minimalistinen HTML lomakerakentaja WordPressille; tehty kehittäjille."
 
 #. Author of the plugin/theme
 msgid "@anttiviljami"
@@ -276,6 +296,12 @@ msgstr "@anttiviljami"
 #. Author URI of the plugin/theme
 msgid "https://github.com/anttiviljami/"
 msgstr "https://github.com/anttiviljami/"
+
+#~ msgid "Make this form publicly visible with direct link?"
+#~ msgstr "Näytä lomake julkisesti suoralla linkillä?"
+
+#~ msgid "HTML form builder for WordPress"
+#~ msgstr "HTML form builder for WordPress"
 
 #~ msgid "referrer"
 #~ msgstr "lähde"
