@@ -332,7 +332,7 @@ class CPT_WPLF_Form {
 ?>
 <p><?php _e('Submissions from this form will use this formatting in their title.', 'wp-libre-form'); ?></p>
 <p><?php _e('You may use any field values enclosed in "%" markers.', 'wp-libre-form');?></p>
-<p><input type="text" name="wplf_title_format" value="<?php echo esc_attr( $format ); ?>" placeholder="<?php echo esc_attr( $default ); ?>" class="code" style="width:100%"></p>
+<p><input type="text" name="wplf_title_format" value="<?php echo esc_attr( $format ); ?>" placeholder="<?php echo esc_attr( $default ); ?>" class="code" style="width:100%" autocomplete="off"></p>
 <?php
   }
 
