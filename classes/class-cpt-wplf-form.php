@@ -314,7 +314,7 @@ class CPT_WPLF_Form {
 <p>
   <label for="wplf_email_copy_enabled">
     <input type="checkbox" <?php echo $email_enabled ? 'checked="checked"' : ''; ?> id="wplf_email_copy_enabled" name="wplf_email_copy_enabled">
-    <?php _e( 'Send an email copy when a form is submitted?' ); ?>
+    <?php _e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
   </label>
 </p>
 <p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%;display:none"></p>
