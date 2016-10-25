@@ -74,7 +74,11 @@ class WP_Libre_Form {
    * Load our plugin textdomain
    */
   public static function load_our_textdomain() {
-    load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+    $loaded = load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+
+    if( !$loaded ) {
+      $loaded = load_muplugin_textdomain( 'wp-libre-form', dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+    }
   }
 
   /**
