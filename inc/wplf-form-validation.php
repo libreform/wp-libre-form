@@ -30,15 +30,24 @@ function wplf_validate_required_empty( $return ) {
 
   // get required fields from form
   $required = explode( ',', get_post_meta( $_POST['_form_id'], '_wplf_required', true ) );
+
+  // make sure required form fields are submitted within $_POST or $_FILES arrays
   $fields_empty = array();
   foreach( $required as $key ) {
-    if( ! array_key_exists( $key, $_POST ) || empty( $_POST[$key] ) ) {
+    if(
+      ( !array_key_exists( $key, $_POST ) && !array_key_exists( $key, $_FILES ) ) ||
+      ( empty( $_POST[$key] ) && ! ( $_FILES[$key]['size'] > 0 ) )
+    ) {
+      // required field wasn't in $_POST or $_FILES
+      // we also don't accept files that are 0 bytes long
       $fields_empty[] = $key;
     }
   }
   $fields_empty = array_filter( $fields_empty ); // get rid of the empty keys
 
-  if( ! empty( $fields_empty ) ) {
+  $return->debug = $_FILES;
+
+  if(! empty( $fields_empty ) ) {
     $return->ok = 0;
     $return->error = __('Required fields are missing.', 'wp-libre-form');
     $return->fields_empty = $fields_empty;
