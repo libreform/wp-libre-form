@@ -199,20 +199,23 @@ class CPT_WPLF_Submission {
         <?php if( '_' != $field[0]  ) : ?>
         <?php
         $value = $postmeta[ $field ][0];
+
+        // maybe show a link for the field if suitable
         $possible_link = '';
-        $attachment_url = wp_get_attachment_url( $value ); // get_edit_post_link returns something awkward.
 
-        // Maybe add a filter for target="_blank"? Wouldn't enable by default.
+        // if the field ends with '_attachment' and there is an attachment url that corresponds to the id, show a link
+        $attachment_suffix = '_attachment';
+        if ( substr( $field, -strlen( $attachment_suffix ) ) === $attachment_suffix && wp_get_attachment_url( $value ) ) {
+          $link_text = __( 'View Attachment' );
+          $possible_link = '<a target="_blank" href="' . get_edit_post_link( $value ) . '" style="float:right">' . $link_text . '</a>';
+        }
 
-        if ( $attachment_url ) {
-          // If this is true, $value was a valid attachment_id.
-          // Caveat: if user enters a numeric value here, it could be interpreted as attachment.
-          $attachment_url = get_edit_post_link($value);
-          $possible_link = "<a href='$attachment_url' style='float: right;'>Edit attachment</a>";
-        } elseif ( file_exists( $home_path . substr( $value, 1 ) ) ) {
-          // This is bit less ambiguous. Check if there's a file, and if there is, get link for it.
-          $attachment_url = get_home_url() . $value;
-          $possible_link = "<a href='$attachment_url' style='float: right;'>Open file</a>";
+        // Show a link if the field corresponds to a URL
+        // assume values starting with '/' are root relative URLs and should be handled as links
+        $value_is_url = $value[0] === '/' ? true : filter_var( $value, FILTER_VALIDATE_URL );
+        if ( $value_is_url ) {
+          $link_text = __( 'Open Link', 'wp-libre-form' );
+          $possible_link = '<a target="_blank" href="' . $value . '" style="float:right">' . $link_text . '</a>';
         }
         ?>
         <tr>
