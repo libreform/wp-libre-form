@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-10-26 10:29+0100\n"
+"POT-Creation-Date: 2016-10-26 12:52+0100\n"
 "PO-Revision-Date: 2016-02-21 14:22+0100\n"
 "Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
@@ -247,6 +247,14 @@ msgstr ""
 
 #: classes/class-cpt-wplf-submission.php:194
 msgid "Value"
+msgstr ""
+
+#: classes/class-cpt-wplf-submission.php:209
+msgid "View Attachment"
+msgstr ""
+
+#: classes/class-cpt-wplf-submission.php:217
+msgid "Open Link"
 msgstr ""
 
 #: inc/wplf-form-actions.php:20

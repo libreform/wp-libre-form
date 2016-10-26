@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-10-26 10:29+0100\n"
-"PO-Revision-Date: 2016-10-26 10:29+0100\n"
+"POT-Creation-Date: 2016-10-26 12:53+0100\n"
+"PO-Revision-Date: 2016-10-26 12:53+0100\n"
 "Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language: nb\n"
@@ -246,6 +246,14 @@ msgstr "Felt"
 #: classes/class-cpt-wplf-submission.php:194
 msgid "Value"
 msgstr "Verdi"
+
+#: classes/class-cpt-wplf-submission.php:209
+msgid "View Attachment"
+msgstr ""
+
+#: classes/class-cpt-wplf-submission.php:217
+msgid "Open Link"
+msgstr ""
 
 #: inc/wplf-form-actions.php:20
 #, php-format
