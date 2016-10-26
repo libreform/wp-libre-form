@@ -1,5 +1,5 @@
 === WP Libre Form ===
-Contributors: Zuige
+Contributors: Zuige, k1sul1, sippis
 Tags: Contact, Form, Lead, Collector, HTML, Builder
 Donate link: https://github.com/anttiviljami
 Requires at least: 4.2
