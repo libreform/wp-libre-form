@@ -101,7 +101,7 @@ class CPT_WPLF_Form {
   function modify_permalink_html( $html, $post_id ) {
     $publicly_visible = $this->get_publicly_visible_state( $post_id );
 
-    if( !$publicly_visible ) {
+    if( get_post_type( $post_id ) === 'wplf-form' && !$publicly_visible ) {
       $html .= '<span>'.__( 'Form is not publicly visible', 'wp-libre-form' ).__( ', permalink will not work for visitors.', 'wp-libre-form' ).'</span>';
     }
 
@@ -280,15 +280,6 @@ class CPT_WPLF_Form {
       'wplf-form',
       'side'
     );
-
-    // Single form visibility for visitors
-    add_meta_box(
-      'wplf-visibility',
-      __( 'Visibility', 'wp-libre-form' ),
-      array( $this, 'meta_box_visibility' ),
-      'wplf-form',
-      'side'
-    );
   }
 
 
@@ -372,24 +363,6 @@ class CPT_WPLF_Form {
   }
 
   /**
-   * Meta box callback for single form visibility for visitors
-   */
-  function meta_box_visibility( $post ) {
-    // get post meta
-    $meta = get_post_meta( $post->ID );
-    $visible_for_visitors = $this->get_publicly_visible_state( $post->ID );
-?>
-<p>
-  <label for="wplf_is_publicly_visible">
-    <input type="checkbox" <?php echo $visible_for_visitors ? 'checked="checked"' : ''; ?> id="wplf_is_publicly_visible" name="wplf_is_publicly_visible">
-    <?php _e( 'Make this form publicly visible with permalink?', 'wp-libre-form' ); ?>
-  </label>
-</p>
-<?php
-  }
-
-
-  /**
    * Handles saving our post meta
    */
   function save_cpt( $post_id ) {
@@ -467,14 +440,6 @@ class CPT_WPLF_Form {
       // attributes where of course they are escaped using esc_attr() so it
       // should be fine to save the meta field without further sanitisaton
       update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
-    }
-
-    // save publicly visible state
-    if ( isset( $_POST['wplf_is_publicly_visible'] ) ) {
-      update_post_meta( $post_id, '_wplf_is_publicly_visible', $_POST['wplf_is_publicly_visible'] === 'on' );
-    }
-    else {
-      update_post_meta( $post_id, '_wplf_is_publicly_visible', false );
     }
   }
 
@@ -600,8 +565,7 @@ class CPT_WPLF_Form {
    * Wrapper function to check if form is publicly visible.
    */
   function get_publicly_visible_state( $id ) {
-    $publicly_visible = get_post_meta( $id, '_wplf_is_publicly_visible', true );
-    return apply_filters( 'wplf-form-publicly-visible', $publicly_visible, $id );
+    return apply_filters( 'wplf-form-publicly-visible', false, $id );
   }
 }
 
