@@ -12,6 +12,7 @@ Features:
 - **It's pluggable.** Add your own validation or automation with filters and action hooks.
 - Option to send a copy of submitted forms via email
 - Preview your forms
+- Full file upload support with input type=file
 
 ## Screenshots
 

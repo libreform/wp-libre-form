@@ -23,6 +23,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 * Submit and validate forms via AJAX
 * Validates required fields automatically using the native HTML5 required attribute
 * Option to send a copy of submitted forms via email
+* Full file upload support with input type=file
 
 **Contributing**
 
