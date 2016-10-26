@@ -3,8 +3,8 @@ Contributors: Zuige
 Tags: Contact, Form, Lead, Collector, HTML, Builder
 Donate link: https://github.com/anttiviljami
 Requires at least: 4.2
-Tested up to: 4.4.4
-Stable tag: 1.0.2
+Tested up to: 4.6.1
+Stable tag: 1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
