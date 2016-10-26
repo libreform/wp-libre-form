@@ -484,7 +484,7 @@ class CPT_WPLF_Form {
     if( !$publicly_visible ) {
 ?>
       <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
-        <b style="color:#dc3232;"><?php _e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?>.</b><br />
+        <b style="color:#dc3232;"><?php _e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?></b><br />
         <?php _e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) ?>
       </p>
 <?php
