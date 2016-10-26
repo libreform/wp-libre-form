@@ -102,7 +102,7 @@ class CPT_WPLF_Form {
     $publicly_visible = $this->get_publicly_visible_state( $post_id );
 
     if( get_post_type( $post_id ) === 'wplf-form' && !$publicly_visible ) {
-      $html .= '<span>'.__( 'Form is not publicly visible', 'wp-libre-form' ).__( ', permalink will not work for visitors.', 'wp-libre-form' ).'</span>';
+      $html .= '<span>' . __( 'Permalink is for preview purposes only.', 'wp-libre-form' ) . '</span>';
     }
 
     return $html;
@@ -484,8 +484,8 @@ class CPT_WPLF_Form {
     if( !$publicly_visible ) {
 ?>
       <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
-        <b style="color:#dc3232;"><?php _e( 'Form is not publicly visible', 'wp-libre-form' ) ?>.</b><br />
-        <?php _e( 'Subscriber or visitor will see a 404 error page instead of form.', 'wp-libre-form' ) ?>
+        <b style="color:#dc3232;"><?php _e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?>.</b><br />
+        <?php _e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) ?>
       </p>
 <?php
     }

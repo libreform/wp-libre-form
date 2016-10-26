@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-10-26 01:25+0300\n"
+"POT-Creation-Date: 2016-10-26 10:29+0100\n"
 "PO-Revision-Date: 2016-02-21 14:22+0100\n"
 "Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 1.8.8\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-libre-form.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -78,12 +78,8 @@ msgstr ""
 msgid "No forms found in Trash."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:105 classes/class-cpt-wplf-form.php:518
-msgid "Form is not publicly visible"
-msgstr ""
-
 #: classes/class-cpt-wplf-form.php:105
-msgid ", permalink will not work for visitors."
+msgid "Permalink is for preview purposes only."
 msgstr ""
 
 #: classes/class-cpt-wplf-form.php:163
@@ -151,37 +147,33 @@ msgstr ""
 msgid "Submission Title Format"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:287
-msgid "Visibility"
-msgstr ""
-
-#: classes/class-cpt-wplf-form.php:310
+#: classes/class-cpt-wplf-form.php:301
 msgctxt "Default success message"
 msgid "Thank you! :)"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:331
+#: classes/class-cpt-wplf-form.php:322
 msgid "Fields marked with * are required"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:352
+#: classes/class-cpt-wplf-form.php:343
 msgid "Send an email copy when a form is submitted?"
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:368
+#: classes/class-cpt-wplf-form.php:359
 msgid "Submissions from this form will use this formatting in their title."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:369
+#: classes/class-cpt-wplf-form.php:360
 msgid "You may use any field values enclosed in \"%\" markers."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:385
-msgid "Make this form publicly visible with permalink?"
+#: classes/class-cpt-wplf-form.php:487
+msgid "This form preview URL is not public and cannot be shared."
 msgstr ""
 
-#: classes/class-cpt-wplf-form.php:519
-msgid "Subscriber or visitor will see a 404 error page instead of form."
+#: classes/class-cpt-wplf-form.php:488
+msgid "Non-logged in visitors will see a 404 error page instead."
 msgstr ""
 
 #: classes/class-cpt-wplf-submission.php:37

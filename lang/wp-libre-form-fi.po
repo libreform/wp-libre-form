@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP Libre Form\n"
-"POT-Creation-Date: 2016-10-26 01:25+0300\n"
-"PO-Revision-Date: 2016-10-26 01:28+0300\n"
-"Last-Translator: Timi Wahalahti <timi@dude.fi>\n"
+"POT-Creation-Date: 2016-10-26 10:29+0100\n"
+"PO-Revision-Date: 2016-10-26 10:30+0100\n"
+"Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 1.8.8\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: wp-libre-form.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -77,13 +77,9 @@ msgstr "Lomakkeita ei löytynt."
 msgid "No forms found in Trash."
 msgstr "Roskakorissa ei ole lomakkeita."
 
-#: classes/class-cpt-wplf-form.php:105 classes/class-cpt-wplf-form.php:518
-msgid "Form is not publicly visible"
-msgstr "Lomake ei näy julkisesti"
-
 #: classes/class-cpt-wplf-form.php:105
-msgid ", permalink will not work for visitors."
-msgstr ", eikä kestolinkki toimi käyttäjillä."
+msgid "Permalink is for preview purposes only."
+msgstr "Kestolinkki toimii vain esikatseluna."
 
 #: classes/class-cpt-wplf-form.php:163
 msgid "Please enter your name"
@@ -149,41 +145,37 @@ msgstr "Sähköpostit"
 msgid "Submission Title Format"
 msgstr "Nimi lähetetylle lomakkeelle"
 
-#: classes/class-cpt-wplf-form.php:287
-msgid "Visibility"
-msgstr "Näkyvyys"
-
-#: classes/class-cpt-wplf-form.php:310
+#: classes/class-cpt-wplf-form.php:301
 msgctxt "Default success message"
 msgid "Thank you! :)"
 msgstr "Kiitos! :)"
 
-#: classes/class-cpt-wplf-form.php:331
+#: classes/class-cpt-wplf-form.php:322
 msgid "Fields marked with * are required"
 msgstr "Tähdelliset * kentät on pakollisia"
 
-#: classes/class-cpt-wplf-form.php:352
+#: classes/class-cpt-wplf-form.php:343
 msgid "Send an email copy when a form is submitted?"
 msgstr "Lähetä kopio sähköpostiin kun lomake lähetetään?"
 
-#: classes/class-cpt-wplf-form.php:368
+#: classes/class-cpt-wplf-form.php:359
 msgid "Submissions from this form will use this formatting in their title."
 msgstr ""
 "Tähän lomakkeeseen lähetetyt vastaukset nimetään allaolevan kaavan "
 "mukaisesti."
 
-#: classes/class-cpt-wplf-form.php:369
+#: classes/class-cpt-wplf-form.php:360
 msgid "You may use any field values enclosed in \"%\" markers."
 msgstr ""
 "Voit käyttää otsikossa mitä tahansa kenttiä arvoja \"%\"-merkkien sisällä."
 
-#: classes/class-cpt-wplf-form.php:385
-msgid "Make this form publicly visible with permalink?"
-msgstr "Näytä lomake julkisesti kestolinkillä?"
+#: classes/class-cpt-wplf-form.php:487
+msgid "This form preview URL is not public and cannot be shared."
+msgstr "Tämä esikatselusivu ei ole julkinen, eikä sitä voi jakaa."
 
-#: classes/class-cpt-wplf-form.php:519
-msgid "Subscriber or visitor will see a 404 error page instead of form."
-msgstr "Tilaaja tai käyttäjä näkee lomakkeen sijaan 404-virhesivun."
+#: classes/class-cpt-wplf-form.php:488
+msgid "Non-logged in visitors will see a 404 error page instead."
+msgstr "Kirjautumattomille vierailijoille näytetään 404-sivu."
 
 #: classes/class-cpt-wplf-submission.php:37
 msgctxt "post type general name"
@@ -296,6 +288,21 @@ msgstr "@anttiviljami"
 #. Author URI of the plugin/theme
 msgid "https://github.com/anttiviljami/"
 msgstr "https://github.com/anttiviljami/"
+
+#~ msgid "Form is not publicly visible"
+#~ msgstr "Lomake ei näy julkisesti"
+
+#~ msgid ", permalink will not work for visitors."
+#~ msgstr ", eikä kestolinkki toimi käyttäjillä."
+
+#~ msgid "Visibility"
+#~ msgstr "Näkyvyys"
+
+#~ msgid "Make this form publicly visible with permalink?"
+#~ msgstr "Näytä lomake julkisesti kestolinkillä?"
+
+#~ msgid "Subscriber or visitor will see a 404 error page instead of form."
+#~ msgstr "Tilaaja tai käyttäjä näkee lomakkeen sijaan 404-virhesivun."
 
 #~ msgid "Make this form publicly visible with direct link?"
 #~ msgstr "Näytä lomake julkisesti suoralla linkillä?"
