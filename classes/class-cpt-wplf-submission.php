@@ -206,7 +206,7 @@ class CPT_WPLF_Submission {
         // if the field ends with '_attachment' and there is an attachment url that corresponds to the id, show a link
         $attachment_suffix = '_attachment';
         if ( substr( $field, -strlen( $attachment_suffix ) ) === $attachment_suffix && wp_get_attachment_url( $value ) ) {
-          $link_text = __( 'View Attachment' );
+          $link_text = __( 'View Attachment', 'wp-libre-form' );
           $possible_link = '<a target="_blank" href="' . get_edit_post_link( $value ) . '" style="float:right">' . $link_text . '</a>';
         }
 
