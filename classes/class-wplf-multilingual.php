@@ -29,9 +29,9 @@ if ( !class_exists( 'WPLF_Multilingual' ) ) {
     public function render_form ( $form_content ) {
       // Get all strings inside double curly braces.
       preg_match_all( $this->regular_expression, $form_content, $matches );
-      foreach( $matches as $match ){
+      foreach( $matches[0] as $match ){
         // match contains the braces, get rid of them.
-        $string = trim( str_replace( array( "{" , "}" ), array( "", "" ), $match[0] ) );
+        $string = trim( str_replace( array( "{" , "}" ), array( "", "" ), $match ) );
         $form_content = str_replace( $match, $this->translate_string ( $string ), $form_content );
       }
 
@@ -41,9 +41,9 @@ if ( !class_exists( 'WPLF_Multilingual' ) ) {
     function save_form ( $post_id, $post, $update ) {
       preg_match_all( $this->regular_expression, $post->post_content, $matches );
       if( !empty( $matches ) ) {
-        foreach( $matches as $match ){
+        foreach( $matches[0] as $match ){
           // match contains the braces, get rid of them.
-          $string = trim( str_replace( array( "{" , "}" ), array( "", "" ), $match[0] ) );
+          $string = trim( str_replace( array( "{" , "}" ), array( "", "" ), $match ) );
           $this->strings[$string] = null;
           // By storing the string as the array key, we don't need to use array_unique.
         }
