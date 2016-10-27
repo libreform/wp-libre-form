@@ -59,11 +59,19 @@ if ( !class_exists( 'WPLF_Multilingual' ) ) {
     }
 
     public function register_string ( $string  ) {
-      pll_register_string( $string, $string, 'WP Libre Form' );
+      if( function_exists( 'pll_register_string' ) ) {
+        pll_register_string( $string, $string, 'WP Libre Form' );
+      } else {
+        // Don't kill anything.
+      }
     }
 
     public function translate_string ( $string ) {
-      return pll__( $string );
+      if( function_exists( 'pll__' ) ) {
+        return pll__( $string );
+      } else {
+        return $string; // Don't kill anything.
+      }
     }
   }
 }
