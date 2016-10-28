@@ -1,6 +1,6 @@
 <?php
-if ( !class_exists( 'WPLF_Multilingual' ) ) {
-  class WPLF_Multilingual {
+if ( !class_exists( 'WPLF_Polylang' ) ) {
+  class WPLF_Polylang {
     /**
      * CPT for the forms
      */
@@ -10,7 +10,7 @@ if ( !class_exists( 'WPLF_Multilingual' ) ) {
 
     public static function init() {
       if ( is_null( self::$instance ) ) {
-        self::$instance = new WPLF_Multilingual();
+        self::$instance = new WPLF_Polylang();
       }
       return self::$instance;
     }
@@ -24,6 +24,7 @@ if ( !class_exists( 'WPLF_Multilingual' ) ) {
       add_action( 'after_setup_theme', array ( $this, 'register_strings') );
 
       $this->strings = get_option( 'wplf-translation-strings', array() );
+      $this->register_strings();
     }
 
     public function render_form ( $form_content ) {
