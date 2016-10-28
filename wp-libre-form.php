@@ -56,6 +56,13 @@ class WP_Libre_Form {
     CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
 
+    add_action( 'after_setup_theme', function() {
+      if ( apply_filters( 'wplf_load_polylang', true ) ) {
+        require_once 'classes/class-wplf-polylang.php';
+        WPLF_Polylang::init();
+      }
+    } );
+
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
 
     // flush rewrites on activation since we have slugs for our cpts

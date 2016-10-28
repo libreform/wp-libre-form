@@ -185,3 +185,20 @@ function wplf_recaptcha( $return ) {
   return $return;
 }
 ```
+
+### Multilingual
+
+You can create multilingual forms using Polylang. WPLF will register and automatically fetch the translation when you use special template tags.
+
+Example:
+```html
+<input type="text" placeholder="{{ Test string  }}" name="test">
+```
+
+You can also disable this feature, and create your own middleware for WPML, if you'd like.
+
+```php
+add_filter( 'wplf_load_polylang' , function() {
+  return false;
+} );
+```
