@@ -161,13 +161,13 @@ class CPT_WPLF_Form {
       // default content starts here:
 ?>
 <label for="name"><?php _e( 'Please enter your name', 'wp-libre-form' ); ?></label>
-<input type="text" name="name" placeholder="<?php _ex( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>">
+<input type="text" name="name" id="name" placeholder="<?php _ex( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>">
 
 <label for="email"><?php _e( 'Please enter your email address', 'wp-libre-form' ); ?> <?php _e( '(required)', 'wp-libre-form' ); ?></label>
-<input type="email" name="email" placeholder="<?php _ex( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required>
+<input type="email" name="email" id="email" placeholder="<?php _ex( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required>
 
 <label for="message"><?php _e( 'Write your message below', 'wp-libre-form' ); ?> <?php _e( '(required)', 'wp-libre-form' ); ?></label>
-<textarea name="message" rows="5" placeholder="<?php _ex( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea>
+<textarea name="message" rows="5" id="message" placeholder="<?php _ex( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea>
 
 <button type="submit"><?php _e( 'Submit', 'wp-libre-form' ); ?></button>
 
