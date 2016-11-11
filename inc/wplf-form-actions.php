@@ -25,8 +25,8 @@ function wplf_send_email_copy( $return ) {
       if( '_' === $key[0] ) {
         continue;
       }
-      if(is_array($value)) { // in case input type="radio" submits an array
-        $value = implode(', ', $value);
+      if( is_array( $value ) ) { // in case input type="radio" submits an array
+        $value = implode( ', ' , $value );
       }
       $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
     }
