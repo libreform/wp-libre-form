@@ -13,11 +13,19 @@
 
 window.wplf = {
   successCallbacks: [],
-  errorCallbacks: []
-};
+  errorCallbacks: [],
+  attach: function(form){
+    // form is a selector
+    if (typeof form == 'string')
+      form = document.querySelectorAll(form);
 
-document.addEventListener("DOMContentLoaded", function(){
-  [].forEach.call(document.querySelectorAll(".libre-form"), function(form){
+    // form is an array of elements or a node list
+    if (form.constructor === Array || form.constructor === NodeList){
+      [].forEach.call(form, function(form){
+        window.wplf.attach(form);
+      });
+      return;
+    }
 
     form.addEventListener("submit", function(e){
 
@@ -91,6 +99,10 @@ document.addEventListener("DOMContentLoaded", function(){
       e.preventDefault();
     });
 
-  });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  [].forEach.call(document.querySelectorAll(".libre-form"), wplf.attach);
 });
 })();
