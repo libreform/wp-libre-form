@@ -19,8 +19,13 @@ function wplf_ajax_submit_handler() {
   if( $return->ok ) {
     // form existence has already been validated via filters
 
+    // copy $_POST to $form_data in order to undo WordPress' magic quotes
+    $form_data = stripslashes_deep($_POST);
 
-    $form = get_post( intval( $_POST['_form_id'] ) );
+    // Make form data filterable
+    $form_data = apply_filters( 'wplf_form_data', $form_data );
+
+    $form = get_post( intval( $form_data['_form_id'] ) );
 
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
@@ -31,8 +36,8 @@ function wplf_ajax_submit_handler() {
     preg_match_all('/%(.+?)%/', $post_title, $toks);
     foreach($toks[1] as $tok) {
       $replace = '';
-      if( array_key_exists( $tok, $_POST ) ) {
-        $replace = sanitize_text_field( $_POST[$tok] );
+      if( array_key_exists( $tok, $form_data ) ) {
+        $replace = sanitize_text_field( $form_data[$tok] );
       }
       $post_title = preg_replace('/%.+?%/', $replace, $post_title, 1);
     }
@@ -45,13 +50,14 @@ function wplf_ajax_submit_handler() {
     ));
 
     // add submission data as meta values
-    foreach( $_POST as $key => $value ) {
-      if( !is_array($value) ) {
-        add_post_meta($post_id, $key, esc_html( $value ), true);
-      }
-      else {
-        add_post_meta($post_id, $key, esc_html( json_encode( $value ) ), true);
-      }
+    foreach( $form_data as $key => $value ) {
+      if ( $slash = is_array($value ) )
+        $value = json_encode($value);
+
+      // Escape slashes for add_post_meta (https://codex.wordpress.org/Function_Reference/update_post_meta#Character_Escaping)
+      $value = wp_slash($value);
+
+      add_post_meta($post_id, $key, $value, true);
     }
 
     // handle files
