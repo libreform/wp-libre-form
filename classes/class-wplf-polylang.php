@@ -5,7 +5,7 @@ if ( !class_exists( 'WPLF_Polylang' ) ) {
      * CPT for the forms
      */
     public static $instance;
-    protected $regular_expression = "/{{\s*.+\s*}}/";
+    protected $regular_expression = "/{{[^{}\n]+}}/";
     protected $strings = array();
 
     public static function init() {
