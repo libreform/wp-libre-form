@@ -33,14 +33,8 @@ function wplf_ajax_submit_handler() {
     // substitute the %..% tags with field values
     $post_title = $title_format;
 
-    preg_match_all('/%(.+?)%/', $post_title, $toks);
-    foreach($toks[1] as $tok) {
-      $replace = '';
-      if( array_key_exists( $tok, $form_data ) ) {
-        $replace = sanitize_text_field( $form_data[$tok] );
-      }
-      $post_title = preg_replace('/%.+?%/', $replace, $post_title, 1);
-    }
+    $wplf = WP_Libre_Form::init();
+    $post_title = $wplf->substitute($post_title, $form_data);
 
     // create submission post
     $post_id = wp_insert_post( array(

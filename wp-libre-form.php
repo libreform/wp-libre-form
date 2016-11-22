@@ -96,6 +96,33 @@ class WP_Libre_Form {
   public function wplf_form( $id, $content = '', $xclass = '' ) {
     return CPT_WPLF_Form::wplf_form( $id, $content, $xclass );
   }
+
+  /**
+  * Substitutes %..% tokens in $string with values with corresponding keys in $data.
+  *
+  * @param string $string     Input string
+  * @param array  $data       Key-value pairs to substitute in $string
+  * @param bool   $cleanup    Remove unused tokens at the end
+  */
+public function substitute($string, $data = array(), $cleanup = true) {
+    // Moved and modified from wplf-ajax.php
+
+    preg_match_all('/%(.+?)%/', $string, $toks);
+    $toks = array_unique($toks);
+    foreach($toks[1] as $tok) {
+      $replace = '';
+      if( array_key_exists( $tok, $data ) ) {
+        $replace = sanitize_text_field( $data[$tok] );
+        $string = str_replace('%' . $tok . '%', $replace, $string);
+      }
+    }
+
+    // cleanup
+    if ($cleanup)
+      $string = preg_replace('/%.+?%/', '', $string);
+
+    return $string;
+  }
 }
 
 endif;
