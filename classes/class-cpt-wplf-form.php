@@ -436,14 +436,7 @@ class CPT_WPLF_Form {
 
     // save title format
     if ( isset( $_POST['wplf_title_format'] ) ) {
-      $safe_title_format = $_POST['wplf_title_format']; // TODO: are there any applicable sanitize functions?
-
-      // A typical title format will include characters like <, >, %, -.
-      // which means all sanitize_* fuctions will probably mess with the field
-      // The only place the title formats are displayed are within value=""
-      // attributes where of course they are escaped using esc_attr() so it
-      // should be fine to save the meta field without further sanitisaton
-      update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
+      update_post_meta( $post_id, '_wplf_title_format', $_POST['wplf_title_format'] );
     }
   }
 
