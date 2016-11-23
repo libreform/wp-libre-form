@@ -27,7 +27,6 @@ function wplf_ajax_submit_handler() {
 
     $form = get_post( intval( $form_data['_form_id'] ) );
 
-    // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
 
     // substitute the %..% tags with field values
