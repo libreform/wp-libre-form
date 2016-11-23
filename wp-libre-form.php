@@ -108,8 +108,8 @@ public function substitute($string, $data = array(), $cleanup = true) {
     // Moved and modified from wplf-ajax.php
 
     preg_match_all('/%(.+?)%/', $string, $toks);
-    $toks = array_unique($toks);
-    foreach($toks[1] as $tok) {
+    $toks = array_unique($toks[1]);
+    foreach($toks as $tok) {
       $replace = '';
       if( array_key_exists( $tok, $data ) ) {
         $replace = sanitize_text_field( $data[$tok] );
