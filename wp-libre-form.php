@@ -98,6 +98,57 @@ class WP_Libre_Form {
   }
 
   /**
+   * Returns the theme's email templates
+   *
+   * Modified from WP_Theme::get_page_templates
+   */
+  public function get_email_templates() {
+    // If you screw up your current theme and we invalidate your parent, most things still work. Let it slide.
+    //if ( $this->errors() && $this->errors()->get_error_codes() !== array( 'theme_parent_invalid' ) )
+    //  return array();
+    $theme = wp_get_theme();
+
+    $email_templates = wp_cache_get( 'email_copy_templates', 'wplf', false, $email_templates );
+
+    if ( !is_array( $email_templates ) ) {
+
+      $internal_templates_path = plugin_dir_path(__file__) . 'email-templates/';
+      $email_templates = array();
+
+      $files = (array) $theme->get_files( 'php', 1, true);
+
+      // include wplf's own templates
+      $internal_templates = glob($internal_templates_path . '*.php');
+      foreach ($internal_templates as $full_path) {
+        $file = basename($full_path);
+        // internal templates get prefixed with _wplf.
+        // This makes it easy to resolve the full path and if necessary, filter out these from the template selector
+        $files['_wplf/' . $file] = $full_path;
+      }
+      foreach ( $files as $file => $full_path ) {
+        if ( ! preg_match( '|Wplf Template Name:(.*)$|mi', file_get_contents( $full_path ), $header ) )
+          continue;
+        $name = _cleanup_header_comment( $header[1] );
+        // Translation support for template name.
+        // TODO: Not 100% sure if this is done right.
+        $name = __($name, 'wp-libre-form');
+        $email_templates[ $file ] = [
+          'name' => $name,
+          'path' => $full_path,
+          'file' => $file
+        ];
+      }
+
+      wp_cache_set( 'email_copy_templates', $email_templates, 'wplf');
+    }
+    // TODO: Original WP code had template header translation here. Didn't seem too important
+    // in this scenario and frankly I just couldn't be bothered/had more important things to do.
+    // But in case someone wants to add and test it, here's the place! :)
+
+    return (array) apply_filters( 'wplf_email_copy_templates', $email_templates );
+  }
+
+  /**
   * Substitutes %..% tokens in $string with values with corresponding keys in $data.
   *
   * @param string $string     Input string
