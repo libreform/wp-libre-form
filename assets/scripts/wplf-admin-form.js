@@ -57,9 +57,9 @@ $(document).ready(function() {
   // display email copy field if the feature is enabled
   function toggleEmailCopy() {
     if( $('input[name="wplf_email_copy_enabled"]:checked').length > 0 ) {
-      $('input[name="wplf_email_copy_to"]').show();
+      $('.wplf-email-fields').show();
     } else {
-      $('input[name="wplf_email_copy_to"]').hide();
+      $('.wplf-email-fields').hide();
     }
   }
   $('input[name="wplf_email_copy_enabled"]').change(toggleEmailCopy);

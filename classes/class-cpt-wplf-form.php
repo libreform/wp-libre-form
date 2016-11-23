@@ -343,7 +343,10 @@ class CPT_WPLF_Form {
     <?php _e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
   </label>
 </p>
+<div class="wplf-email-fields" style="display: none">
 <p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%;display:none"></p>
+</div>
+
 <?php
   }
 
