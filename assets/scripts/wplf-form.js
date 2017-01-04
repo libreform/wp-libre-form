@@ -8,53 +8,32 @@
 // Promise polyfill: https://github.com/taylorhakes/promise-polyfill
 !function(t){function e(){}function n(t,e){return function(){t.apply(e,arguments)}}function o(t){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof t)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(t,this)}function r(t,e){for(;3===t._state;)t=t._value;return 0===t._state?void t._deferreds.push(e):(t._handled=!0,void a(function(){var n=1===t._state?e.onFulfilled:e.onRejected;if(null===n)return void(1===t._state?i:f)(e.promise,t._value);var o;try{o=n(t._value)}catch(r){return void f(e.promise,r)}i(e.promise,o)}))}function i(t,e){try{if(e===t)throw new TypeError("A promise cannot be resolved with itself.");if(e&&("object"==typeof e||"function"==typeof e)){var r=e.then;if(e instanceof o)return t._state=3,t._value=e,void u(t);if("function"==typeof r)return void s(n(r,e),t)}t._state=1,t._value=e,u(t)}catch(i){f(t,i)}}function f(t,e){t._state=2,t._value=e,u(t)}function u(t){2===t._state&&0===t._deferreds.length&&a(function(){t._handled||d(t._value)});for(var e=0,n=t._deferreds.length;n>e;e++)r(t,t._deferreds[e]);t._deferreds=null}function c(t,e,n){this.onFulfilled="function"==typeof t?t:null,this.onRejected="function"==typeof e?e:null,this.promise=n}function s(t,e){var n=!1;try{t(function(t){n||(n=!0,i(e,t))},function(t){n||(n=!0,f(e,t))})}catch(o){if(n)return;n=!0,f(e,o)}}var l=setTimeout,a="function"==typeof setImmediate&&setImmediate||function(t){l(t,0)},d=function(t){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",t)};o.prototype["catch"]=function(t){return this.then(null,t)},o.prototype.then=function(t,n){var o=new this.constructor(e);return r(this,new c(t,n,o)),o},o.all=function(t){var e=Array.prototype.slice.call(t);return new o(function(t,n){function o(i,f){try{if(f&&("object"==typeof f||"function"==typeof f)){var u=f.then;if("function"==typeof u)return void u.call(f,function(t){o(i,t)},n)}e[i]=f,0===--r&&t(e)}catch(c){n(c)}}if(0===e.length)return t([]);for(var r=e.length,i=0;i<e.length;i++)o(i,e[i])})},o.resolve=function(t){return t&&"object"==typeof t&&t.constructor===o?t:new o(function(e){e(t)})},o.reject=function(t){return new o(function(e,n){n(t)})},o.race=function(t){return new o(function(e,n){for(var o=0,r=t.length;r>o;o++)t[o].then(e,n)})},o._setImmediateFn=function(t){a=t},o._setUnhandledRejectionFn=function(t){d=t},"undefined"!=typeof module&&module.exports?module.exports=o:t.Promise||(t.Promise=o)}(this);
 
+(function() {
 
-(function(){
-
-window.wplf = {
-  successCallbacks: [],
-  errorCallbacks: [],
-  attach: function(form){
-    // form is a selector
-    if (typeof form == 'string')
-      form = document.querySelectorAll(form);
-
-    // form is an array of elements or a node list
-    if (form.constructor === Array || form.constructor === NodeList){
-      [].forEach.call(form, function(form){
-        window.wplf.attach(form);
-      });
-      return;
-    }
-
-    form.addEventListener("submit", function(e){
-
+  window.wplf = {
+    successCallbacks: [],
+    errorCallbacks: [],
+    submitHandler: function (e) {
+      var form = e.target;
+      var data = new FormData(form);
       // add class to enable css changes to indicate ajax loading
       form.classList.add("sending");
 
-      [].forEach.call(form.querySelectorAll(".wplf-error"), function(error){
+      [].forEach.call(form.querySelectorAll(".wplf-error"), function(error) {
         // reset errors
         error.parentNode.removeChild(error);
       });
 
-      var data = new FormData(form);
-
-      window.data = data;
-
       fetch(ajax_object.ajax_url  + '?action=wplf_submit', {
         method: "POST",
         body: data
-      }).then(function(response){
-
+      }).then(function(response) {
         return response.text();
-
-      }).then(function(response){
-
+      }).then(function(response) {
         response = JSON.parse(response);
 
         if( 'success' in response ) {
           // show success message if one exists
-
           var success = document.createElement("p");
           success.className = "wplf-success";
           success.innerHTML = response.success;
@@ -66,43 +45,59 @@ window.wplf = {
           // submit succesful!
           form.parentNode.removeChild(form);
 
-          window.wplf.successCallbacks.forEach(function(func){
+          window.wplf.successCallbacks.forEach(function(func) {
             func(response);
           });
         }
 
         if( 'error' in response ) {
           // show error message in form
-
           var error = document.createElement("p");
           error.className = "wplf-error error";
           error.textContent = response.error;
 
           form.appendChild(error);
 
-          window.wplf.errorCallbacks.forEach(function(func){
+          window.wplf.errorCallbacks.forEach(function(func) {
             func(response);
           });
         }
 
         form.classList.remove('sending');
-
-      }).catch(function(error){
-
-        console.warn("Fetch error: ", error);
+      }).catch(function(error) {
         form.classList.remove("sending");
 
+        if (window.wplf.errorCallbacks.length > 0) {
+          window.wplf.errorCallbacks.forEach(function(func) {
+            func(error);
+          });
+        } else {
+          console.warn("Fetch error: ", error);
+        }
       });
 
       // don't actually submit the form, causing a page reload
-
       e.preventDefault();
-    });
+    },
+    attach: function(form) {
+      // form is a selector
+      if (typeof form == 'string') {
+        form = document.querySelectorAll(form);
+      }
 
-  }
-}
+      // form is an array of elements or a node list
+      if (form.constructor === Array || form.constructor === NodeList) {
+        [].forEach.call(form, function(form){
+          window.wplf.attach(form);
+        });
+        return;
+      }
 
-document.addEventListener("DOMContentLoaded", function(){
-  [].forEach.call(document.querySelectorAll(".libre-form"), wplf.attach);
-});
+      form.addEventListener("submit", window.wplf.submitHandler);
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
+  });
 })();
