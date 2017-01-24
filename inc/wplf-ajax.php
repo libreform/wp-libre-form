@@ -5,7 +5,7 @@
  */
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
-function wplf_ajax_submit_handler() {
+function wplf_ajax_submit_handler( $nojs_fallback_call = false ) {
   $return = new stdClass();
   $return->ok = 1;
 
@@ -78,7 +78,9 @@ function wplf_ajax_submit_handler() {
 
   }
 
-  // respond with json
-  wp_send_json( $return );
-  wp_die();
+  // respond with json if was a js call
+  if( !$nojs_fallback_call ) {
+    wp_send_json( $return );
+    wp_die();
+  }
 }
