@@ -463,6 +463,11 @@ class CPT_WPLF_Form {
    */
   function wplf_form( $id , $content = '', $xclass = '' ) {
     global $post;
+    
+    if( isset( $_POST['_wplf_success'] ) ) {
+      $thankyou = apply_filters( 'the_content', get_post_meta( $id, '_wplf_thank_you', true ) );
+      return $thankyou;
+    }
 
     if( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
       if( empty( $content ) ) {
@@ -478,7 +483,7 @@ class CPT_WPLF_Form {
 
       ob_start();
 ?>
-<form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>" <?php echo $multipart; ?>>
+<form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>" method="post" <?php echo $multipart; ?>>
   <?php if( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) {
     $publicly_visible = $this->get_publicly_visible_state( $id );
     if( !$publicly_visible ) {
