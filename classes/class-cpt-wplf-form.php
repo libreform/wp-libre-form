@@ -512,7 +512,13 @@ class CPT_WPLF_Form {
     global $post;
 
     // register the script, but only enqueue it if the current post contains a form in it
-    wp_register_script( 'wplf-form-js', plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), array(), WPLF_VERSION, true );
+    wp_register_script( 
+      'wplf-form-js', 
+      plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), 
+      apply_filters( 'wplf_frontend_script_dependencies', array() ),
+      WPLF_VERSION, 
+      true
+    );
 
     if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
       wp_enqueue_script( 'wplf-form-js' );
