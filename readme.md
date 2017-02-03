@@ -87,7 +87,10 @@ If you use shortcodes outside the content, ex. custom fields or by `do_shortcode
 
 ```php
 wp_enqueue_script('wplf-form-js');
-wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+wp_localize_script( 'wplf-form-js', 'ajax_object', array( 
+  'ajax_url' => admin_url( 'admin-ajax.php' ),
+  'ajax_credentials' => apply_filters('wplf_frontend_script_credentials', 'same-origin')
+) );
 ```
 
 ### Client side callbacks
