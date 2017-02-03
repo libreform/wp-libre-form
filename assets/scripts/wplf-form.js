@@ -26,6 +26,7 @@
 
       fetch(ajax_object.ajax_url  + '?action=wplf_submit', {
         method: "POST",
+        credentials: ajax_object.ajax_credentials,
         body: data
       }).then(function(response) {
         return response.text();
