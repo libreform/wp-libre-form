@@ -30,6 +30,11 @@ class CPT_WPLF_Submission {
     add_action( 'manage_posts_custom_column' , array( $this, 'custom_columns_display_cpt' ), 10, 2 );
     add_action( 'restrict_manage_posts', array( $this, 'form_filter_dropdown' ) );
     add_filter( 'pre_get_posts', array( $this, 'filter_by_form' ) );
+
+    // add custom bulk actions
+    add_filter( 'bulk_actions-edit-wplf-submission', array( $this, 'register_wplf_submission_bulk_actions' ) );
+    add_filter( 'handle_bulk_actions-edit-wplf-submission', array( $this, 'wplf_submission_bulk_action_handler' ), 10, 3  );
+    add_action( 'admin_notices', array( $this, 'wplf_submission_bulk_action_admin_notice' ) );
   }
 
   public static function register_cpt() {
@@ -160,6 +165,39 @@ class CPT_WPLF_Submission {
     }
 
     return $query;
+  }
+
+  function register_wplf_submission_bulk_actions( $bulk_actions ) {
+    $bulk_actions['wplf_resend_copy'] = __('Resend email copy', 'wp-libre-form');
+    return $bulk_actions;
+  }
+
+  function wplf_submission_bulk_action_handler( $redirect_to, $doaction, $post_ids ) {
+    if( $doaction !== 'wplf_resend_copy' ) {
+      return $redirect_to;
+    }
+
+    foreach( $post_ids as $post_id ) {
+      $return = new stdClass();
+      $return->ok = 1;
+
+      wplf_send_email_copy( $return, $post_id );
+    }
+
+    $redirect_to = add_query_arg( 'wplf_resent', count( $post_ids ), $redirect_to );
+    return $redirect_to;
+  }
+
+  function wplf_submission_bulk_action_admin_notice() {
+    if( !empty( $_REQUEST['wplf_resent'] ) ) {
+      $count = intval( $_REQUEST['wplf_resent'] );
+      printf( '<div id="wplf-submission-bulk-resend-message" class="notice notice-success"><p>' .
+        _n( 'Resent email copy of %s submission.',
+          'Resent email copy of %s submissions.',
+          $count,
+          'wp-libre-form'
+        ) . '</p></div>', $count );
+    }
   }
 
   /**

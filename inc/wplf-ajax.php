@@ -19,7 +19,6 @@ function wplf_ajax_submit_handler() {
   if( $return->ok ) {
     // form existence has already been validated via filters
 
-
     $form = get_post( intval( $_POST['_form_id'] ) );
 
     // the title is the value of whatever the first field was in the form
@@ -46,11 +45,11 @@ function wplf_ajax_submit_handler() {
 
     // add submission data as meta values
     foreach( $_POST as $key => $value ) {
-      if( !is_array($value) ) {
-        add_post_meta($post_id, $key, esc_html( $value ), true);
+      if( !is_array( $value ) ) {
+        add_post_meta( $post_id, $key, esc_html( $value ), true );
       }
       else {
-        add_post_meta($post_id, $key, esc_html( json_encode( $value ) ), true);
+        add_post_meta( $post_id, $key, esc_html( json_encode( $value ) ), true );
       }
     }
 
@@ -63,7 +62,10 @@ function wplf_ajax_submit_handler() {
       add_post_meta( $post_id, $key . "_attachment", $attach_id );
     }
 
-
+    // save email copy address to submission meta for later use
+    $to = get_post_meta( $form->ID, '_wplf_email_copy_to', true );
+    $to = !empty( $to ) ? $to : get_option( 'admin_email' );
+    add_post_meta( $post_id, '_wplf_email_copy_to', apply_filters( 'wplf_email_copy_to', $to ) );
 
     $return->submission_id = $post_id;
     $return->submission_title = $post_title;
@@ -74,8 +76,7 @@ function wplf_ajax_submit_handler() {
 
     // allow user to attach custom actions after the submission has been received
     // these could be confirmation emails, additional processing for the submission fields, e.g.
-    do_action('wplf_post_validate_submission', $return);
-
+    do_action( 'wplf_post_validate_submission', $return );
   }
 
   // respond with json
