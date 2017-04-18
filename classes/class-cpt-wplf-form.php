@@ -512,17 +512,20 @@ class CPT_WPLF_Form {
     global $post;
 
     // register the script, but only enqueue it if the current post contains a form in it
-    wp_register_script( 
-      'wplf-form-js', 
-      plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), 
+    wp_register_script(
+      'wplf-form-js',
+      plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ),
       apply_filters( 'wplf_frontend_script_dependencies', array() ),
-      WPLF_VERSION, 
+      WPLF_VERSION,
       true
     );
 
     if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
       wp_enqueue_script( 'wplf-form-js' );
-      wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+      wp_localize_script( 'wplf-form-js', 'ajax_object', array(
+        'ajax_url' => admin_url( 'admin-ajax.php' ),
+        'ajax_credentials' => apply_filters('wplf_ajax_fetch_credentials_mode', 'same-origin')
+      ) );
     }
   }
 
