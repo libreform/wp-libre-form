@@ -26,7 +26,7 @@
 
       fetch(ajax_object.ajax_url  + '?action=wplf_submit', {
         method: "POST",
-        credentials: ajax_object.ajax_credentials || 'omit', // if it's not defined, omit. 
+        credentials: ajax_object.ajax_credentials || 'same-origin',
         body: data
       }).then(function(response) {
         return response.text();
