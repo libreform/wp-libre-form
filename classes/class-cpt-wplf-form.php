@@ -343,7 +343,41 @@ class CPT_WPLF_Form {
     <?php _e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
   </label>
 </p>
-<p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%;display:none"></p>
+<div class="wplf-email-fields" style="display: none">
+<p><strong><?php _e('Email Recipient') ?></strong></p>
+<p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%"></p>
+
+<?php
+  $wplf = WP_Libre_Form::init();
+  $templates = $wplf->get_email_templates();
+
+?>
+<p><strong><?php _e('Email Template') ?></strong></p>
+<p><select name="wplf_email_copy_template" id="wplf_email_copy_template" style="width: 100%">
+
+<?php
+    $default = isset( $meta['_wplf_email_copy_template'] ) ? $meta['_wplf_email_copy_template'][0] : '';
+    ksort( $templates );
+    foreach ( $templates as $key => $template ) {
+        $selected = selected( $default, $key, false );
+        $templateName = $template['name'];
+        echo "\n\t<option value='" . $key . "' $selected>$templateName</option>";
+    }
+
+?>
+
+</select></p>
+
+<?php
+$default = apply_filters( 'wplf_default_email_copy_subject', __( '%title% - New submission from %name%', 'wp-libre-form' ), 'meta-box');
+$format = isset( $meta['_wplf_email_copy_subject_format'] ) ? $meta['_wplf_email_copy_subject_format'][0] : $default;
+?>
+<p><strong><?php _e('Subject Template') ?></strong></p>
+<p><?php _e('Submissions from this form will use this formatting in their email subject.', 'wp-libre-form'); ?></p>
+<p><?php _e('You may use any field values enclosed in "%" markers.', 'wp-libre-form');?></p>
+<p><input type="text" name="wplf_email_copy_subject_format" value="<?php echo esc_attr( $format ); ?>" placeholder="<?php echo esc_attr( $default ); ?>" class="code" style="width:100%" autocomplete="off"></p>
+</div>
+
 <?php
   }
 
@@ -407,6 +441,16 @@ class CPT_WPLF_Form {
       update_post_meta( $post_id, '_wplf_email_copy_enabled', false );
     }
 
+    // email template
+    if ( isset( $_POST['wplf_email_copy_template'] ) ) {
+      update_post_meta( $post_id, '_wplf_email_copy_template', $_POST['wplf_email_copy_template'] );
+    }
+
+    // email subject format
+    if ( isset( $_POST['wplf_email_copy_subject_format'] ) ) {
+      update_post_meta( $post_id, '_wplf_email_copy_subject_format', $_POST['wplf_email_copy_subject_format'] );
+    }
+
     // save email copy
     if ( isset( $_POST['wplf_email_copy_to'] ) ) {
       $emailField = $_POST['wplf_email_copy_to'];
@@ -436,14 +480,7 @@ class CPT_WPLF_Form {
 
     // save title format
     if ( isset( $_POST['wplf_title_format'] ) ) {
-      $safe_title_format = $_POST['wplf_title_format']; // TODO: are there any applicable sanitize functions?
-
-      // A typical title format will include characters like <, >, %, -.
-      // which means all sanitize_* fuctions will probably mess with the field
-      // The only place the title formats are displayed are within value=""
-      // attributes where of course they are escaped using esc_attr() so it
-      // should be fine to save the meta field without further sanitisaton
-      update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
+      update_post_meta( $post_id, '_wplf_title_format', $_POST['wplf_title_format'] );
     }
   }
 
