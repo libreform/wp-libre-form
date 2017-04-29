@@ -56,12 +56,7 @@ class WP_Libre_Form {
     CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
 
-    add_action( 'after_setup_theme', function() {
-      if ( apply_filters( 'wplf_load_polylang', true ) ) {
-        require_once 'classes/class-wplf-polylang.php';
-        WPLF_Polylang::init();
-      }
-    } );
+    add_action( 'after_setup_theme', array( $this, 'init_polylang_support' ) );
 
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
 
@@ -84,9 +79,18 @@ class WP_Libre_Form {
    */
   public static function load_our_textdomain() {
     $loaded = load_plugin_textdomain( 'wp-libre-form', false, dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
-
-    if( !$loaded ) {
+    if ( ! $loaded ) {
       $loaded = load_muplugin_textdomain( 'wp-libre-form', dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
+    }
+  }
+
+  /**
+   * Enable Polylang support
+   */
+  public function init_polylang_support() {
+    if ( apply_filters( 'wplf_load_polylang', true ) ) {
+      require_once 'classes/class-wplf-polylang.php';
+      WPLF_Polylang::init();
     }
   }
 

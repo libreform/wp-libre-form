@@ -1,8 +1,8 @@
 <?php
-
 /**
  * Ajax handler for the form submissions
  */
+
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
 function wplf_ajax_submit_handler() {
@@ -10,15 +10,14 @@ function wplf_ajax_submit_handler() {
   $return->ok = 1;
 
   // allow user to pre-process the post fields
-  do_action('wplf_pre_validate_submission');
+  do_action( 'wplf_pre_validate_submission' );
 
   // validate form fields
   // @see: wplf-form-validation.php
   $return = apply_filters( 'wplf_validate_submission', $return );
 
-  if( $return->ok ) {
+  if ( $return->ok ) {
     // form existence has already been validated via filters
-
     $form = get_post( intval( $_POST['_form_id'] ) );
 
     // the title is the value of whatever the first field was in the form
@@ -27,13 +26,13 @@ function wplf_ajax_submit_handler() {
     // substitute the %..% tags with field values
     $post_title = $title_format;
 
-    preg_match_all('/%(.+?)%/', $post_title, $toks);
-    foreach($toks[1] as $tok) {
+    preg_match_all( '/%(.+?)%/', $post_title, $toks );
+    foreach ( $toks[1] as $tok ) {
       $replace = '';
-      if( array_key_exists( $tok, $_POST ) ) {
-        $replace = sanitize_text_field( $_POST[$tok] );
+      if ( array_key_exists( $tok, $_POST ) ) {
+        $replace = sanitize_text_field( $_POST[ $tok ] );
       }
-      $post_title = preg_replace('/%.+?%/', $replace, $post_title, 1);
+      $post_title = preg_replace( '/%.+?%/', $replace, $post_title, 1 );
     }
 
     // create submission post
@@ -44,27 +43,26 @@ function wplf_ajax_submit_handler() {
     ));
 
     // add submission data as meta values
-    foreach( $_POST as $key => $value ) {
-      if( !is_array( $value ) ) {
+    foreach ( $_POST as $key => $value ) {
+      if ( ! is_array( $value ) ) {
         add_post_meta( $post_id, $key, esc_html( $value ), true );
-      }
-      else {
-        add_post_meta( $post_id, $key, esc_html( json_encode( $value ) ), true );
+      } else {
+        add_post_meta( $post_id, $key, esc_html( wp_json_encode( $value ) ), true );
       }
     }
 
     // handle files
-    foreach( $_FILES as $key => $file) {
+    foreach ( $_FILES as $key => $file ) {
       // Is this enough security wise?
       // Currenly only supports 1 file per input
-      $attach_id = media_handle_upload( $key, 0, array(), array( "test_form" => false ) );
-      add_post_meta( $post_id, $key, wp_get_attachment_url($attach_id) );
-      add_post_meta( $post_id, $key . "_attachment", $attach_id );
+      $attach_id = media_handle_upload( $key, 0, array(), array( 'test_form' => false ) );
+      add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
+      add_post_meta( $post_id, $key . '_attachment', $attach_id );
     }
 
     // save email copy address to submission meta for later use
     $to = get_post_meta( $form->ID, '_wplf_email_copy_to', true );
-    $to = !empty( $to ) ? $to : get_option( 'admin_email' );
+    $to = ! empty( $to ) ? $to : get_option( 'admin_email' );
     add_post_meta( $post_id, '_wplf_email_copy_to', apply_filters( 'wplf_email_copy_to', $to ) );
 
     $return->submission_id = $post_id;
