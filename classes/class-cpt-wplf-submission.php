@@ -270,7 +270,7 @@ class CPT_WPLF_Submission {
         }
         ?>
         <tr>
-          <th><strong><?php echo esc_html( $field ); ?></strong> <?php echo wp_kses( $possible_link ); ?></th>
+          <th><strong><?php echo esc_html( $field ); ?></strong> <?php echo wp_kses( $possible_link, '' ); ?></th>
           <?php if ( strlen( $value ) > 60 || strpos( $value, "\n" ) ) : ?>
           <td><textarea style="width:100%" readonly><?php echo esc_textarea( $value ); ?></textarea></td>
           <?php else : ?>
