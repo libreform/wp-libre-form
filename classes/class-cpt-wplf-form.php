@@ -401,7 +401,7 @@ class CPT_WPLF_Form {
     // verify nonce
     if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
       return;
-    } else if ( ! wp_verify_nonce( $_POST['wplf_form_meta_nonce'], 'wplf_form_meta' ) ) {
+    } elseif ( ! wp_verify_nonce( $_POST['wplf_form_meta_nonce'], 'wplf_form_meta' ) ) {
       return;
     }
 
@@ -502,7 +502,7 @@ class CPT_WPLF_Form {
       ob_start();
 ?>
 <form
-  class="libre-form libre-form-<?php esc_attr_e( $id . ' ' . $xclass ); ?>"
+  class="libre-form libre-form-<?php echo esc_attr( $id . ' ' . $xclass ); ?>"
   <?php
     // check if form contains file inputs
     if ( strpos( $content, "type='file'" ) >= 0 || strpos( $content, 'type="file"' ) >= 0 ) {
@@ -531,8 +531,8 @@ class CPT_WPLF_Form {
     // @codingStandardsIgnoreEnd
   ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
-  <input type="hidden" name="_referrer_id" value="<?php esc_attr_e( get_the_id() ) ?>">
-  <input type="hidden" name="_form_id" value="<?php esc_attr_e( $id ); ?>">
+  <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ) ?>">
+  <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
 </form>
 <?php
       $output = ob_get_clean();

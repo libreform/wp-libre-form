@@ -87,7 +87,7 @@ class CPT_WPLF_Submission {
     if ( 'form' === $column ) {
       if ( $form_id = get_post_meta( $post_id, '_form_id', true ) ) {
         $form = get_post( $form_id );
-        echo '<a href="' . esc_url_raw( get_edit_post_link( $form_id, '' ) ). '" target="_blank">';
+        echo '<a href="' . esc_url_raw( get_edit_post_link( $form_id, '' ) ) . '" target="_blank">';
         echo esc_html( $form->post_title );
         echo '</a>';
       }
@@ -197,14 +197,16 @@ class CPT_WPLF_Submission {
       $count = intval( $_REQUEST['wplf_resent'] );
       printf(
         '<div id="wplf-submission-bulk-resend-message" class="notice notice-success"><p>' .
-         esc_html__(
-           _n( 'Resent email copy of %s submission.',
-               'Resent email copy of %s submissions.',
-               $count ),
-           'wp-libre-form'
-        ) . '</p></div>',
-        intval( $count )
-      );
+          esc_html(
+             // translators: %s is number of submissions
+             _n( 'Resent email copy of %s submission.',
+                 'Resent email copy of %s submissions.',
+                 $count,
+             'wp-libre-form'
+             )
+          ) .
+          '</p></div>',
+        intval( $count ) );
     }
   }
 
@@ -242,7 +244,7 @@ class CPT_WPLF_Submission {
     </thead>
     <tbody>
       <?php foreach ( $fields as $field ) : ?>
-        <?php if ( '_' !== $field[0]  ) : ?>
+        <?php if ( '_' !== $field[0] ) : ?>
         <?php
         $value = $postmeta[ $field ][0];
 
@@ -272,7 +274,7 @@ class CPT_WPLF_Submission {
           <?php if ( strlen( $value ) > 60 || strpos( $value, "\n" ) ) : ?>
           <td><textarea style="width:100%" readonly><?php echo esc_textarea( $value ); ?></textarea></td>
           <?php else : ?>
-          <td><input style="width:100%" type="text" value="<?php esc_attr_e( $value ); ?>" readonly></td>
+          <td><input style="width:100%" type="text" value="<?php echo esc_attr( $value ); ?>" readonly></td>
           <?php endif; ?>
         </tr>
         <?php endif; ?>

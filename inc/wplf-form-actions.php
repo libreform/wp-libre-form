@@ -21,17 +21,20 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     || isset( $submission_id ) ) {
 
     $to = $form_meta['_wplf_email_copy_to'][0];
+    // translators: %s is email address of form submitter
     $subject = wp_sprintf( __( 'New submission from %s', 'wp-libre-form' ), $referrer );
 
     if ( isset( $submission_id ) ) {
       $to = get_post_meta( $submission_id, '_wplf_email_copy_to', true );
+      // translators: %s is email address of form submitter
       $subject = wp_sprintf( __( 'Submission from %s', 'wp-libre-form' ), $referrer );
     }
 
     $to = empty( $to ) ? get_option( 'admin_email' ) : $to;
     $content = wp_sprintf(
-      __( 'Form "%s" (ID %d) was submitted with values below: ', 'wp-libre-form' ), $form_title, $form_id );
-    $content = apply_filters( 'wplf_email_copy_content_start', $content, $form_title, $form_id ). "\n\n";
+      // translators: %1$s is form title, %2$d is form ID
+      __( 'Form "%1$s" (ID %2$d) was submitted with values below: ', 'wp-libre-form' ), $form_title, $form_id );
+    $content = apply_filters( 'wplf_email_copy_content_start', $content, $form_title, $form_id ) . "\n\n";
 
     $fields = $_POST;
     if ( isset( $submission_id ) ) {

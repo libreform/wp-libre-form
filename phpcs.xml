@@ -108,5 +108,15 @@
 
     <!-- We don't use nonce verification in this plugin -->
     <exclude name="WordPress.CSRF.NonceVerification.NoNonceVerification" />
+
+    <!-- We like assignments in if -->
+    <exclude name="Squiz.PHP.DisallowMultipleAssignments.Found" />
+
+    <!-- Our hooks use dashes, not underscores -->
+    <exclude name="WordPress.NamingConventions.ValidHookName.UseUnderscores" />
+
+    <!-- This would be nice to enforce, but plugin main file shouldn't be called class-something -->
+    <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+
   </rule>
 </ruleset>

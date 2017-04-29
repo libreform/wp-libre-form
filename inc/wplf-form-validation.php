@@ -16,6 +16,7 @@ function wplf_validate_form_exists( $return ) {
     || 'wplf-form' !== get_post_type( $_POST['_form_id'] )
   ) {
     $return->ok = 0;
+    // translators: %d is form ID
     $return->error = sprintf( __( "Form id %d doesn't exist!", 'wp-libre-form' ), intval( $_POST['_form_id'] ) );
   }
   return $return;
