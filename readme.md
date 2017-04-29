@@ -1,5 +1,5 @@
 # WP Libre Form
-[![Latest Stable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/stable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Total Downloads](https://poser.pugx.org/anttiviljami/wp-libre-form/downloads)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/unstable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![License](https://poser.pugx.org/anttiviljami/wp-libre-form/license)](https://packagist.org/packages/anttiviljami/wp-libre-form)
+[![Build Status](https://travis-ci.org/anttiviljami/wp-libre-form.svg?branch=master)](https://travis-ci.org/anttiviljami/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/stable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Total Downloads](https://poser.pugx.org/anttiviljami/wp-libre-form/downloads)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/unstable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![License](https://poser.pugx.org/anttiviljami/wp-libre-form/license)](https://packagist.org/packages/anttiviljami/wp-libre-form)
 
 Use standard HTML5 markup to create fully functional forms for WordPress
 
@@ -87,7 +87,7 @@ If you use shortcodes outside the content, ex. custom fields or by `do_shortcode
 
 ```php
 wp_enqueue_script('wplf-form-js');
-wp_localize_script( 'wplf-form-js', 'ajax_object', array( 
+wp_localize_script( 'wplf-form-js', 'ajax_object', array(
   'ajax_url' => admin_url( 'admin-ajax.php' ),
   'ajax_credentials' => apply_filters('wplf_frontend_script_credentials', 'same-origin')
 ) );
