@@ -13,6 +13,7 @@ Features:
 - Option to send a copy of submitted forms via email
 - Preview your forms
 - Full file upload support with input type=file
+- Multilingual form support with Polylang
 
 ## Screenshots
 
@@ -67,7 +68,7 @@ Send a thank you email to the email in the submission
 add_action( 'wplf_post_validate_submission', 'my_email_thankyou' );
 function my_email_thankyou( $return ) {
   // do nothing if form validation failed
-  if( ! $return->ok ) {
+  if ( ! $return->ok ) {
     return;
   }
 
@@ -79,44 +80,6 @@ function my_email_thankyou( $return ) {
   wp_mail( $to, $subject, $content );
 }
 ```
-
-### Use shortcodes outside post content
-
-By default, scripts are only loaded when the shortcode is within the content.
-If you use shortcodes outside the content, ex. custom fields or by `do_shortcode`, you need to manually enqueue the scripts for the submit to work.
-
-```php
-wp_enqueue_script('wplf-form-js');
-wp_localize_script( 'wplf-form-js', 'ajax_object', array(
-  'ajax_url' => admin_url( 'admin-ajax.php' ),
-  'ajax_credentials' => apply_filters('wplf_frontend_script_credentials', 'same-origin')
-) );
-```
-
-### Client side callbacks
-
-WP Libre Form supports client side callbacks after form submission using window.wplf object. Example usage:
-
-```
-window.wplf.successCallbacks.push(function(response){
-  alert("You succesfully submitted form " + response.form_id);
-});
-
-window.wplf.errorCallbacks.push(function(response){
-  alert("Form submission failed!");
-});
-```
-
-These callbacks are executed in the order they appear.
-
-### Add CSS classes to form output
-
-You can use the xclass attribute inside the shortcode to add your own extra classes.
-
-```
-[libre-form id="1" xclass="extra"]
-```
-
 
 ### Filter: wplf_validate_submission
 
@@ -189,7 +152,20 @@ function wplf_recaptcha( $return ) {
 }
 ```
 
-### Multilingual
+## Javascript API
+
+### Client side callbacks
+
+WP Libre Form supports client side callbacks after form submission using window.wplf object. Example usage:
+
+```
+window.wplf.successCallbacks.push(res => alert('Form submission success: ' + res.form_id));
+window.wplf.errorCallbacks.push(() => alert('Form submission failed!'));
+```
+
+These callbacks are executed in the order they appear.
+
+## Multilingual
 
 You can create multilingual forms using Polylang. WPLF will register and automatically fetch the translation when you use special template tags.
 
@@ -205,3 +181,53 @@ add_filter( 'wplf_load_polylang' , function() {
   return false;
 } );
 ```
+
+## Adding classes to the rendered form element
+
+You can use the xclass attribute inside the shortcode to add your own extra classes for CSS.
+
+```
+[libre-form id="1" xclass="extra"]
+```
+
+## Using the shortcode outside post content
+
+By default, scripts are only loaded when the shortcode is within the content.
+If you use shortcodes outside the content, ex. custom fields or by `do_shortcode`, you need to manually enqueue the scripts for the submit to work.
+
+```php
+wp_enqueue_script('wplf-form-js');
+wp_localize_script( 'wplf-form-js', 'ajax_object', array(
+  'ajax_url' => admin_url( 'admin-ajax.php' ),
+  'ajax_credentials' => apply_filters('wplf_frontend_script_credentials', 'same-origin')
+) );
+```
+
+## Contributing
+
+Please make sure your code conforms to the code style used in the rest of the plugin.
+
+We use the standard WordPress code style, with a few major exceptions to make it nicer for modern GitHub projects:
+
+* Indedation is 2 spaces, not tabs.
+* Yoda conditions aren't enforced
+
+### PHP Codesniffer
+
+This project comes with a phpcs configuration (`phpcs.xml`) you can use to check your code like so:
+
+Run phpcs in the project root directory:
+
+```
+phpcs --extensions=php --standard=./phpcs.xml -n -p .
+```
+
+Before you can run phpcs, you need to install PHP Codesniffer and WordPress coding standards like so:
+
+```
+composer create-project wp-coding-standards/wpcs:dev-master --no-dev $HOME/wpcs
+```
+
+Or read the official installation instructions here:
+
+https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards
