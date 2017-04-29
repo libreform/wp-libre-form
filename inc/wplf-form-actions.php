@@ -7,6 +7,10 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     return;
   }
 
+  if ( ! $submission_id ) {
+    $submission_id = $return->submission_id;
+  }
+
   // _form_id is already validated and we know it exists by this point
   $form_id = intval( ( isset( $submission_id ) ) ?
     get_post_meta( $submission_id, '_form_id', true ) : $_POST['_form_id'] );
@@ -24,12 +28,12 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
       $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
 
     // translators: %1$s is submission ID, %2$s is URL where form was submitted
-    $subject = wp_sprintf( __( '[%1$s] New submission to %2$s', 'wp-libre-form' ), $return->submission_id, $referrer );
+    $subject = wp_sprintf( __( '[%1$s] New submission to %2$s', 'wp-libre-form' ), $submission_id, $referrer );
 
     if ( isset( $submission_id ) ) {
       $to = get_post_meta( $submission_id, '_wplf_email_copy_to', true );
       // translators: %1$s is submission ID, %2$s is URL where form was submitted
-      $subject = wp_sprintf( __( '[%1$s] Submission from %2$s', 'wp-libre-form' ), $return->submission_id, $referrer );
+      $subject = wp_sprintf( __( '[%1$s] Submission from %2$s', 'wp-libre-form' ), $submission_id, $referrer );
     }
 
     $to = empty( $to ) ? get_option( 'admin_email' ) : $to;
