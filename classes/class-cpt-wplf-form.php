@@ -536,6 +536,13 @@ class CPT_WPLF_Form {
 </form>
 <?php
       $output = ob_get_clean();
+
+      wp_enqueue_script( 'wplf-form-js' );
+      wp_localize_script( 'wplf-form-js', 'ajax_object', array(
+        'ajax_url' => admin_url( 'admin-ajax.php' ),
+        'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
+      ) );
+
       return $output;
     }
 
@@ -558,16 +565,6 @@ class CPT_WPLF_Form {
       WPLF_VERSION,
       true
     );
-
-    if ( is_a( $post, 'WP_Post' ) ) {
-      if ( has_shortcode( $post->post_content, 'libre-form' ) || $post->post_type === 'wplf-form' ) {
-        wp_enqueue_script( 'wplf-form-js' );
-        wp_localize_script( 'wplf-form-js', 'ajax_object', array(
-          'ajax_url' => admin_url( 'admin-ajax.php' ),
-          'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
-        ) );
-      }
-    }
   }
 
 
