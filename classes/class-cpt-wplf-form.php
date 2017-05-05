@@ -47,13 +47,13 @@ class CPT_WPLF_Form {
     add_filter( 'wplf_form', 'convert_smilies' );
     add_filter( 'wplf_form', 'convert_chars' );
     add_filter( 'wplf_form', 'shortcode_unautop' );
-    
+
     remove_filter( 'wplf_form', 'wpautop' );
     remove_filter( 'wplf_form', 'wptexturize' );
-    
+
     // Removing wpautop isn't enough if form is used inside a ACF field or so.
     // Fitting the output to one line prevents <br> tags from appearing. 
-    add_filter( 'wplf_form', array( $this, 'minify_output' );
+    add_filter( 'wplf_form', array( $this, 'minify_output' ));
   }
 
   public static function register_cpt() {
@@ -629,7 +629,7 @@ class CPT_WPLF_Form {
   function get_publicly_visible_state( $id ) {
     return apply_filters( 'wplf-form-publicly-visible', false, $id );
   }
-               
+
   function minify_output( $html ) {
     return str_replace( array( "\n", "\r" ), '', $html );
   }
