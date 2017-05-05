@@ -52,8 +52,8 @@ class CPT_WPLF_Form {
     remove_filter( 'wplf_form', 'wptexturize' );
 
     // Removing wpautop isn't enough if form is used inside a ACF field or so.
-    // Fitting the output to one line prevents <br> tags from appearing. 
-    add_filter( 'wplf_form', array( $this, 'minify_output' ));
+    // Fitting the output to one line prevents <br> tags from appearing.
+    add_filter( 'wplf_form', array( $this, 'minify_output' ) );
   }
 
   public static function register_cpt() {
