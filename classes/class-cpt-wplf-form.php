@@ -313,7 +313,7 @@ class CPT_WPLF_Form {
     // get post meta
     $meta = get_post_meta( $post->ID );
     $message = isset( $meta['_wplf_thank_you'] ) ?
-      $meta['_wplf_thank_you'][0] : _x( 'Thank you! :)', 'Default success message', 'wp-libre-form' );
+      $meta['_wplf_thank_you'][0] : _x( 'Success!', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
 <?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
