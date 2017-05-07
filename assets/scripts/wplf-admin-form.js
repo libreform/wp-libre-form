@@ -2,9 +2,9 @@
  * Custom JS on the edit screen for the form cpt
  */
 (function($) {
+
 $(document).ready(function() {
   function parseFields() {
-
     // get editor content
     // we don't allow the wysiwyg editor here, so it's fine to just get the textarea value
     var content = $('#content').val();
@@ -63,6 +63,6 @@ $(document).ready(function() {
   }
   $('input[name="wplf_email_copy_enabled"]').change(toggleEmailCopy);
   toggleEmailCopy();
-
 });
+
 })(jQuery);
