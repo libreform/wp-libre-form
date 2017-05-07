@@ -74,7 +74,7 @@ function my_email_thankyou( $return ) {
 
   $name = sanitize_text_field( $_POST['name'] );
   $email = sanitize_email( $_POST['email'] );
-  $to = '"' . $name . '" <' . $email . '>';
+  $to = "\"$name\" <$email>";
   $subject = __( 'Thank You For Submitting A Form' );
   $content = wp_sprintf( __('Thanks, %s for clicking Submit on this glorious HTML5 Form!'), $name );
   wp_mail( $to, $subject, $content );
@@ -87,21 +87,21 @@ Used to add validation to your forms
 
 Example use:
 
-Make sure people don't include dumb questions about Contact Form 7 in the message field.
+Make sure people don't include questions about Contact Form 7 in the message field.
 
 ```php
 <?php
 add_filter( 'wplf_validate_submission', 'my_form_validation' );
 function my_form_validation( $return ) {
   // skip this validation if submission has already failed
-  if( ! $return->ok ) {
+  if ( ! $return->ok ) {
     return $return;
   }
 
   // don't allow contact form 7 to be mentioned in the message field
-  if( false !== strpos( strtolower( $_POST['message'] ), 'contact form 7' ) ) {
+  if ( false !== strpos( strtolower( $_POST['message'] ), 'contact form 7' ) ) {
     $return->ok = 0;
-    $return->error = sprintf( __("I don't like Contact Form 7 so I won't accept your submission."), intval( $_POST['_form_id'] ) );
+    $return->error = __("I don't like Contact Form 7 so I won't accept your submission.");
   }
   return $return;
 }
@@ -116,18 +116,11 @@ function my_form_validation( $return ) {
 add_filter( 'wplf_validate_submission', 'wplf_recaptcha' );
 function wplf_recaptcha( $return ) {
   // skip this validation if submission has already failed
-  if( ! $return->ok ) {
+  if ( ! $return->ok ) {
     return $return;
   }
 
-  $form = get_post( (int) $_POST['_form_id'] );
-  if( false === strpos( $form->post_content, 'g-recaptcha' ) ) {
-    // this form doesn't have recaptcha
-    return $return;
-  }
-
-  $secret = 'XXXX'; // substitute with your own secret recaptcha key
-
+  $secret = RECAPTCHA_KEY; // substitute with your own secret recaptcha key string
   $options = [
     'http' => [
       'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -138,14 +131,15 @@ function wplf_recaptcha( $return ) {
       ])
     ],
   ];
+
   $context  = stream_context_create( $options );
   $result = file_get_contents( 'https://www.google.com/recaptcha/api/siteverify', false, $context );
 
   $captcha_obj = json_decode( $result );
 
-  if( false === $captcha_obj->success ) {
+  if ( false === $captcha_obj->success ) {
     $return->ok = 0;
-    $return->error = sprintf( __("Please prove you're not a robot before submitting."), intval( $_POST['_form_id'] ) );
+    $return->error = __("Please prove you're not a robot before submitting.");
   }
 
   return $return;
