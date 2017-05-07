@@ -107,11 +107,6 @@ Triggers after the form validation is done.
 ```php
 add_action( 'wplf_post_validate_submission', 'my_email_thankyou' );
 function my_email_thankyou( $return ) {
-  // do nothing if form validation failed
-  if ( ! $return->ok ) {
-    return;
-  }
-
   $name = sanitize_text_field( $_POST['name'] );
   $email = sanitize_email( $_POST['email'] );
   $to = "\"$name\" <$email>";

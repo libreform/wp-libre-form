@@ -2,11 +2,6 @@
 
 add_action( 'wplf_post_validate_submission', 'wplf_send_email_copy', 20 );
 function wplf_send_email_copy( $return, $submission_id = null ) {
-  // do nothing if form validation failed
-  if ( ! $return->ok ) {
-    return;
-  }
-
   if ( ! $submission_id ) {
     $submission_id = $return->submission_id;
   }
