@@ -40,7 +40,7 @@ class CPT_WPLF_Form {
     // front end
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
     add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
-    add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ) );
+    add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
 
     // default filters for the_content, but we don't want to use actual the_content
@@ -48,12 +48,13 @@ class CPT_WPLF_Form {
     add_filter( 'wplf_form', 'convert_chars' );
     add_filter( 'wplf_form', 'shortcode_unautop' );
 
+    // we want to keep form content strictly html, so let's remove auto <p> tags
     remove_filter( 'wplf_form', 'wpautop' );
     remove_filter( 'wplf_form', 'wptexturize' );
 
     // Removing wpautop isn't enough if form is used inside a ACF field or so.
     // Fitting the output to one line prevents <br> tags from appearing.
-    add_filter( 'wplf_form', array( $this, 'minify_output' ) );
+    add_filter( 'wplf_form', array( $this, 'minify_html' ) );
   }
 
   public static function register_cpt() {
@@ -511,9 +512,9 @@ class CPT_WPLF_Form {
   class="libre-form libre-form-<?php echo esc_attr( $id . ' ' . $xclass ); ?>"
   <?php
     // check if form contains file inputs
-    if ( strpos( $content, "type='file'" ) >= 0
-      || strpos( $content, 'type="file"' ) >= 0
-      || strpos( $content, 'type=file' ) >= 0
+    if ( false !== strpos( $content, "type='file'" )
+      || false !== strpos( $content, 'type="file"' )
+      || false !== strpos( $content, 'type=file' )
     ) : ?>
     enctype="multipart/form-data"
   <?php endif; ?>
@@ -523,12 +524,12 @@ class CPT_WPLF_Form {
       echo esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . "\"\n";
     }
   ?>
-
 >
-  <?php if ( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) {
-    $publicly_visible = $this->get_publicly_visible_state( $id );
-    if ( ! $publicly_visible ) {
-?>
+  <?php if ( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) : ?>
+    <?php
+      $publicly_visible = $this->get_publicly_visible_state( $id );
+      if ( ! $publicly_visible ) :
+    ?>
       <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
         <strong style="color:#dc3232;">
           <?php esc_html_e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?>
@@ -536,9 +537,8 @@ class CPT_WPLF_Form {
         <br />
         <?php esc_html_e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) ?>
       </p>
-<?php
-    }
-  } ?>
+    <?php endif; ?>
+  <?php endif; ?>
   <?php
     // This is where we output the user-input form html. We allow all HTML here. Yes, even scripts.
     // @codingStandardsIgnoreStart
@@ -589,7 +589,7 @@ class CPT_WPLF_Form {
   /**
    * Shortcode for displaying a Form
    */
-  function shortcode( $shortcode_atts ) {
+  function shortcode( $shortcode_atts, $content = null ) {
     $attributes = shortcode_atts( array(
       'id' => null,
       'xclass' => '',
@@ -604,7 +604,7 @@ class CPT_WPLF_Form {
     ) );
 
     // display form
-    return $this->wplf_form( $id, null, $xclass, $attributes );
+    return $this->wplf_form( $id, $content, $xclass, $attributes );
   }
 
 
@@ -613,10 +613,10 @@ class CPT_WPLF_Form {
    */
   function use_shortcode_for_preview( $content ) {
     global $post;
-    if ( isset( $post->post_type ) && $post->post_type === 'wplf-form' ) {
-      return $this->wplf_form( $post->ID, $content );
+    if ( ! isset( $post->post_type ) || $post->post_type !== 'wplf-form' ) {
+      return $content;
     }
-    return $content;
+    return '[libre-form id="' . (int) $post->ID . '"]' . $this->minify_html( $content ) . '[/libre-form]';
   }
 
   /**
@@ -648,8 +648,11 @@ class CPT_WPLF_Form {
     return apply_filters( 'wplf-form-publicly-visible', false, $id );
   }
 
-  function minify_output( $html ) {
-    return str_replace( array( "\n", "\r" ), '', $html );
+  /**
+   * A very simple uglify. Just removes line breaks from html
+   */
+  function minify_html( $html ) {
+    return str_replace( array( "\n", "\r" ), ' ', $html );
   }
 }
 
