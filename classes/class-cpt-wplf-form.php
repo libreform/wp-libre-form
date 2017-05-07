@@ -500,10 +500,16 @@ class CPT_WPLF_Form {
     global $post;
 
     if ( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
+      $form = get_post( $id );
       if ( empty( $content ) ) {
         // you can override the content via parameter
-        $content = get_post( $id )->post_content;
+        $content = $form->post_content;
       }
+
+      // filter content html
+      $content = apply_filters( 'wplf_form', $content );
+      $content = apply_filters( "wplf_{$form->post_name}_form", $content );
+      $content = apply_filters( "wplf_{$form->ID}_form", $content );
 
       ob_start();
 ?>
@@ -542,7 +548,7 @@ class CPT_WPLF_Form {
   <?php
     // This is where we output the user-input form html. We allow all HTML here. Yes, even scripts.
     // @codingStandardsIgnoreStart
-    echo apply_filters( 'wplf_form', $content );
+    echo $content;
     // @codingStandardsIgnoreEnd
   ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
