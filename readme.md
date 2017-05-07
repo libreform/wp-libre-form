@@ -176,12 +176,26 @@ add_filter( 'wplf_load_polylang' , function() {
 } );
 ```
 
-## Adding classes to the rendered form element
+## Adding extra classes to the form element
 
 You can use the xclass attribute inside the shortcode to add your own extra classes for CSS.
 
 ```
 [libre-form id="1" xclass="extra"]
+```
+
+## Adding extra attributes to the form element
+
+You can add any custom attributes to the form element easily by adding them to the shortcode
+
+```
+[libre-form id="1" data-custom-attr="contactme"]
+```
+
+The attribute will render as is on the `<form>` element
+
+```html
+<form class="libre-form libre-form-1" data-custom-attr="contactme">
 ```
 
 ## Contributing
