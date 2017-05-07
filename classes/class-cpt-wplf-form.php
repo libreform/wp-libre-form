@@ -169,16 +169,16 @@ class CPT_WPLF_Form {
       // default content starts here:
       // @codingStandardsIgnoreStart
 ?>
-<label for="name"><?php esc_html_e( 'Please enter your name', 'wp-libre-form' ); ?></label>
-<input type="text" name="name" id="name" placeholder="<?php echo esc_html_x( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>">
+<p><label for="name"><?php esc_html_e( 'Please enter your name', 'wp-libre-form' ); ?></label>
+<input type="text" name="name" id="name" placeholder="<?php echo esc_html_x( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>"></p>
 
-<label for="email"><?php echo esc_html_x( 'Please enter your email address', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
-<input type="email" name="email" id="email" placeholder="<?php echo esc_html_x( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required>
+<p><label for="email"><?php echo esc_html_x( 'Please enter your email address', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
+<input type="email" name="email" id="email" placeholder="<?php echo esc_html_x( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required></p>
 
-<label for="message"><?php esc_html_e( 'Write your message below', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
-<textarea name="message" rows="5" id="message" placeholder="<?php echo esc_html_x( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea>
+<p><label for="message"><?php esc_html_e( 'Write your message below', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
+<textarea name="message" rows="5" id="message" placeholder="<?php echo esc_html_x( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea></p>
 
-<button type="submit"><?php esc_html_e( 'Submit', 'wp-libre-form' ); ?></button>
+<p><button type="submit"><?php esc_html_e( 'Submit', 'wp-libre-form' ); ?></button></p>
 
 <!-- <?php echo esc_html_x( 'Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wp-libre-form' ); ?> -->
 <?php
