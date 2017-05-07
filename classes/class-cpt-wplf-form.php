@@ -495,25 +495,35 @@ class CPT_WPLF_Form {
   /**
    * The function we display the form with
    */
-  function wplf_form( $id, $content = '', $xclass = '' ) {
+  function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
     global $post;
 
     if ( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
       if ( empty( $content ) ) {
-        // you can override the content via a parameter
+        // you can override the content via parameter
         $content = get_post( $id )->post_content;
       }
 
       ob_start();
 ?>
 <form
+  data-form-id="<?php echo intval( $id ); ?>"
   class="libre-form libre-form-<?php echo esc_attr( $id . ' ' . $xclass ); ?>"
   <?php
     // check if form contains file inputs
-    if ( strpos( $content, "type='file'" ) >= 0 || strpos( $content, 'type="file"' ) >= 0 ) {
-      echo "enctype='multipart/form-data'";
+    if ( strpos( $content, "type='file'" ) >= 0
+      || strpos( $content, 'type="file"' ) >= 0
+      || strpos( $content, 'type=file' ) >= 0
+    ) : ?>
+    enctype="multipart/form-data"
+  <?php endif; ?>
+  <?php
+    // add custom attributes from shortcode to <form> element
+    foreach ( $attributes as $attr_name => $attr_value ) {
+      echo esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . "\"\n";
     }
   ?>
+
 >
   <?php if ( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) {
     $publicly_visible = $this->get_publicly_visible_state( $id );
@@ -579,14 +589,22 @@ class CPT_WPLF_Form {
   /**
    * Shortcode for displaying a Form
    */
-  function shortcode( $attributes ) {
+  function shortcode( $shortcode_atts ) {
     $attributes = shortcode_atts( array(
       'id' => null,
       'xclass' => '',
-    ), $attributes );
+    ), $shortcode_atts, 'libre-form' );
+
+    // we don't render id and class as <form> attributes
+    $id = $attributes['id'];
+    $xclass = $attributes['xclass'];
+    $attributes = array_diff_key( $shortcode_atts, array(
+      'id' => null,
+      'xclass' => null,
+    ) );
 
     // display form
-    return $this->wplf_form( $attributes['id'], null, $attributes['xclass'] );
+    return $this->wplf_form( $id, null, $xclass, $attributes );
   }
 
 
