@@ -140,15 +140,13 @@ You can create multilingual forms using Polylang. WPLF will register and automat
 
 Example:
 ```html
-<input type="text" placeholder="{{ Test string  }}" name="test">
+<input type="text" placeholder="{{ Test string }}" name="test">
 ```
 
 You can also disable this feature, and create your own middleware for WPML, if you'd like.
 
 ```php
-add_filter( 'wplf_load_polylang' , function() {
-  return false;
-} );
+add_filter( 'wplf_load_polylang' , __return_false );
 ```
 
 ## Adding extra classes to the form element
