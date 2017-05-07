@@ -25,15 +25,11 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 
 **Why?**
 
-Modern HTML markup is already a great way to build forms. With Libre Form,
-there's no need to learn clunky form builders that are hard to customise.
+Modern HTML markup is already a great way to build forms. With Libre Form, there's no need to learn clunky form builders that are hard to customise.
 
-Just use standard HTML inputs to build, or copy a form to your WordPress site
-that will just magically work. No need to touch PHP code if you don't want to.
+Just use standard HTML inputs to build, or copy a form to your WordPress site that will just magically work. No need to touch PHP code if you don't want to.
 
-Required field validation, email notifications, file uploads to WP gallery and
-lots more are included by default in the core of the plugin but you can also
-add your own functionality with hooks and APIs provided by Libre Form.
+Required field validation, email notifications, file uploads to WP gallery and lots more are included by default in the core of the plugin but you can also add your own functionality with hooks and APIs provided by Libre Form.
 
 **Contributing**
 
