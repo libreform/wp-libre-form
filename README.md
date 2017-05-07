@@ -57,28 +57,7 @@ You can also install the plugin by directly uploading the zip file as instructed
 
 ### Filter: wplf_validate_submission
 
-Used to add validation to your forms
-
-Example use:
-
-Make sure people don't include questions about Contact Form 7 in the message field.
-
-```php
-add_filter( 'wplf_validate_submission', 'my_form_validation' );
-function my_form_validation( $return ) {
-  // skip this validation if submission has already failed
-  if ( ! $return->ok ) {
-    return $return;
-  }
-
-  // don't allow contact form 7 to be mentioned in the message field
-  if ( false !== strpos( strtolower( $_POST['message'] ), 'contact form 7' ) ) {
-    $return->ok = 0;
-    $return->error = __("I don't like Contact Form 7 so I won't accept your submission.");
-  }
-  return $return;
-}
-```
+Used to add validation to your forms.
 
 #### Example: Google ReCaptcha integration
 
@@ -123,9 +102,7 @@ function wplf_recaptcha( $return ) {
 
 Triggers after the form validation is done.
 
-Example use:
-
-Send a thank you email to the email in the submission
+#### Example: Send a thank you email to the email in the submission
 
 ```php
 add_action( 'wplf_post_validate_submission', 'my_email_thankyou' );
