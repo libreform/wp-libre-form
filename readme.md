@@ -64,7 +64,6 @@ Example use:
 Send a thank you email to the email in the submission
 
 ```php
-<?php
 add_action( 'wplf_post_validate_submission', 'my_email_thankyou' );
 function my_email_thankyou( $return ) {
   // do nothing if form validation failed
@@ -90,7 +89,6 @@ Example use:
 Make sure people don't include questions about Contact Form 7 in the message field.
 
 ```php
-<?php
 add_filter( 'wplf_validate_submission', 'my_form_validation' );
 function my_form_validation( $return ) {
   // skip this validation if submission has already failed
