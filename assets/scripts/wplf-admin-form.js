@@ -48,10 +48,9 @@ $(document).ready(function() {
     // save field array in a hidden input
     $('input#wplf_fields').val( fields.join() );
     $('input#wplf_required').val( required.join() );
-
   }
 
-  $('#content').bind('input propertychange', parseFields);
+  $('#content').bind('input propertychange', _.debounce(parseFields, 300));
   parseFields();
 
   // display email copy field if the feature is enabled
