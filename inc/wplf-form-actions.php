@@ -10,7 +10,9 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
   $form_id = intval( ( isset( $submission_id ) ) ?
     get_post_meta( $submission_id, '_form_id', true ) : $_POST['_form_id'] );
 
-  $form_title = esc_html( get_the_title( $form_id ) );
+  $form = get_post( intval( $form_id ) );
+
+  $form_title = esc_html( get_the_title( $form ) );
   $form_meta = get_post_meta( $form_id );
 
   $referrer = esc_url_raw( ( isset( $submission_id ) ) ?
@@ -56,12 +58,31 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
       // @codingStandardsIgnoreEnd
     }
 
-    wp_mail(
-      apply_filters( 'wplf_email_copy_to', $to ),
-      apply_filters( 'wplf_email_copy_subject', $subject ),
-      apply_filters( 'wplf_email_copy_content', $content ),
-      apply_filters( 'wplf_email_copy_headers', '' ),
-      apply_filters( 'wplf_email_copy_attachments', array() )
-    );
+    // default pre-filtered values for email headers and attachments
+    $headers = '';
+    $attachments = array();
+
+    // allow filtering email fields
+    $to = apply_filters( 'wplf_email_copy_to', $to );
+    $subject = apply_filters( 'wplf_email_copy_subject', $subject );
+    $content = apply_filters( 'wplf_email_copy_content', $content );
+    $headers = apply_filters( 'wplf_email_copy_headers', $headers );
+    $attachments = apply_filters( 'wplf_email_copy_attachments', $attachments );
+
+    // form slug specific filters
+    $to = apply_filters( "wplf_{$form->post_name}_email_copy_to", $to );
+    $subject = apply_filters( "wplf_{$form->post_name}_email_copy_subject", $subject );
+    $content = apply_filters( "wplf_{$form->post_name}_email_copy_content", $content );
+    $headers = apply_filters( "wplf_{$form->post_name}_email_copy_headers", $headers );
+    $attachments = apply_filters( "wplf_{$form->post_name}_email_copy_attachments", $attachment );
+
+    // form ID specific filters
+    $to = apply_filters( "wplf_{$form->ID}_email_copy_to", $to );
+    $subject = apply_filters( "wplf_{$form->ID}_email_copy_subject", $subject );
+    $content = apply_filters( "wplf_{$form->ID}_email_copy_content", $content );
+    $headers = apply_filters( "wplf_{$form->ID}_email_copy_headers", $headers );
+    $attachments = apply_filters( "wplf_{$form->ID}_email_copy_attachments", $attachment );
+
+    wp_mail( $to, $subject, $content, $headers, $attachments );
   }
 }

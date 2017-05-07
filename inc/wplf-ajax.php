@@ -20,6 +20,13 @@ function wplf_ajax_submit_handler() {
     // form existence has already been validated via filters
     $form = get_post( intval( $_POST['_form_id'] ) );
 
+    // form-specific validation
+    $return->slug = $form->post_name;
+    $return = apply_filters( "wplf_{$form->post_name}_validate_submission", $return );
+    $return = apply_filters( "wplf_{$form->ID}_validate_submission", $return );
+  }
+
+  if ( $return->ok ) {
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
 
@@ -77,6 +84,8 @@ function wplf_ajax_submit_handler() {
     // allow user to attach custom actions after the submission has been received
     // these could be confirmation emails, additional processing for the submission fields, e.g.
     do_action( 'wplf_post_validate_submission', $return );
+    do_action( "wplf_{$form->post_name}_post_validate_submission", $return );
+    do_action( "wplf_{$form->ID}_post_validate_submission", $return );
   }
 
   // respond with json
