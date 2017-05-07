@@ -3,17 +3,29 @@
 
 Use standard HTML5 markup to create fully functional forms for WordPress
 
-Features:
+## Features
+
 - Uses only HTML5 syntax to build forms. No GUIs, shortcodes, **no bullshit**
 - Works with any valid HTML form. Just copy any form from any website and it will work. **It's magic!**
-- Submits and validates forms via AJAX
-- Automatically detects and captures fields in any HTML form. Form values are saved as standard custom fields
-- Validates required fields automatically using the native HTML5 `required` attribute
-- **It's pluggable.** Add your own validation or automation with filters and action hooks.
-- Option to send a copy of submitted forms via email
-- Preview your forms
-- Full file upload support with input type=file
-- Multilingual form support with Polylang
+- Submissions are saved as custom post type posts. Form values are saved as custom fields.
+- Validates required fields tagged with the native HTML5 `required` attribute.
+- **It's hackable.** Add your own functionality with hooks and APIs.
+- Email notifications of received form submissions
+- Full file upload support to Media Library with input type=file
+- Multilingual support with Polylang
+
+## Why?
+
+Modern HTML markup is already a great way to build forms. With Libre Form,
+there's no need to learn clunky form builders that are hard to customise.
+
+Just use standard HTML inputs to build, or copy a form to your WordPress site
+that will just magically work. No need to touch PHP code if you don't want to.
+
+Required field validation, email notifications, file uploads to WP gallery and
+lots more are included by default in the core of the plugin, but you can also
+add your own functionality with [hooks and APIs](#filter--action-api) provided
+by Libre Form.
 
 ## Screenshots
 
