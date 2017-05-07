@@ -190,19 +190,6 @@ You can use the xclass attribute inside the shortcode to add your own extra clas
 [libre-form id="1" xclass="extra"]
 ```
 
-## Using the shortcode outside post content
-
-By default, scripts are only loaded when the shortcode is within the content.
-If you use shortcodes outside the content, ex. custom fields or by `do_shortcode`, you need to manually enqueue the scripts for the submit to work.
-
-```php
-wp_enqueue_script('wplf-form-js');
-wp_localize_script( 'wplf-form-js', 'ajax_object', array(
-  'ajax_url' => admin_url( 'admin-ajax.php' ),
-  'ajax_credentials' => apply_filters('wplf_frontend_script_credentials', 'same-origin')
-) );
-```
-
 ## Contributing
 
 Please make sure your code conforms to the code style used in the rest of the plugin.
