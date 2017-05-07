@@ -55,31 +55,6 @@ You can also install the plugin by directly uploading the zip file as instructed
 
 ## Filter / Action API
 
-### Action: wplf_post_validate_submission
-
-Triggers after the form validation is done.
-
-Example use:
-
-Send a thank you email to the email in the submission
-
-```php
-add_action( 'wplf_post_validate_submission', 'my_email_thankyou' );
-function my_email_thankyou( $return ) {
-  // do nothing if form validation failed
-  if ( ! $return->ok ) {
-    return;
-  }
-
-  $name = sanitize_text_field( $_POST['name'] );
-  $email = sanitize_email( $_POST['email'] );
-  $to = "\"$name\" <$email>";
-  $subject = __( 'Thank You For Submitting A Form' );
-  $content = wp_sprintf( __('Thanks, %s for clicking Submit on this glorious HTML5 Form!'), $name );
-  wp_mail( $to, $subject, $content );
-}
-```
-
 ### Filter: wplf_validate_submission
 
 Used to add validation to your forms
@@ -105,7 +80,7 @@ function my_form_validation( $return ) {
 }
 ```
 
-### wplf_validate_submission example: Google ReCaptcha integration
+#### Example: Google ReCaptcha integration
 
 ```php
 /**
@@ -141,6 +116,31 @@ function wplf_recaptcha( $return ) {
   }
 
   return $return;
+}
+```
+
+### Action: wplf_post_validate_submission
+
+Triggers after the form validation is done.
+
+Example use:
+
+Send a thank you email to the email in the submission
+
+```php
+add_action( 'wplf_post_validate_submission', 'my_email_thankyou' );
+function my_email_thankyou( $return ) {
+  // do nothing if form validation failed
+  if ( ! $return->ok ) {
+    return;
+  }
+
+  $name = sanitize_text_field( $_POST['name'] );
+  $email = sanitize_email( $_POST['email'] );
+  $to = "\"$name\" <$email>";
+  $subject = __( 'Thank You For Submitting A Form' );
+  $content = wp_sprintf( __('Thanks, %s for clicking Submit on this glorious HTML5 Form!'), $name );
+  wp_mail( $to, $subject, $content );
 }
 ```
 
@@ -195,4 +195,3 @@ The attribute will render as is on the `<form>` element
 ```html
 <form class="libre-form libre-form-1" data-custom-attr="contactme">
 ```
-
