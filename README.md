@@ -59,6 +59,15 @@ You can also install the plugin by directly uploading the zip file as instructed
 
 Used to add validation to your forms.
 
+#### Form specific hooks
+
+This filter supports form specific hooks:
+
+- `wplf_{form_id}_validate_submission`
+- `wplf_{form_slug}_validate_submission`
+
+These filters are only applied for the target form by ID or slug.
+
 #### Example: Google ReCaptcha integration
 
 ```php
@@ -101,6 +110,15 @@ function wplf_recaptcha( $return ) {
 ### Action: wplf_post_validate_submission
 
 Triggers after the form validation is done.
+
+#### Form specific hooks
+
+This action supports form specific hooks:
+
+- `wplf_{form_id}_post_validate_submission`
+- `wplf_{form_slug}_post_validate_submission`
+
+These actions are only run for the target form by ID or slug.
 
 #### Example: Send a thank you email to the email in the submission
 
