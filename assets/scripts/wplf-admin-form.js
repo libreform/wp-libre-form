@@ -28,6 +28,13 @@ $(document).ready(function() {
           '<div class="wplf-form-field widget-top"><div class="widget-title"><h4>' +  $(this).prop('name') + '</h4></div></div>'
         );
 
+        // check if we are in nojs fallback state and show warning if user uses input name reserved for WordPress core
+        if( wplf.nojs_fallback && $.inArray( $(this).prop('name'), wplf.wp_reserved_names ) > -1 ) {
+      		$fieldbox.css('border-color', '#dc3232');
+      		$fieldbox.css('color', '#dc3232');
+      		$fieldbox.find('h4').append('<br><br><i style="font-weight:400;white-space:normal;line-height:1.2em;">' + wplf.is_wp_reserved_name + '</i>');
+      	}
+
         if( $(this).prop('required') ) {
           // mark as required field for validation
           $fieldbox.addClass('required');

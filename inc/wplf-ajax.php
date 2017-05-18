@@ -5,7 +5,7 @@
 
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
-function wplf_ajax_submit_handler( $nojs_fallback_call = false ) {
+function wplf_ajax_submit_handler( $is_nojs_fallback_call = false ) {
   $return = new stdClass();
   $return->ok = 1;
 
@@ -88,9 +88,20 @@ function wplf_ajax_submit_handler( $nojs_fallback_call = false ) {
     do_action( "wplf_{$form->ID}_post_validate_submission", $return );
   }
 
-  // respond with json if was a js call
-  if( !$nojs_fallback_call ) {
+  // Respond with json if was a js call
+  if ( ! $is_nojs_fallback_call ) {
     wp_send_json( $return );
     wp_die();
+  } else {
+  	if( $return->ok ) {
+  		$nojs_redirect = get_permalink( $_POST['_referrer_id'] ) . '?wplf_success=true';
+  		$nojs_redirect = apply_filters( 'wplf_nojs_success_redirect', $nojs_redirect );
+  		$nojs_redirect = apply_filters( "wplf_$form->post_name}_nojs_success_redirect", $nojs_redirect );
+  		$nojs_redirect = apply_filters( "wplf_{$form->ID}_nojs_success_redirect", $nojs_redirect );
+  	} else {
+  		$nojs_redirect = get_permalink( $_POST['_referrer_id'] ) . '?wplf_error=' . urlencode( $return->error );
+  	}
+
+  	wp_safe_redirect( $nojs_redirect );
   }
 }
