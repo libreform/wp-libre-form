@@ -1,6 +1,6 @@
 <?php
 
-if ( !class_exists('CPT_WPLF_Form') ) :
+if ( ! class_exists( 'CPT_WPLF_Form' ) ) :
 
 class CPT_WPLF_Form {
   /**
@@ -25,14 +25,14 @@ class CPT_WPLF_Form {
     // post.php / post-new.php view
     add_filter( 'get_sample_permalink_html', array( $this, 'modify_permalink_html' ), 10, 2 );
     add_action( 'save_post', array( $this, 'save_cpt' ) );
-    add_filter( 'content_save_pre' , array( $this, 'strip_form_tags' ), 10, 1 );
+    add_filter( 'content_save_pre', array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
 
     // edit.php view
     add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
-    add_filter( 'manage_edit-wplf-form_columns' , array( $this, 'custom_columns_cpt' ), 100, 1 );
-    add_action( 'manage_posts_custom_column' , array( $this, 'custom_columns_display_cpt' ), 10, 2 );
+    add_filter( 'manage_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );
+    add_action( 'manage_posts_custom_column', array( $this, 'custom_columns_display_cpt' ), 10, 2 );
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );
     add_filter( 'user_can_richedit', array( $this, 'disable_tinymce' ) );
@@ -40,15 +40,21 @@ class CPT_WPLF_Form {
     // front end
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
     add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
-    add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ) );
+    add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
 
-    // same default filters as the_content, but we don't want to use actual the_content for the form output
-    add_filter( 'wplf_form', 'wptexturize' );
+    // default filters for the_content, but we don't want to use actual the_content
     add_filter( 'wplf_form', 'convert_smilies' );
-    add_filter( 'wplf_form', 'convert_chars'  );
-    add_filter( 'wplf_form', 'wpautop' );
+    add_filter( 'wplf_form', 'convert_chars' );
     add_filter( 'wplf_form', 'shortcode_unautop' );
+
+    // we want to keep form content strictly html, so let's remove auto <p> tags
+    remove_filter( 'wplf_form', 'wpautop' );
+    remove_filter( 'wplf_form', 'wptexturize' );
+
+    // Removing wpautop isn't enough if form is used inside a ACF field or so.
+    // Fitting the output to one line prevents <br> tags from appearing.
+    add_filter( 'wplf_form', array( $this, 'minify_html' ) );
   }
 
   public static function register_cpt() {
@@ -65,26 +71,26 @@ class CPT_WPLF_Form {
       'all_items'          => __( 'All Forms', 'wp-libre-form' ),
       'search_items'       => __( 'Search Forms', 'wp-libre-form' ),
       'not_found'          => __( 'No forms found.', 'wp-libre-form' ),
-      'not_found_in_trash' => __( 'No forms found in Trash.', 'wp-libre-form' )
+      'not_found_in_trash' => __( 'No forms found in Trash.', 'wp-libre-form' ),
     );
 
     $args = array(
-      'labels'             => $labels,
-      'public'             => true,
-      'publicly_queryable' => true,
-      'exclude_from_search'=> true,
-      'show_ui'            => true,
-      'show_in_menu'       => true,
-      'menu_icon'          => 'dashicons-archive',
-      'query_var'          => false,
-      'capability_type'    => 'post',
-      'has_archive'        => false,
-      'hierarchical'       => false,
-      'menu_position'      => null,
-      'rewrite'            => array(
+      'labels'              => $labels,
+      'public'              => true,
+      'publicly_queryable'  => true,
+      'exclude_from_search' => true,
+      'show_ui'             => true,
+      'show_in_menu'        => true,
+      'menu_icon'           => 'dashicons-archive',
+      'query_var'           => false,
+      'capability_type'     => 'post',
+      'has_archive'         => false,
+      'hierarchical'        => false,
+      'menu_position'       => null,
+      'rewrite'             => array(
         'slug' => 'libre-forms',
       ),
-      'supports'           => array(
+      'supports'            => array(
         'title',
         'editor',
         'revisions',
@@ -101,8 +107,10 @@ class CPT_WPLF_Form {
   function modify_permalink_html( $html, $post_id ) {
     $publicly_visible = $this->get_publicly_visible_state( $post_id );
 
-    if( get_post_type( $post_id ) === 'wplf-form' && !$publicly_visible ) {
-      $html .= '<span>' . __( 'Permalink is for preview purposes only.', 'wp-libre-form' ) . '</span>';
+    if ( get_post_type( $post_id ) === 'wplf-form' && ! $publicly_visible ) {
+      $html .= '<span>';
+      $html .= __( 'Permalink is for preview purposes only.', 'wp-libre-form' );
+      $html .= '</span>';
     }
 
     return $html;
@@ -115,7 +123,7 @@ class CPT_WPLF_Form {
     global $post;
 
     // only for this cpt
-    if ( 'wplf-form' == get_post_type( $post ) ) {
+    if ( 'wplf-form' === get_post_type( $post ) ) {
       return false;
     }
 
@@ -129,17 +137,17 @@ class CPT_WPLF_Form {
     global $post;
 
     // make sure we're on the correct view
-    if ( 'post-new.php' != $hook && 'post.php' != $hook ) {
+    if ( 'post-new.php' !== $hook && 'post.php' !== $hook ) {
       return;
     }
 
     // only for this cpt
-    if ( 'wplf-form' != $post->post_type ) {
+    if ( 'wplf-form' !== $post->post_type ) {
       return;
     }
 
     // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname(__FILE__) ) );
+    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname( __FILE__ ) ) );
   }
 
 
@@ -150,7 +158,7 @@ class CPT_WPLF_Form {
     global $pagenow;
 
     // only on post.php screen
-    if ( 'post-new.php' != $pagenow && 'post.php' != $pagenow ) {
+    if ( 'post-new.php' !== $pagenow && 'post.php' !== $pagenow ) {
       return $content;
     }
 
@@ -159,20 +167,22 @@ class CPT_WPLF_Form {
       ob_start();
 
       // default content starts here:
+      // @codingStandardsIgnoreStart
 ?>
-<label for="name"><?php _e( 'Please enter your name', 'wp-libre-form' ); ?></label>
-<input type="text" name="name" id="name" placeholder="<?php _ex( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>">
+<p><label for="name"><?php esc_html_e( 'Please enter your name', 'wp-libre-form' ); ?></label>
+<input type="text" name="name" id="name" placeholder="<?php echo esc_html_x( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>"></p>
 
-<label for="email"><?php _e( 'Please enter your email address', 'wp-libre-form' ); ?> <?php _e( '(required)', 'wp-libre-form' ); ?></label>
-<input type="email" name="email" id="email" placeholder="<?php _ex( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required>
+<p><label for="email"><?php echo esc_html_x( 'Please enter your email address', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
+<input type="email" name="email" id="email" placeholder="<?php echo esc_html_x( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required></p>
 
-<label for="message"><?php _e( 'Write your message below', 'wp-libre-form' ); ?> <?php _e( '(required)', 'wp-libre-form' ); ?></label>
-<textarea name="message" rows="5" id="message" placeholder="<?php _ex( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea>
+<p><label for="message"><?php esc_html_e( 'Write your message below', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
+<textarea name="message" rows="5" id="message" placeholder="<?php echo esc_html_x( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea></p>
 
-<button type="submit"><?php _e( 'Submit', 'wp-libre-form' ); ?></button>
+<p><button type="submit"><?php esc_html_e( 'Submit', 'wp-libre-form' ); ?></button></p>
 
-<!-- <?php _ex( 'Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wp-libre-form' ); ?> -->
+<!-- <?php echo esc_html_x( 'Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wp-libre-form' ); ?> -->
 <?php
+      // @codingStandardsIgnoreEnd
       $content = esc_textarea( ob_get_clean() );
     }
 
@@ -185,8 +195,9 @@ class CPT_WPLF_Form {
   function remove_row_actions( $actions, $post ) {
     $publicly_visible = $this->get_publicly_visible_state( $post->ID );
 
-    if( $post->post_type === 'wplf-form' && !$publicly_visible )
+    if ( 'wplf-form' === $post->post_type && ! $publicly_visible ) {
       unset( $actions['view'] );
+    }
 
     return $actions;
   }
@@ -210,21 +221,24 @@ class CPT_WPLF_Form {
    * Custom column display for Form CPT in edit.php
    */
   function custom_columns_display_cpt( $column, $post_id ) {
-    if( 'shortcode' === $column ) {
+    if ( 'shortcode' === $column ) {
 ?>
-<input type="text" class="code" value='[libre-form id="<?php echo $post_id; ?>"]' readonly>
+<input type="text" class="code" value='[libre-form id="<?php echo intval( $post_id ); ?>"]' readonly>
 <?php
     }
-    if( 'submissions' === $column ) {
+    if ( 'submissions' === $column ) {
       // count number of submissions
       $submissions = get_posts( array(
         'post_type' => 'wplf-submission',
         'posts_per_page' => -1,
         'meta_key' => '_form_id',
         'meta_value' => $post_id,
+        'suppress_filters' => false,
       ) );
 ?>
-  <a href="<?php echo admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ); ?>"><?php echo count( $submissions ); ?></a>
+  <a href="<?php echo esc_url_raw( admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ) ); ?>">
+    <?php echo count( $submissions ); ?>
+  </a>
 <?php
     }
   }
@@ -288,7 +302,7 @@ class CPT_WPLF_Form {
    */
   function metabox_shortcode( $post ) {
 ?>
-<p><input type="text" class="code" value='[libre-form id="<?php echo $post->ID; ?>"]' readonly></p>
+<p><input type="text" class="code" value='[libre-form id="<?php echo esc_attr( $post->ID ); ?>"]' readonly></p>
 <?php
   }
 
@@ -298,7 +312,8 @@ class CPT_WPLF_Form {
   function metabox_thank_you( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
-    $message = isset( $meta['_wplf_thank_you'] ) ? $meta['_wplf_thank_you'][0] : _x( 'Thank you! :)', 'Default success message', 'wp-libre-form' );
+    $message = isset( $meta['_wplf_thank_you'] ) ?
+      $meta['_wplf_thank_you'][0] : _x( 'Success!', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
 <?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
@@ -306,7 +321,7 @@ class CPT_WPLF_Form {
   'media_buttons' => true,
   'textarea_name' => 'wplf_thank_you',
   'textarea_rows' => 6,
-  'teeny' => true
+  'teeny' => true,
   )); ?>
 </p>
 <?php
@@ -317,9 +332,9 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for form fields meta box
    */
-  function metabox_form_fields( $post ) {
+  function metabox_form_fields() {
 ?>
-<p><?php _e('Fields marked with * are required', 'wp-libre-form'); ?></p>
+<p><?php esc_html_e( 'Fields marked with * are required', 'wp-libre-form' ); ?></p>
 <div class="wplf-form-field-container">
 <!--  <div class="wplf-form-field widget-top"><div class="widget-title"><h4>name</h4></div></div> -->
 </div>
@@ -339,11 +354,24 @@ class CPT_WPLF_Form {
 ?>
 <p>
   <label for="wplf_email_copy_enabled">
-    <input type="checkbox" <?php echo $email_enabled ? 'checked="checked"' : ''; ?> id="wplf_email_copy_enabled" name="wplf_email_copy_enabled">
-    <?php _e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
+    <input
+      id="wplf_email_copy_enabled"
+      name="wplf_email_copy_enabled"
+      type="checkbox"
+      <?php echo $email_enabled ? 'checked="checked"' : ''; ?>
+    >
+    <?php esc_html_e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
   </label>
 </p>
-<p><input type="text" name="wplf_email_copy_to" value="<?php echo esc_attr( $email_copy_to ); ?>" placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>" style="width:100%;display:none"></p>
+<p>
+  <input
+    type="text"
+    name="wplf_email_copy_to"
+    value="<?php echo esc_attr( $email_copy_to ); ?>"
+    placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>"
+    style="width:100%;display:none"
+  >
+</p>
 <?php
   }
 
@@ -356,9 +384,19 @@ class CPT_WPLF_Form {
     $default = '%name% <%email%>'; // default submission title format
     $format = isset( $meta['_wplf_title_format'] ) ? $meta['_wplf_title_format'][0] : $default;
 ?>
-<p><?php _e('Submissions from this form will use this formatting in their title.', 'wp-libre-form'); ?></p>
-<p><?php _e('You may use any field values enclosed in "%" markers.', 'wp-libre-form');?></p>
-<p><input type="text" name="wplf_title_format" value="<?php echo esc_attr( $format ); ?>" placeholder="<?php echo esc_attr( $default ); ?>" class="code" style="width:100%" autocomplete="off"></p>
+<p><?php esc_html_e( 'Submissions from this form will use this formatting in their title.', 'wp-libre-form' ); ?></p>
+<p><?php esc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' );?></p>
+<p>
+  <input
+    type="text"
+    name="wplf_title_format"
+    value="<?php echo esc_attr( $format ); ?>"
+    placeholder="<?php echo esc_attr( $default ); ?>"
+    class="code"
+    style="width:100%"
+    autocomplete="off"
+  >
+</p>
 <?php
   }
 
@@ -369,13 +407,12 @@ class CPT_WPLF_Form {
     // verify nonce
     if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
       return;
-    }
-    else if ( ! wp_verify_nonce( $_POST['wplf_form_meta_nonce'], 'wplf_form_meta' ) ) {
+    } elseif ( ! wp_verify_nonce( $_POST['wplf_form_meta_nonce'], 'wplf_form_meta' ) ) {
       return;
     }
 
     // only for this cpt
-    if ( !isset( $_POST['post_type'] ) || 'wplf-form' != $_POST['post_type'] ) {
+    if ( ! isset( $_POST['post_type'] ) || 'wplf-form' !== $_POST['post_type'] ) {
       return;
     }
 
@@ -402,32 +439,30 @@ class CPT_WPLF_Form {
     // save email copy enabled state
     if ( isset( $_POST['wplf_email_copy_enabled'] ) ) {
       update_post_meta( $post_id, '_wplf_email_copy_enabled', $_POST['wplf_email_copy_enabled'] === 'on' );
-    }
-    else {
+    } else {
       update_post_meta( $post_id, '_wplf_email_copy_enabled', false );
     }
 
     // save email copy
     if ( isset( $_POST['wplf_email_copy_to'] ) ) {
-      $emailField = $_POST['wplf_email_copy_to'];
+      $email_field = $_POST['wplf_email_copy_to'];
       $to = '';
 
-      if( strpos( $emailField, "," ) > 0 ) {
+      if ( strpos( $email_field, ',' ) > 0 ) {
         // Intentional. Makes no sense if the first character is a comma, so pass it along as a single address.
         // sanitize_email() should take care of the rest.
-        $emailArray = explode( ",", $emailField );
-        foreach($emailArray as $email){
-          $email = trim($email);
-          $email = sanitize_email( $email ) . ", ";
+        $email_array = explode( ',', $email_field );
+        foreach ( $email_array as $email ) {
+          $email = trim( $email );
+          $email = sanitize_email( $email ) . ', ';
           $to .= $email;
         }
-        $to = rtrim( $to, ", " );
-      }
-      else {
-        $to = sanitize_email( $emailField );
+        $to = rtrim( $to, ', ' );
+      } else {
+        $to = sanitize_email( $email_field );
       }
 
-      if( !empty( $to ) ) {
+      if ( ! empty( $to ) ) {
         update_post_meta( $post_id, '_wplf_email_copy_to', $to );
       } else {
         delete_post_meta( $post_id, '_wplf_email_copy_to' );
@@ -454,54 +489,85 @@ class CPT_WPLF_Form {
    * We apply <form> via the shortcode, you can't have nested forms anyway
    */
   function strip_form_tags( $content ) {
-    return preg_replace( '/<\/?form.*>/i', '', $content);
+    return preg_replace( '/<\/?form.*>/i', '', $content );
   }
 
 
   /**
    * The function we display the form with
    */
-  function wplf_form( $id , $content = '', $xclass = '' ) {
+  function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
     global $post;
-    
+
     if( isset( $_POST['_wplf_success'] ) ) {
       $thankyou = apply_filters( 'the_content', get_post_meta( $id, '_wplf_thank_you', true ) );
       return $thankyou;
     }
 
-    if( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
-      if( empty( $content ) ) {
-        // you can override the content via a parameter
-        $content = get_post( $id )->post_content;
+    if ( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
+      $form = get_post( $id );
+      if ( empty( $content ) ) {
+        // you can override the content via parameter
+        $content = $form->post_content;
       }
 
-      $multipart = "";
-      // check if form contains file inputs
-      if(strpos($content, "type='file'") > -1 || strpos($content, "type=\"file\"") > -1){
-        $multipart = "enctype='multipart/form-data'";
-      }
+      // filter content html
+      $content = apply_filters( "wplf_{$form->post_name}_form", $content );
+      $content = apply_filters( "wplf_{$form->ID}_form", $content );
+
+      // run default filters after. The user probably wants to filter original content, not modified by WP
+      $content = apply_filters( 'wplf_form', $content );
 
       ob_start();
 ?>
-<form class="libre-form libre-form-<?php echo $id . ' ' . $xclass; ?>" method="post" <?php echo $multipart; ?>>
-  <?php if( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) {
-    $publicly_visible = $this->get_publicly_visible_state( $id );
-    if( !$publicly_visible ) {
-?>
-      <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
-        <b style="color:#dc3232;"><?php _e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?></b><br />
-        <?php _e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) ?>
-      </p>
-<?php
+<form
+  data-form-id="<?php echo intval( $id ); ?>"
+  class="libre-form libre-form-<?php echo esc_attr( $id . ' ' . $xclass ); ?>"
+  <?php
+    // check if form contains file inputs
+    if ( false !== strpos( $content, "type='file'" )
+      || false !== strpos( $content, 'type="file"' )
+      || false !== strpos( $content, 'type=file' )
+    ) : ?>
+    enctype="multipart/form-data"
+  <?php endif; ?>
+  <?php
+    // add custom attributes from shortcode to <form> element
+    foreach ( $attributes as $attr_name => $attr_value ) {
+      echo esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . "\"\n";
     }
-  } ?>
-  <?php echo apply_filters( 'wplf_form', $content ); ?>
+  ?>
+>
+  <?php if ( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) : ?>
+    <?php
+      $publicly_visible = $this->get_publicly_visible_state( $id );
+      if ( ! $publicly_visible ) :
+    ?>
+      <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
+        <strong style="color:#dc3232;">
+          <?php esc_html_e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?>
+        </strong>
+        <br />
+        <?php esc_html_e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) ?>
+      </p>
+    <?php endif; ?>
+  <?php endif; ?>
+  <?php
+    // This is where we output the user-input form html. We allow all HTML here. Yes, even scripts.
+    // @codingStandardsIgnoreStart
+    echo $content;
+    // @codingStandardsIgnoreEnd
+  ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
-  <input type="hidden" name="_referrer_id" value="<?php esc_attr_e( get_the_id() ) ?>">
-  <input type="hidden" name="_form_id" value="<?php esc_attr_e( $id ); ?>">
+  <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ) ?>">
+  <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
 </form>
 <?php
       $output = ob_get_clean();
+
+      // enqueue our footer script here
+      wp_enqueue_script( 'wplf-form-js' );
+
       return $output;
     }
 
@@ -517,32 +583,41 @@ class CPT_WPLF_Form {
     global $post;
 
     // register the script, but only enqueue it if the current post contains a form in it
-    wp_register_script( 
-      'wplf-form-js', 
-      plugins_url( 'assets/scripts/wplf-form.js', dirname(__FILE__) ), 
+    wp_register_script(
+      'wplf-form-js',
+      plugins_url( 'assets/scripts/wplf-form.js', dirname( __FILE__ ) ),
       apply_filters( 'wplf_frontend_script_dependencies', array() ),
-      WPLF_VERSION, 
+      WPLF_VERSION,
       true
     );
 
-    if( is_a( $post, 'WP_Post' ) && ( has_shortcode( $post->post_content, 'libre-form') || $post->post_type === 'wplf-form') ) {
-      wp_enqueue_script( 'wplf-form-js' );
-      wp_localize_script( 'wplf-form-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-    }
+    // add dynamic variables to the script's scope
+    wp_localize_script( 'wplf-form-js', 'ajax_object', array(
+      'ajax_url' => admin_url( 'admin-ajax.php' ),
+      'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
+    ) );
   }
 
 
   /**
    * Shortcode for displaying a Form
    */
-  function shortcode($attributes, $content = null) {
+  function shortcode( $shortcode_atts, $content = null ) {
     $attributes = shortcode_atts( array(
       'id' => null,
       'xclass' => '',
-    ), $attributes );
+    ), $shortcode_atts, 'libre-form' );
+
+    // we don't render id and class as <form> attributes
+    $id = $attributes['id'];
+    $xclass = $attributes['xclass'];
+    $attributes = array_diff_key( $shortcode_atts, array(
+      'id' => null,
+      'xclass' => null,
+    ) );
 
     // display form
-    return $this->wplf_form( $attributes['id'], null, $attributes['xclass'] );
+    return $this->wplf_form( $id, $content, $xclass, $attributes );
   }
 
 
@@ -551,10 +626,10 @@ class CPT_WPLF_Form {
    */
   function use_shortcode_for_preview( $content ) {
     global $post;
-    if( isset( $post->post_type ) && $post->post_type === 'wplf-form') {
-      return $this->wplf_form( $post->ID, $content );
+    if ( ! isset( $post->post_type ) || $post->post_type !== 'wplf-form' ) {
+      return $content;
     }
-    return $content;
+    return '[libre-form id="' . (int) $post->ID . '"]' . $this->minify_html( $content ) . '[/libre-form]';
   }
 
   /**
@@ -564,14 +639,16 @@ class CPT_WPLF_Form {
   function maybe_set_404_for_single_form() {
     global $post;
 
-    if( !is_singular( 'wplf-form' ) )
+    if ( ! is_singular( 'wplf-form' ) ) {
       return;
+    }
 
     $publicly_visible = $this->get_publicly_visible_state( $post->ID );
-    if( $publicly_visible )
+    if ( $publicly_visible ) {
       return;
+    }
 
-    if( !current_user_can( 'edit_post', $post->ID ) ) {
+    if ( ! current_user_can( 'edit_post', $post->ID ) ) {
       global $wp_query;
       $wp_query->set_404();
     }
@@ -582,6 +659,13 @@ class CPT_WPLF_Form {
    */
   function get_publicly_visible_state( $id ) {
     return apply_filters( 'wplf-form-publicly-visible', false, $id );
+  }
+
+  /**
+   * A very simple uglify. Just removes line breaks from html
+   */
+  function minify_html( $html ) {
+    return str_replace( array( "\n", "\r" ), ' ', $html );
   }
 }
 
