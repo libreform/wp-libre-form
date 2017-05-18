@@ -1,0 +1,25 @@
+sudo: false
+language: php
+php:
+  - 5.6
+  - 7.1
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.composer/vendor
+    - vendor
+
+before_install:
+  # Update Composer
+  - composer self-update
+
+  # Install phpcs with wp-coding-standards
+  - composer create-project wp-coding-standards/wpcs:dev-master --no-dev $HOME/wpcs
+
+script:
+  # Check project with phps
+  - ~/wpcs/vendor/bin/phpcs --extensions=php --standard=./phpcs.xml -n -p .
+
+  # Check that composer is valid and installs correctly
+  - composer install -o --prefer-dist --no-interaction
