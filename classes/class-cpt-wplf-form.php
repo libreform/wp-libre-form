@@ -42,6 +42,7 @@ class CPT_WPLF_Form {
     add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
+		add_action( 'init', array( $this, 'maybe_do_nojs_submit' ) );
 
     // default filters for the_content, but we don't want to use actual the_content
     add_filter( 'wplf_form', 'convert_smilies' );
@@ -148,6 +149,11 @@ class CPT_WPLF_Form {
 
     // enqueue the custom JS for this view
     wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname( __FILE__ ) ) );
+    wp_localize_script( 'wplf-form-edit-js', 'wplf', array(
+    	'nojs_fallback' 			=> apply_filters( 'wplf_form_nojs_fallback', false ),
+    	'wp_reserved_names'		=> $this->get_wp_reserved_terms(),
+    	'is_wp_reserved_name'	=> __( 'Name of this field is <a href="#wplf-wp-reserved-names">reserved for WordPress</a> and may conflict with core functionality when no-js fallback is used.', 'wp-libre-form' )
+    ) );
   }
 
 
@@ -268,6 +274,18 @@ class CPT_WPLF_Form {
       'high'
     );
 
+    // Maybe WP reserved terms meta box
+    if ( apply_filters( 'wplf_form_nojs_fallback', false ) ) {
+    	add_meta_box(
+	      'wplf-wp-reserved-names',
+	      __( 'Field names reserved for WordPress', 'wp-libre-form' ),
+	      array( $this, 'metabox_wp_reserved_terms' ),
+	      'wplf-form',
+	      'normal',
+	      'high'
+	    );
+    }
+
     // Form Fields meta box
     add_meta_box(
       'wplf-fields',
@@ -326,6 +344,20 @@ class CPT_WPLF_Form {
 </p>
 <?php
     wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
+  }
+
+  /**
+   *  Meta box callback for displaying reserved terms
+   */
+  function metabox_wp_reserved_terms() {
+?>
+<p><?php _e( 'Following field names are reserved for WordPress and may conflict with core functionality when no-js fallback is used. Please avoid using these terms.', 'wp-libre-form' ) ?></p>
+<ul style="list-style:disc;padding-left:20px;">
+<?php foreach ( $this->get_wp_reserved_terms() as $term ) : ?>
+	<li><?php echo $term; ?></li>
+<?php endforeach; ?>
+</ul>
+<?php
   }
 
 
@@ -499,6 +531,10 @@ class CPT_WPLF_Form {
   function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
     global $post;
 
+    if ( isset( $_GET['wplf_success'] ) ) {
+      return apply_filters( 'the_content', get_post_meta( $id, '_wplf_thank_you', true ) );
+    }
+
     if ( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
       $form = get_post( $id );
       if ( empty( $content ) ) {
@@ -525,12 +561,16 @@ class CPT_WPLF_Form {
       || false !== strpos( $content, 'type=file' )
     ) : ?>
     enctype="multipart/form-data"
-  <?php endif; ?>
-  <?php
+  <?php endif;
+
     // add custom attributes from shortcode to <form> element
     foreach ( $attributes as $attr_name => $attr_value ) {
       echo esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . "\"\n";
     }
+
+    if ( apply_filters( 'wplf_form_nojs_fallback', false ) ) : ?>
+   		method="post"
+   <?php endif;
   ?>
 >
   <?php if ( is_singular( 'wplf-form' ) && current_user_can( 'edit_post', $id ) ) : ?>
@@ -556,8 +596,14 @@ class CPT_WPLF_Form {
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
   <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ) ?>">
   <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
+  <input type="hidden" class="wplf-nojs" name="_wplf_nojs" />
 </form>
 <?php
+
+			if ( ! empty( $_GET['wplf_error'] ) ) {
+	      return apply_filters( 'the_content', urldecode( $_GET['wplf_error'] ) );
+	    }
+
       $output = ob_get_clean();
 
       // enqueue our footer script here
@@ -591,6 +637,15 @@ class CPT_WPLF_Form {
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
     ) );
+  }
+
+  /**
+   *  Handle form subission when nojs fallback is on and javascript is not used on submit
+   */
+  function maybe_do_nojs_submit() {
+  	if ( apply_filters( 'wplf_form_nojs_fallback', false ) && isset( $_POST['_wplf_nojs'] ) ) {
+  		wplf_ajax_submit_handler( true );
+  	}
   }
 
 
@@ -661,6 +716,96 @@ class CPT_WPLF_Form {
    */
   function minify_html( $html ) {
     return str_replace( array( "\n", "\r" ), ' ', $html );
+  }
+
+  /**
+   *  Get terms that are reserved for WordPress core
+   */
+  function get_wp_reserved_terms() {
+  	return apply_filters( 'wplf-wp-reserved-terms', array(
+  		'attachment',
+  		'attachment_id',
+  		'author',
+  		'author_name',
+  		'calendar',
+  		'cat',
+  		'category',
+  		'category__and',
+  		'category__in',
+  		'category__not_in',
+  		'category_name',
+  		'comments_per_page',
+  		'comments_popup',
+  		'custom',
+  		'customize_messenger_channel',
+  		'customized',
+  		'cpage',
+  		'day',
+  		'debug',
+  		'embed',
+  		'error',
+  		'exact',
+  		'feed',
+  		'hour',
+  		'link_category',
+  		'm',
+  		'minute',
+  		'monthnum',
+  		'more',
+  		'name',
+  		'nav_menu',
+  		'nonce',
+  		'nopaging',
+  		'offset',
+  		'order',
+  		'orderby',
+  		'p',
+  		'page',
+  		'page_id',
+  		'paged',
+  		'pagename',
+  		'pb',
+  		'perm',
+  		'post',
+  		'post__in',
+  		'post__not_in',
+  		'post_format',
+  		'post_mime_type',
+  		'post_status',
+  		'post_tag',
+  		'post_type',
+  		'posts',
+  		'posts_per_archive_page',
+  		'posts_per_page',
+  		'preview',
+  		'robots',
+  		's',
+  		'search',
+  		'second',
+  		'sentence',
+  		'showposts',
+  		'static',
+  		'subpost',
+  		'subpost_id',
+  		'tag',
+  		'tag__and',
+  		'tag__in',
+  		'tag__not_in',
+  		'tag_id',
+  		'tag_slug__and',
+  		'tag_slug__in',
+  		'taxonomy',
+  		'tb',
+  		'term',
+  		'terms',
+  		'theme',
+  		'title',
+  		'type',
+  		'w',
+  		'withcomments',
+  		'withoutcomments',
+  		'year',
+  	) );
   }
 }
 
