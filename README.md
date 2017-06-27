@@ -167,7 +167,7 @@ These callbacks are executed in the order they appear.
 
 To avoid running your JavaScript too early, add `wplf-form-js` to your enqueue dependencies: 
 ```php
-wp_enqueue_script("themejs", "/path/to/theme.js", ["wplf-form-js"], ...);
+wp_enqueue_script( "themejs", "/path/to/theme.js", array( "wplf-form-js" ), ... );
 ```
 Otherwise you might run into errors like "Cannot read property 'push' of undefined".  
 
