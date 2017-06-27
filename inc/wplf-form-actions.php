@@ -74,14 +74,14 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     $subject = apply_filters( "wplf_{$form->post_name}_email_copy_subject", $subject );
     $content = apply_filters( "wplf_{$form->post_name}_email_copy_content", $content );
     $headers = apply_filters( "wplf_{$form->post_name}_email_copy_headers", $headers );
-    $attachments = apply_filters( "wplf_{$form->post_name}_email_copy_attachments", $attachment );
+    $attachments = apply_filters( "wplf_{$form->post_name}_email_copy_attachments", $attachments );
 
     // form ID specific filters
     $to = apply_filters( "wplf_{$form->ID}_email_copy_to", $to );
     $subject = apply_filters( "wplf_{$form->ID}_email_copy_subject", $subject );
     $content = apply_filters( "wplf_{$form->ID}_email_copy_content", $content );
     $headers = apply_filters( "wplf_{$form->ID}_email_copy_headers", $headers );
-    $attachments = apply_filters( "wplf_{$form->ID}_email_copy_attachments", $attachment );
+    $attachments = apply_filters( "wplf_{$form->ID}_email_copy_attachments", $attachments );
 
     wp_mail( $to, $subject, $content, $headers, $attachments );
   }
