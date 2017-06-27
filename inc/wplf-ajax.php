@@ -66,7 +66,7 @@ function wplf_ajax_submit_handler() {
         'test_form' => false,
       ) );
 
-      if ( !is_wp_error( $attach_id ) ) {
+      if ( ! is_wp_error( $attach_id ) ) {
         add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
         add_post_meta( $post_id, $key . '_attachment', $attach_id );
       }
