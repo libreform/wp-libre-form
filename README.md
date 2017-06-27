@@ -165,6 +165,12 @@ window.wplf.errorCallbacks.push(() => alert('Form submission failed!'));
 
 These callbacks are executed in the order they appear.
 
+To avoid running your JavaScript too early, add `wplf-form-js` to your enqueue dependencies: 
+```php
+wp_enqueue_script( "themejs", "/path/to/theme.js", array( "wplf-form-js" ), ... );
+```
+Otherwise you might run into errors like "Cannot read property 'push' of undefined".  
+
 ## Multilingual
 
 You can create multilingual forms using Polylang. WPLF will register and automatically fetch the translation when you use special template tags.
