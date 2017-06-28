@@ -75,10 +75,10 @@ function wplf_validate_additional_fields( $return ) {
   $form_fields = explode( ',', get_post_meta( $_POST['_form_id'], '_wplf_fields', true ) );
 
   // add all default fields
-  $default_fields = array("referrer", "_referrer_id", "_form_id");
+  $default_fields = array( 'referrer', '_referrer_id', '_form_id' );
 
   // combine fields
-  $all_fields = array_merge($form_fields, $default_fields);
+  $all_fields = array_merge( $form_fields, $default_fields );
 
   // make sure fields from all_fields are the only ones present in $_POST
   $additional_fields = array();
