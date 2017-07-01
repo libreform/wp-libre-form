@@ -15,6 +15,10 @@
     submitHandler: function (e) {
       var form = e.target;
       var data = new FormData(form);
+
+      // Pass language if it exists.
+      ajax_object.lang && data.append('lang', ajax_object.lang);
+
       // add class to enable css changes to indicate ajax loading
       form.classList.add("sending");
 

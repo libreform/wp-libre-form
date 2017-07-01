@@ -24,6 +24,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       // Earlier than default. User probably wants to filter the translated message.
       add_action( 'wplf_success_message', array( $this, 'render_success_message' ), 9 );
       add_action( 'wplf_save_success_message', array( $this, 'save_success_message' ) );
+      add_action( 'wplf_ajax_object', array( $this, 'ajax_object' ) );
 
       $this->strings = get_option( 'wplf-translation-strings', array() );
       $this->register_strings();
@@ -83,6 +84,11 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       update_option( 'wplf-translation-strings', $this->strings ); // Let's be optimistic.
 
       return $message;
+    }
+
+    public function ajax_object($array) {
+      $array['lang'] = pll_current_language();
+      return $array;
     }
 
     public function register_strings() {

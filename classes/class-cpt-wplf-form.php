@@ -589,10 +589,10 @@ class CPT_WPLF_Form {
     );
 
     // add dynamic variables to the script's scope
-    wp_localize_script( 'wplf-form-js', 'ajax_object', array(
+    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
-    ) );
+    ) ) );
   }
 
 
