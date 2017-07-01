@@ -58,7 +58,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       update_option( 'wplf-translation-strings', $this->strings ); // Let's be optimistic.
     }
 
-    public function render_success_message($message) {
+    public function render_success_message( $message ) {
       // Get all strings inside double curly braces.
       preg_match_all( $this->regular_expression, $message, $matches );
       foreach ( $matches[0] as $match ) {
@@ -70,7 +70,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       return $message;
     }
 
-    public function save_success_message($message) {
+    public function save_success_message( $message ) {
       preg_match_all( $this->regular_expression, $message, $matches );
       if ( ! empty( $matches ) ) {
         foreach ( $matches[0] as $match ) {
@@ -86,7 +86,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       return $message;
     }
 
-    public function ajax_object($array) {
+    public function ajax_object( $array ) {
       $array['lang'] = pll_current_language();
       return $array;
     }
