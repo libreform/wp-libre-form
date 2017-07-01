@@ -1,9 +1,7 @@
 <?php
 if ( ! class_exists( 'WPLF_Polylang' ) ) {
   class WPLF_Polylang {
-    /**
-     * CPT for the forms
-     */
+
     public static $instance;
     protected $regular_expression = "/{{[^{}\n]+}}/";
     protected $strings = array();
