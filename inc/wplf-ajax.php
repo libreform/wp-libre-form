@@ -81,8 +81,13 @@ function wplf_ajax_submit_handler() {
     $return->submission_title = $post_title;
     $return->form_id = $form->ID;
 
+    $success = get_post_meta( $form->ID, '_wplf_thank_you', true );
+    $success = apply_filters( "wplf_{$form->post_name}_success_message", $success );
+    $success = apply_filters( "wplf_{$form->ID}_success_message", $success );
+    $success = apply_filters( 'wplf_success_message', $success );
+
     // return the success message for the form
-    $return->success = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
+    $return->success = $success;
 
     // allow user to attach custom actions after the submission has been received
     // these could be confirmation emails, additional processing for the submission fields, e.g.
