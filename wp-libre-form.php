@@ -88,7 +88,7 @@ class WP_Libre_Form {
    * Enable Polylang support
    */
   public function init_polylang_support() {
-    if ( apply_filters( 'wplf_load_polylang', true ) && class_exists( 'Polylang ' ) ) {
+    if ( apply_filters( 'wplf_load_polylang', true ) && class_exists( 'Polylang' ) ) {
       require_once 'classes/class-wplf-polylang.php';
       WPLF_Polylang::init();
     }
