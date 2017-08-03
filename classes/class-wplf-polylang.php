@@ -16,7 +16,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
     /**
      * Hook our actions, filters and such
      */
-    private function __construct() {
+    public function __construct() {
       add_filter( 'wplf_form', array( $this, 'render_form' ) );
       add_filter( 'save_post_wplf-form', array( $this, 'save_form' ), 10, 3 );
       add_action( 'after_setup_theme', array( $this, 'register_strings' ) );

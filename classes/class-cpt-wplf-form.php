@@ -18,7 +18,7 @@ class CPT_WPLF_Form {
   /**
    * Hook our actions, filters and such
    */
-  private function __construct() {
+  public function __construct() {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
 
@@ -385,7 +385,7 @@ class CPT_WPLF_Form {
     $format = isset( $meta['_wplf_title_format'] ) ? $meta['_wplf_title_format'][0] : $default;
 ?>
 <p><?php esc_html_e( 'Submissions from this form will use this formatting in their title.', 'wp-libre-form' ); ?></p>
-<p><?php esc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' );?></p>
+<p><?php esc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' ); ?></p>
 <p>
   <input
     type="text"
@@ -542,10 +542,10 @@ class CPT_WPLF_Form {
     ?>
       <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
         <strong style="color:#dc3232;">
-          <?php esc_html_e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) ?>
+          <?php esc_html_e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ); ?>
         </strong>
         <br />
-        <?php esc_html_e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) ?>
+        <?php esc_html_e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ); ?>
       </p>
     <?php endif; ?>
   <?php endif; ?>
@@ -556,7 +556,7 @@ class CPT_WPLF_Form {
     // @codingStandardsIgnoreEnd
   ?>
   <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
-  <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ) ?>">
+  <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ); ?>">
   <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
 </form>
 <?php
