@@ -423,7 +423,9 @@ class CPT_WPLF_Form {
 
     // save success message
     if ( isset( $_POST['wplf_thank_you'] ) ) {
-      update_post_meta( $post_id, '_wplf_thank_you', wp_kses_post( $_POST['wplf_thank_you'] ) );
+      $success = wp_kses_post( $_POST['wplf_thank_you'] );
+      $success = apply_filters( 'wplf_save_success_message', $success, $post_id );
+      update_post_meta( $post_id, '_wplf_thank_you', $success );
     }
 
     // save fields
@@ -587,10 +589,10 @@ class CPT_WPLF_Form {
     );
 
     // add dynamic variables to the script's scope
-    wp_localize_script( 'wplf-form-js', 'ajax_object', array(
+    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
-    ) );
+    ) ) );
   }
 
 
