@@ -18,7 +18,7 @@ class CPT_WPLF_Submission {
   /**
    * Hook our actions, filters and such
    */
-  private function __construct() {
+  public function __construct() {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
 
