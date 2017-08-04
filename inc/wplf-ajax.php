@@ -65,8 +65,11 @@ function wplf_ajax_submit_handler() {
       $attach_id = media_handle_upload( $key, 0, array(), array(
         'test_form' => false,
       ) );
-      add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
-      add_post_meta( $post_id, $key . '_attachment', $attach_id );
+
+      if ( ! is_wp_error( $attach_id ) ) {
+        add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
+        add_post_meta( $post_id, $key . '_attachment', $attach_id );
+      }
     }
 
     // save email copy address to submission meta for later use
@@ -78,8 +81,13 @@ function wplf_ajax_submit_handler() {
     $return->submission_title = $post_title;
     $return->form_id = $form->ID;
 
+    $success = get_post_meta( $form->ID, '_wplf_thank_you', true );
+    $success = apply_filters( "wplf_{$form->post_name}_success_message", $success );
+    $success = apply_filters( "wplf_{$form->ID}_success_message", $success );
+    $success = apply_filters( 'wplf_success_message', $success );
+
     // return the success message for the form
-    $return->success = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
+    $return->success = $success;
 
     // allow user to attach custom actions after the submission has been received
     // these could be confirmation emails, additional processing for the submission fields, e.g.
