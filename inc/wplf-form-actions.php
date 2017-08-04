@@ -7,30 +7,22 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
   }
 
   // _form_id is already validated and we know it exists by this point
-  $form_id = intval( ( isset( $submission_id ) ) ?
-    get_post_meta( $submission_id, '_form_id', true ) : $_POST['_form_id'] );
+  $form_id = intval( ( isset( $submission_id ) ) ? get_post_meta( $submission_id, '_form_id', true ) : $_POST['_form_id'] );
 
   $form = get_post( intval( $form_id ) );
 
   $form_title = esc_html( get_the_title( $form ) );
   $form_meta = get_post_meta( $form_id );
 
-  $referrer = esc_url_raw( ( isset( $submission_id ) ) ?
-    get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] );
+  $referrer = esc_url_raw( ( isset( $submission_id ) ) ? get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] );
 
-  if ( ( isset( $form_meta['_wplf_email_copy_enabled'] ) && $form_meta['_wplf_email_copy_enabled'][0] )
-    || isset( $submission_id ) ) {
+  if ( ( isset( $form_meta['_wplf_email_copy_enabled'] ) && $form_meta['_wplf_email_copy_enabled'][0] ) || isset( $submission_id ) ) {
 
-    $to = isset( $form_meta['_wplf_email_copy_to'] ) ?
-      $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
+    $to = isset( $form_meta['_wplf_email_copy_to'] ) ? $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
 
-    // translators: %1$s is submission ID, %2$s is URL where form was submitted
-    $subject = wp_sprintf( __( '[%1$s] New submission to %2$s', 'wp-libre-form' ), $submission_id, $referrer );
-
-    if ( isset( $submission_id ) ) {
-      $to = get_post_meta( $submission_id, '_wplf_email_copy_to', true );
-      // translators: %1$s is submission ID, %2$s is URL where form was submitted
-      $subject = wp_sprintf( __( '[%1$s] Submission from %2$s', 'wp-libre-form' ), $submission_id, $referrer );
+    $subject = __( '[{{submission-id}}] New submission from {{referrer}}', 'wp-libre-form' );
+    if ( isset( $form_meta['_wplf_email_copy_subject'] ) ) {
+    	$subject = $form_meta['_wplf_email_copy_subject'][0];
     }
 
     $to = empty( $to ) ? get_option( 'admin_email' ) : $to;
@@ -44,23 +36,23 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
       $fields = get_post_meta( $submission_id );
     }
 
-    foreach ( $fields as $key => $value ) {
-      if ( '_' === $key[0] ) {
-        continue;
-      }
-      if ( is_array( $value ) ) { // in case input type="radio" submits an array
-        $value = implode( ', ', $value );
-      }
-      // @codingStandardsIgnoreStart
-      // WP coding standards don't like print_r
-      // @TODO: come up with a prettier format for default mail output
-      $content .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
-      // @codingStandardsIgnoreEnd
-    }
+    $content .= wplf_email_copy_make_fields_key_value_list( $fields );
 
     // default pre-filtered values for email headers and attachments
     $headers = '';
     $attachments = array();
+
+    if ( isset( $form_meta['_wplf_email_copy_from'][0] ) ) {
+    	$headers[] = 'From: ' . wplf_email_copy_replace_tags( $form_meta['_wplf_email_copy_from'][0], $form, $submission_id ) . '<' . wplf_email_copy_replace_tags( $form_meta['_wplf_email_copy_from_address'][0], $form, $submission_id ) . '>';
+    }
+
+    if ( isset( $form_meta['_wplf_email_copy_content'] ) ) {
+    	$content = $form_meta['_wplf_email_copy_content'][0];
+    }
+
+    // maybe replace template tags with real content
+    $subject = wplf_email_copy_replace_tags( $subject, $form, $submission_id );
+    $content = wplf_email_copy_replace_tags( $content, $form, $submission_id );
 
     // allow filtering email fields
     $to = apply_filters( 'wplf_email_copy_to', $to );
@@ -85,4 +77,64 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
 
     wp_mail( $to, $subject, $content, $headers, $attachments );
   }
+}
+
+function wplf_email_copy_make_fields_key_value_list( $fields ) {
+	$list = '';
+
+	foreach ( $fields as $key => $value ) {
+    if ( '_' === $key[0] ) {
+      continue;
+    }
+    if ( is_array( $value ) ) { // in case input type="radio" submits an array
+      $value = implode( ', ', $value );
+    }
+    // @codingStandardsIgnoreStart
+    // WP coding standards don't like print_r
+    // @TODO: come up with a prettier format for default mail output
+    $list .= esc_html( $key ) . ': ' . esc_html( print_r( $value, true ) ) . "\n";
+    // @codingStandardsIgnoreEnd
+  }
+
+  return $list;
+}
+
+function wplf_email_copy_replace_tags( $content, $form = null, $submission_id = null ) {
+	if ( ! $form || ! $submission_id ) {
+		return $content;
+	}
+
+	$fields = $_POST;
+  if ( isset( $submission_id ) ) {
+    $fields = get_post_meta( $submission_id );
+  }
+
+  $fields_key_value = wplf_email_copy_make_fields_key_value_list( $fields );
+
+	$defaults_store = array(
+		'submission-id'	=> $submission_id,
+		'referrer'			=> esc_url_raw( ( isset( $submission_id ) ) ? get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] ),
+		'form-title'		=> esc_html( get_the_title( $form ) ),
+		'form-id'				=> $form->ID,
+		'all-form-data'	=> $fields_key_value
+	);
+
+	$fields = $_POST;
+  if ( isset( $submission_id ) ) {
+    $fields = get_post_meta( $submission_id );
+  }
+
+	preg_match_all( "/{{[^{}\n]+}}/", $content, $matches );
+  foreach ( $matches[0] as $match ) {
+    // match contains the braces, get rid of them.
+    $string = trim( str_replace( array( '{', '}' ), array( '', '' ), $match ) );
+
+    if ( isset( $fields[ $string ] ) ) {
+    	$content = str_replace( $match, $fields[ $string ][0], $content );
+    } else if ( isset( $defaults_store[ $string ] ) ) {
+    	$content = str_replace( $match, $defaults_store[ $string ], $content );
+    }
+  }
+
+  return $content;
 }
