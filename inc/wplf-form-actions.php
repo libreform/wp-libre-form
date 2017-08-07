@@ -20,15 +20,13 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
 
     $to = isset( $form_meta['_wplf_email_copy_to'] ) ? $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
 
-    $subject = __( '[{{submission-id}}] New submission from {{referrer}}', 'wp-libre-form' );
+    $subject = __( '[%submission-id%] New submission from %referrer%', 'wp-libre-form' );
     if ( isset( $form_meta['_wplf_email_copy_subject'] ) ) {
     	$subject = $form_meta['_wplf_email_copy_subject'][0];
     }
 
     $to = empty( $to ) ? get_option( 'admin_email' ) : $to;
-    $content = wp_sprintf(
-      // translators: %1$s is form title, %2$d is form ID
-      __( 'Form "%1$s" (ID %2$d) was submitted with values below: ', 'wp-libre-form' ), $form_title, $form_id );
+    $content = wp_sprintf( __( 'Form %form-title% (ID %form-id%) was submitted with values below: ', 'wp-libre-form' ), $form_title, $form_id );
     $content = apply_filters( 'wplf_email_copy_content_start', $content, $form_title, $form_id ) . "\n\n";
 
     $fields = $_POST;
@@ -51,6 +49,7 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     }
 
     // maybe replace template tags with real content
+    $to = wplf_email_copy_replace_tags( $to, $form, $submission_id );
     $subject = wplf_email_copy_replace_tags( $subject, $form, $submission_id );
     $content = wplf_email_copy_replace_tags( $content, $form, $submission_id );
 
@@ -116,6 +115,10 @@ function wplf_email_copy_replace_tags( $content, $form = null, $submission_id = 
 		'referrer'			=> esc_url_raw( ( isset( $submission_id ) ) ? get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] ),
 		'form-title'		=> esc_html( get_the_title( $form ) ),
 		'form-id'				=> $form->ID,
+		'user-id'				=> ( isset( get_current_user_id() ) ) ? wp_get_current_user()->display_name . ' (ID ' . get_current_user_id() . ')' : __( 'No user logged in', 'wp-libre-form' ),
+		'timestamp'			=> current_time( 'mysql' ),
+		'datetime'			=> current_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ),
+		'language'			=> ( function_exists( 'pll_current_language' ) ) ? pll_current_language( 'locale' ) : get_locale(),
 		'all-form-data'	=> $fields_key_value
 	);
 
@@ -124,10 +127,10 @@ function wplf_email_copy_replace_tags( $content, $form = null, $submission_id = 
     $fields = get_post_meta( $submission_id );
   }
 
-	preg_match_all( "/{{[^{}\n]+}}/", $content, $matches );
+	preg_match_all( '/%(.+?)%/', $content, $matches );
   foreach ( $matches[0] as $match ) {
     // match contains the braces, get rid of them.
-    $string = trim( str_replace( array( '{', '}' ), array( '', '' ), $match ) );
+    $string = trim( str_replace( array( '%' ), array( '' ), $match ) );
 
     if ( isset( $fields[ $string ] ) ) {
     	$content = str_replace( $match, $fields[ $string ][0], $content );

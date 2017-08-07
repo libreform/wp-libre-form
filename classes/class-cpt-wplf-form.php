@@ -375,7 +375,7 @@ class CPT_WPLF_Form {
   </label>
 </p>
 <p class="wplf-email-copy-to-field">
-	<?php _e( 'You can use following template tags always: submission-id, referrer, form-title, form-id, all-form-data. You may also use any form field values wrapper inside curly brackets.' ) ?>
+	<?php _e( 'You may use any form field values and following global tags: submission-id, referrer, form-title, form-id, user-id, timestamp, datetime, language, all-form-data. All field values and tags should be enclosed in "%" markers.', 'wp-libre-form' ) ?>
 </p>
 <p class="wplf-email-copy-to-field">
 	<label for="wplf_email_copy_to" style="display:inline-block;width:100px;font-weight:600;"><?php _e( 'Send copy to', 'wp-libre-form' ) ?></label>
@@ -413,7 +413,7 @@ class CPT_WPLF_Form {
     type="text"
     name="wplf_email_copy_subject"
     value="<?php echo esc_attr( $email_copy_subject ); ?>"
-    placeholder="[{{submission-id}}] Submission from {{referrer}}"
+    placeholder="[%submission-id%] Submission from %referrer%"
     style="width:80%;"
   >
 </p>
@@ -421,9 +421,9 @@ class CPT_WPLF_Form {
 	<label for="wplf_email_copy_content" style="display:table-cell;width:105px;font-weight:600;vertical-align:top;"><?php _e( 'Content', 'wp-libre-form' ) ?></label>
   <textarea
     name="wplf_email_copy_content"
-    placeholder="Form {{form-title}} (ID {{form-id}}) was submitted with values below:
+    placeholder="Form %form-title% (ID %form-id%) was submitted with values below:
 
-{{all-form-data}}"
+%all-form-data%"
     style="display:table-cell;width:94%;"
     rows="10"
   ><?php echo esc_attr( $email_copy_content ); ?></textarea>
