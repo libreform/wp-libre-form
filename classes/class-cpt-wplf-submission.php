@@ -263,7 +263,10 @@ class CPT_WPLF_Submission {
 
         // Show a link if the field corresponds to a URL
         // assume values starting with '/' are root relative URLs and should be handled as links
-        $value_is_url = $value[0] === '/' ? true : filter_var( $value, FILTER_VALIDATE_URL );
+        $value_is_url = false;
+        if ( strlen( $value ) > 0 ) {
+          $value_is_url = $value[0] === '/' ? true : filter_var( $value, FILTER_VALIDATE_URL );
+        }
         if ( $value_is_url ) {
           $link_text = __( 'Open Link', 'wp-libre-form' );
           $possible_link = '<a target="_blank" href="' . $value . '" style="float:right">' . $link_text . '</a>';
