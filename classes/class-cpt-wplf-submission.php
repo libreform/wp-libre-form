@@ -264,7 +264,7 @@ class CPT_WPLF_Submission {
         // Show a link if the field corresponds to a URL
         // assume values starting with '/' are root relative URLs and should be handled as links
         $value_is_url = false;
-        if ( strlen($value) > 0 ) {
+        if ( strlen( $value ) > 0 ) {
           $value_is_url = $value[0] === '/' ? true : filter_var( $value, FILTER_VALIDATE_URL );
         }
         if ( $value_is_url ) {
