@@ -124,7 +124,7 @@ function initialize(dependencies, app) {
     if (!window[dependency]) {
       return dependency.toLowerCase();
     }
-  }).map(function(dependency) {
+  }).filter(Boolean).map(function(dependency) {
     return get_script(dependency);
   }).map(function(script) {
     script.addEventListener('load', function() {
