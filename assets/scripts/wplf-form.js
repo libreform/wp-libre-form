@@ -95,9 +95,7 @@ window.wplf = {
 };
 
 var main = function () {
-   document.addEventListener("DOMContentLoaded", function() {
-    [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
-  });
+  [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
 };
 
 var dependencies = [];
@@ -110,7 +108,6 @@ if (!window.Promise) {
   dependencies.push('Promise');
 }
 
-initialize(dependencies, main);
 
 function initialize(dependencies, app) {
   var dependency_count = dependencies.length;
@@ -145,3 +142,7 @@ function initialize(dependencies, app) {
 
   run_when_ready();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  initialize(dependencies, main);
+});
