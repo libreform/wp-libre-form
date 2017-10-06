@@ -85,9 +85,13 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
 
       return $message;
     }
-
+    
     public function ajax_object( $array ) {
-      $array['lang'] = pll_current_language();
+      if ( function_exists( 'pll_current_language' ) ) {
+        $array['lang'] = pll_current_language();
+      } else {
+        $array['lang'] = null;
+      }
       return $array;
     }
 
