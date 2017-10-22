@@ -286,6 +286,15 @@ class CPT_WPLF_Form {
       'side'
     );
 
+    // Textarea Replacement
+    add_meta_box(
+      'wplf-textarea-replacement',
+      __('Textarea Replacement', 'wp-libre-form'),
+      array($this, 'metabox_textarea_replacement'),
+      'wplf-form',
+      'side'
+    );
+
     // Submission title format meta box
     add_meta_box(
       'wplf-title-format',
@@ -342,6 +351,29 @@ class CPT_WPLF_Form {
 <input type="hidden" name="wplf_required" id="wplf_required">
 <?php
   }
+
+    /**
+     * Meta box callback for submit email meta box
+     */
+    function metabox_textarea_replacement($post)
+    {
+        // get post meta
+        $meta = get_post_meta($post->ID);
+        $textarea_replacement_enabled = isset($meta['_wplf_textarea_replacement']) ? $meta['_wplf_textarea_replacement'][0] : false;
+        ?>
+        <p>
+            <label for="wplf_textarea_replacement">
+                <input
+                        id="wplf_textarea_replacement"
+                        name="wplf_textarea_replacement"
+                        type="checkbox"
+                    <?php echo $textarea_replacement_enabled ? 'checked="checked"' : ''; ?>
+                >
+                <?php esc_html_e('Replace Textareas for Wordpress Editor?', 'wp-libre-form'); ?>
+            </label>
+        </p>
+        <?php
+    }
 
   /**
    * Meta box callback for submit email meta box
@@ -482,6 +514,15 @@ class CPT_WPLF_Form {
       // should be fine to save the meta field without further sanitisaton
       update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
     }
+
+    // save textarea replacement
+    if (isset($_POST['wplf_textarea_replacement'])) {
+      $textarea_replacement = $_POST['wplf_textarea_replacement'];
+
+      update_post_meta($post_id, '_wplf_textarea_replacement', $textarea_replacement);
+    } else {
+      update_post_meta($post_id, '_wplf_textarea_replacement', false);
+    }
   }
 
 
@@ -492,6 +533,92 @@ class CPT_WPLF_Form {
    */
   function strip_form_tags( $content ) {
     return preg_replace( '/<\/?form.*>/i', '', $content );
+  }
+
+
+  /**
+   * Parse text area in case of the existence of wplf_textarea_replacement directive
+   *
+   * @param int $id
+   * @param string $content
+   * @return string $content
+   */
+  function parse_textareas($id, $content)
+  {
+    $meta = get_post_meta($id);
+
+    if( $meta['_wplf_textarea_replacement'][0] == 'on' ) {
+
+      $doc = new DOMDocument();
+      $doc->loadHTML($content);
+      $textareas = $doc->getElementsByTagName('textarea');
+
+      for ($i = 0; $i < $textareas->length; $i++) {
+
+        $current_textarea = $textareas->item($i);
+
+        $textarea_attributes = $current_textarea->attributes;
+
+        $current_textarea_id = "";
+
+        $current_textarea_name = "";
+
+        foreach ($textarea_attributes as $att) {
+
+          if ($att->name == 'id')
+            $current_textarea_id = $att->value;
+
+          if ($att->name == 'name')
+            $current_textarea_name = $att->value;
+
+        }
+
+        if (
+          empty($current_textarea_id)
+          || empty($current_textarea_name)
+        )
+          continue;
+
+        // encapsulating the wp_editor output
+        ob_start();
+        $this->wp_ed('', $current_textarea_id, $current_textarea_name);
+        $output = ob_get_clean();
+
+        // creating the new element
+        $sub_textarea_doc = new DOMDocument('1.0', 'UTF-8');
+        $sub_textarea_doc->loadHTML($output);
+        $sub_textarea_node = $sub_textarea_doc->getElementById('wp-note_content-wrap');
+
+        // importing the new elemento into the default dom doc
+        $newnode = $doc->importNode($sub_textarea_node, true);
+
+        // replacing the textarea with the new element
+        $current_textarea->parentNode->replaceChild($newnode, $current_textarea);
+
+      }
+
+      $content = $doc->saveHTML();
+    }
+
+    return $content;
+  }
+
+  /**
+   * Run wp_editor - the purpose is to wrap this function with a
+   * procedure to encapsulate the output in a variable
+   *
+   * @param string $content
+   * @param string $editor_id
+   * @param string $name
+   */
+  function wp_ed($content, $editor_id, $name = null)
+  {
+    $attributes = ['required' => ''];
+
+    if (!is_null($name))
+      $attributes['textarea_name'] = $name;
+
+    wp_editor($content, $editor_id, $attributes);
   }
 
 
@@ -511,6 +638,9 @@ class CPT_WPLF_Form {
       // filter content html
       $content = apply_filters( "wplf_{$form->post_name}_form", $content );
       $content = apply_filters( "wplf_{$form->ID}_form", $content );
+
+      // parse textareas
+      $content = $this->parse_textareas($id, $content);
 
       // run default filters after. The user probably wants to filter original content, not modified by WP
       $content = apply_filters( 'wplf_form', $content );
