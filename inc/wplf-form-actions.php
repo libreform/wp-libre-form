@@ -29,7 +29,10 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     $to = empty( $to ) ? get_option( 'admin_email' ) : $to;
 
     // translators: %form-title% is replaced with form title and %form-id% with form id
+    // @codingStandardsIgnoreStart
+    // %f gets detected as a placeholder for wp_sprintf
     $content = __( 'Form %form-title% (ID %form-id%) was submitted with values below: ', 'wp-libre-form' );
+    // @codingStandardsIgnoreEnd
     $content = apply_filters( 'wplf_email_copy_content_start', $content, $form_title, $form_id ) . "\n\n";
 
     $fields = $_POST;
@@ -119,7 +122,7 @@ function wplf_email_copy_replace_tags( $content, $form = null, $submission_id = 
     'referrer'      => esc_url_raw( ( null !== $submission_id ) ? get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] ),
     'form-title'    => esc_html( get_the_title( $form ) ),
     'form-id'       => $form->ID,
-    'user-id'       => ( isset( get_current_user_id() ) ) ? wp_get_current_user()->display_name . ' (ID ' . get_current_user_id() . ')' : __( 'No user logged in', 'wp-libre-form' ),
+    'user-id'       => ( null !== get_current_user_id() ) ? wp_get_current_user()->display_name . ' (ID ' . get_current_user_id() . ')' : __( 'No user logged in', 'wp-libre-form' ),
     'timestamp'     => current_time( 'mysql' ),
     'datetime'      => current_time( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ),
     'language'      => ( function_exists( 'pll_current_language' ) ) ? pll_current_language( 'locale' ) : get_locale(),
@@ -127,7 +130,7 @@ function wplf_email_copy_replace_tags( $content, $form = null, $submission_id = 
   );
 
   $fields = $_POST;
-  if ( isset( $submission_id ) ) {
+  if ( null !== $submission_id ) {
     $fields = get_post_meta( $submission_id );
   }
 
