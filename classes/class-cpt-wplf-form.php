@@ -403,7 +403,7 @@ class CPT_WPLF_Form {
     type="text"
     name="wplfesc_html_email_copy_from_address"
     value="<?php echo esc_attr( $email_copy_from_address ); ?>"
-    placeholder="<?php echo esc_attr( $email_copy_from_default ) ?>"
+    placeholder="<?php echo esc_attr( $email_copy_from_default ); ?>"
     style="width:80%;"
   >
 </p>

@@ -29,7 +29,7 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     $to = empty( $to ) ? get_option( 'admin_email' ) : $to;
 
     // translators: %form-title% is replaced with form title and %form-id% with form id
-    $content = __( 'Form %form-title% (ID %form-id%) was submitted with values below: ', 'wp-libre-form' ) );
+    $content = __( 'Form %form-title% (ID %form-id%) was submitted with values below: ', 'wp-libre-form' );
     $content = apply_filters( 'wplf_email_copy_content_start', $content, $form_title, $form_id ) . "\n\n";
 
     $fields = $_POST;
