@@ -1,6 +1,6 @@
 <?php
 
-if ( ! class_exists( 'CPT_WPLF_Form' ) ) :
+if ( ! classesc_html_exists( 'CPT_WPLF_Form' ) ) :
 
 class CPT_WPLF_Form {
   /**
@@ -27,11 +27,11 @@ class CPT_WPLF_Form {
     add_action( 'save_post', array( $this, 'save_cpt' ) );
     add_filter( 'content_save_pre', array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
-    add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
+    add_action( 'adminesc_html_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
 
     // edit.php view
     add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
-    add_filter( 'manage_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );
+    add_filter( 'manageesc_html_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );
     add_action( 'manage_posts_custom_column', array( $this, 'custom_columns_display_cpt' ), 10, 2 );
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );
@@ -41,7 +41,7 @@ class CPT_WPLF_Form {
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
     add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
-    add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
+    add_action( 'wpesc_html_enqueue_scripts', array( $this, 'maybeesc_html_enqueue_frontend_script' ) );
 
     // default filters for the_content, but we don't want to use actual the_content
     add_filter( 'wplf_form', 'convert_smilies' );
@@ -147,7 +147,7 @@ class CPT_WPLF_Form {
     }
 
     // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname( __FILE__ ) ) );
+    wpesc_html_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname( __FILE__ ) ) );
   }
 
 
@@ -169,16 +169,16 @@ class CPT_WPLF_Form {
       // default content starts here:
       // @codingStandardsIgnoreStart
 ?>
-<p><label for="name"><?php esc_html_e( 'Please enter your name', 'wp-libre-form' ); ?></label>
+<p><label for="name"><?php esc_htmlesc_html_e( 'Please enter your name', 'wp-libre-form' ); ?></label>
 <input type="text" name="name" id="name" placeholder="<?php echo esc_html_x( 'John Doe', 'Default placeholder name', 'wp-libre-form' ); ?>"></p>
 
-<p><label for="email"><?php echo esc_html_x( 'Please enter your email address', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
+<p><label for="email"><?php echo esc_html_x( 'Please enter your email address', 'wp-libre-form' ); ?> <?php esc_htmlesc_html_e( '(required)', 'wp-libre-form' ); ?></label>
 <input type="email" name="email" id="email" placeholder="<?php echo esc_html_x( 'example@email.com', 'Default placeholder email', 'wp-libre-form' ); ?>" required></p>
 
-<p><label for="message"><?php esc_html_e( 'Write your message below', 'wp-libre-form' ); ?> <?php esc_html_e( '(required)', 'wp-libre-form' ); ?></label>
+<p><label for="message"><?php esc_htmlesc_html_e( 'Write your message below', 'wp-libre-form' ); ?> <?php esc_htmlesc_html_e( '(required)', 'wp-libre-form' ); ?></label>
 <textarea name="message" rows="5" id="message" placeholder="<?php echo esc_html_x( 'I wanted to ask about...', 'Default placeholder message', 'wp-libre-form' ); ?>" required></textarea></p>
 
-<p><button type="submit"><?php esc_html_e( 'Submit', 'wp-libre-form' ); ?></button></p>
+<p><button type="submit"><?php esc_htmlesc_html_e( 'Submit', 'wp-libre-form' ); ?></button></p>
 
 <!-- <?php echo esc_html_x( 'Any valid HTML form can be used here!', 'The HTML comment at the end of the example form', 'wp-libre-form' ); ?> -->
 <?php
@@ -281,7 +281,7 @@ class CPT_WPLF_Form {
     add_meta_box(
       'wplf-submit-email',
       __( 'Emails', 'wp-libre-form' ),
-      array( $this, 'metabox_submit_email' ),
+      array( $this, 'metabox_submitesc_html_email' ),
       'wplf-form',
       'normal',
       'high'
@@ -317,7 +317,7 @@ class CPT_WPLF_Form {
       $meta['_wplf_thank_you'][0] : _x( 'Success!', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
-<?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
+<?php wpesc_html_editor( esc_textarea( $message ), 'wplf_thank_you', array(
   'wpautop' => true,
   'media_buttons' => true,
   'textarea_name' => 'wplf_thank_you',
@@ -335,7 +335,7 @@ class CPT_WPLF_Form {
    */
   function metabox_form_fields() {
 ?>
-<p><?php esc_html_e( 'Fields marked with * are required', 'wp-libre-form' ); ?></p>
+<p><?php esc_htmlesc_html_e( 'Fields marked with * are required', 'wp-libre-form' ); ?></p>
 <div class="wplf-form-field-container">
 <!--  <div class="wplf-form-field widget-top"><div class="widget-title"><h4>name</h4></div></div> -->
 </div>
@@ -347,80 +347,80 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for submit email meta box
    */
-  function metabox_submit_email( $post ) {
+  function metabox_submitesc_html_email( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
-    $email_enabled = isset( $meta['_wplf_email_copy_enabled'] ) ? $meta['_wplf_email_copy_enabled'][0] : true;
-    $email_copy_to = isset( $meta['_wplf_email_copy_to'] ) ? $meta['_wplf_email_copy_to'][0] : '';
-    $email_copy_from = isset( $meta['_wplf_email_copy_from'] ) ? $meta['_wplf_email_copy_from'][0] : '';
-    $email_copy_from_address = isset( $meta['_wplf_email_copy_from_address'] ) ? $meta['_wplf_email_copy_from_address'][0] : '';
-    $email_copy_subject = isset( $meta['_wplf_email_copy_subject'] ) ? $meta['_wplf_email_copy_subject'][0] : '';
-    $email_copy_content = isset( $meta['_wplf_email_copy_content'] ) ? $meta['_wplf_email_copy_content'][0] : '';
+    $emailesc_html_enabled = isset( $meta['_wplfesc_html_email_copyesc_html_enabled'] ) ? $meta['_wplfesc_html_email_copyesc_html_enabled'][0] : true;
+    $email_copy_to = isset( $meta['_wplfesc_html_email_copy_to'] ) ? $meta['_wplfesc_html_email_copy_to'][0] : '';
+    $email_copy_from = isset( $meta['_wplfesc_html_email_copy_from'] ) ? $meta['_wplfesc_html_email_copy_from'][0] : '';
+    $email_copy_from_address = isset( $meta['_wplfesc_html_email_copy_from_address'] ) ? $meta['_wplfesc_html_email_copy_from_address'][0] : '';
+    $email_copy_subject = isset( $meta['_wplfesc_html_email_copy_subject'] ) ? $meta['_wplfesc_html_email_copy_subject'][0] : '';
+    $email_copy_content = isset( $meta['_wplfesc_html_email_copy_content'] ) ? $meta['_wplfesc_html_email_copy_content'][0] : '';
 
     $sitename = strtolower( $_SERVER['SERVER_NAME'] );
-		if ( substr( $sitename, 0, 4 ) == 'www.' ) {
-			$sitename = substr( $sitename, 4 );
-		}
-		$email_copy_from_default = 'wordpress@' . $sitename;
+    if ( substr( $sitename, 0, 4 ) == 'www.' ) {
+      $sitename = substr( $sitename, 4 );
+    }
+    $email_copy_from_default = 'wordpress@' . $sitename;
 ?>
 <p>
-  <label for="wplf_email_copy_enabled">
+  <label for="wplfesc_html_email_copyesc_html_enabled">
     <input
-      id="wplf_email_copy_enabled"
-      name="wplf_email_copy_enabled"
+      id="wplfesc_html_email_copyesc_html_enabled"
+      name="wplfesc_html_email_copyesc_html_enabled"
       type="checkbox"
-      <?php echo $email_enabled ? 'checked="checked"' : ''; ?>
+      <?php echo $emailesc_html_enabled ? 'checked="checked"' : ''; ?>
     >
-    <?php esc_html_e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
+    <?php esc_htmlesc_html_e( 'Send an email copy when a form is submitted?', 'wp-libre-form' ); ?>
   </label>
 </p>
 <p class="wplf-email-copy-to-field">
-	<?php _e( 'You may use any form field values and following global tags: submission-id, referrer, form-title, form-id, user-id, timestamp, datetime, language, all-form-data. All field values and tags should be enclosed in "%" markers.', 'wp-libre-form' ) ?>
+  <?php esc_html_e( 'You may use any form field values and following global tags: submission-id, referrer, form-title, form-id, user-id, timestamp, datetime, language, all-form-data. All field values and tags should be enclosed in "%" markers.', 'wp-libre-form' ); ?>
 </p>
 <p class="wplf-email-copy-to-field">
-	<label for="wplf_email_copy_to" style="display:inline-block;width:100px;font-weight:600;"><?php _e( 'Send copy to', 'wp-libre-form' ) ?></label>
+  <label for="wplfesc_html_email_copy_to" style="display:inline-block;width:100px;font-weight:600;"><?php esc_html_e( 'Send copy to', 'wp-libre-form' ); ?></label>
   <input
     type="text"
-    name="wplf_email_copy_to"
+    name="wplfesc_html_email_copy_to"
     value="<?php echo esc_attr( $email_copy_to ); ?>"
-    placeholder="<?php echo esc_attr( get_option( 'admin_email' ) ); ?>"
+    placeholder="<?php echo esc_attr( get_option( 'adminesc_html_email' ) ); ?>"
     style="width:80%;"
   >
 </p>
 <p class="wplf-email-copy-to-field">
-	<label for="wplf_email_copy_from" style="display:inline-block;width:100px;font-weight:600;"><?php _e( 'Sender name', 'wp-libre-form' ) ?></label>
+  <label for="wplfesc_html_email_copy_from" style="display:inline-block;width:100px;font-weight:600;"><?php esc_html_e( 'Sender name', 'wp-libre-form' ); ?></label>
   <input
     type="text"
-    name="wplf_email_copy_from"
+    name="wplfesc_html_email_copy_from"
     value="<?php echo esc_attr( $email_copy_from ); ?>"
     placeholder="WordPress"
     style="width:80%;"
   >
 </p>
 <p class="wplf-email-copy-to-field">
-	<label for="wplf_email_copy_from_address" style="display:inline-block;width:100px;font-weight:600;"><?php _e( 'Sender email', 'wp-libre-form' ) ?></label>
+  <label for="wplfesc_html_email_copy_from_address" style="display:inline-block;width:100px;font-weight:600;"><?php esc_html_e( 'Sender email', 'wp-libre-form' ); ?></label>
   <input
     type="text"
-    name="wplf_email_copy_from_address"
+    name="wplfesc_html_email_copy_from_address"
     value="<?php echo esc_attr( $email_copy_from_address ); ?>"
-    placeholder="<?php echo $email_copy_from_default ?>"
+    placeholder="<?php echo esc_attr( $email_copy_from_default ) ?>"
     style="width:80%;"
   >
 </p>
 <p class="wplf-email-copy-to-field">
-	<label for="wplf_email_copy_subject" style="display:inline-block;width:100px;font-weight:600;"><?php _e( 'Subject', 'wp-libre-form' ) ?></label>
+  <label for="wplfesc_html_email_copy_subject" style="display:inline-block;width:100px;font-weight:600;"><?php esc_html_e( 'Subject', 'wp-libre-form' ); ?></label>
   <input
     type="text"
-    name="wplf_email_copy_subject"
+    name="wplfesc_html_email_copy_subject"
     value="<?php echo esc_attr( $email_copy_subject ); ?>"
     placeholder="[%submission-id%] Submission from %referrer%"
     style="width:80%;"
   >
 </p>
 <p class="wplf-email-copy-to-field" style="display:table;width:100%;">
-	<label for="wplf_email_copy_content" style="display:table-cell;width:105px;font-weight:600;vertical-align:top;"><?php _e( 'Content', 'wp-libre-form' ) ?></label>
+  <label for="wplfesc_html_email_copy_content" style="display:table-cell;width:105px;font-weight:600;vertical-align:top;"><?php esc_html_e( 'Content', 'wp-libre-form' ); ?></label>
   <textarea
-    name="wplf_email_copy_content"
+    name="wplfesc_html_email_copy_content"
     placeholder="Form %form-title% (ID %form-id%) was submitted with values below:
 
 %all-form-data%"
@@ -440,8 +440,8 @@ class CPT_WPLF_Form {
     $default = '%name% <%email%>'; // default submission title format
     $format = isset( $meta['_wplf_title_format'] ) ? $meta['_wplf_title_format'][0] : $default;
 ?>
-<p><?php esc_html_e( 'Submissions from this form will use this formatting in their title.', 'wp-libre-form' ); ?></p>
-<p><?php esc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' ); ?></p>
+<p><?php esc_htmlesc_html_e( 'Submissions from this form will use this formatting in their title.', 'wp-libre-form' ); ?></p>
+<p><?php esc_htmlesc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' ); ?></p>
 <p>
   <input
     type="text"
@@ -495,64 +495,64 @@ class CPT_WPLF_Form {
     }
 
     // save email copy enabled state
-    if ( isset( $_POST['wplf_email_copy_enabled'] ) ) {
-      update_post_meta( $post_id, '_wplf_email_copy_enabled', $_POST['wplf_email_copy_enabled'] === 'on' );
+    if ( isset( $_POST['wplfesc_html_email_copyesc_html_enabled'] ) ) {
+      update_post_meta( $post_id, '_wplfesc_html_email_copyesc_html_enabled', $_POST['wplfesc_html_email_copyesc_html_enabled'] === 'on' );
     } else {
-      update_post_meta( $post_id, '_wplf_email_copy_enabled', false );
+      update_post_meta( $post_id, '_wplfesc_html_email_copyesc_html_enabled', false );
     }
 
     // save email copy
-    if ( isset( $_POST['wplf_email_copy_to'] ) ) {
-      $email_field = $_POST['wplf_email_copy_to'];
+    if ( isset( $_POST['wplfesc_html_email_copy_to'] ) ) {
+      $email_field = $_POST['wplfesc_html_email_copy_to'];
       $to = '';
 
       if ( strpos( $email_field, ',' ) > 0 ) {
         // Intentional. Makes no sense if the first character is a comma, so pass it along as a single address.
-        // sanitize_email() should take care of the rest.
+        // sanitizeesc_html_email() should take care of the rest.
         $email_array = explode( ',', $email_field );
         foreach ( $email_array as $email ) {
           $email = trim( $email );
-          $email = sanitize_email( $email ) . ', ';
+          $email = sanitizeesc_html_email( $email ) . ', ';
           $to .= $email;
         }
         $to = rtrim( $to, ', ' );
       } else {
-        $to = sanitize_email( $email_field );
+        $to = sanitizeesc_html_email( $email_field );
       }
 
       if ( ! empty( $to ) ) {
-        update_post_meta( $post_id, '_wplf_email_copy_to', $to );
+        update_post_meta( $post_id, '_wplfesc_html_email_copy_to', $to );
       } else {
-        delete_post_meta( $post_id, '_wplf_email_copy_to' );
+        delete_post_meta( $post_id, '_wplfesc_html_email_copy_to' );
       }
     }
 
     // save email copy from
-    if ( isset( $_POST['wplf_email_copy_from'] ) && ! empty( $_POST['wplf_email_copy_from'] ) ) {
-   		update_post_meta( $post_id, '_wplf_email_copy_from', sanitize_text_field( $_POST['wplf_email_copy_from'] ) );
-   	} else {
-   		delete_post_meta( $post_id, '_wplf_email_copy_from' );
-   	}
-
-    if ( isset( $_POST['wplf_email_copy_from_address'] ) && ! empty( $_POST['wplf_email_copy_from_address'] ) ) {
-      update_post_meta( $post_id, '_wplf_email_copy_from_address', sanitize_text_field( $_POST['wplf_email_copy_from_address'] ) );
+    if ( isset( $_POST['wplfesc_html_email_copy_from'] ) && ! empty( $_POST['wplfesc_html_email_copy_from'] ) ) {
+      update_post_meta( $post_id, '_wplfesc_html_email_copy_from', sanitize_text_field( $_POST['wplfesc_html_email_copy_from'] ) );
     } else {
-   		delete_post_meta( $post_id, '_wplf_email_copy_from_address' );
-   	}
+      delete_post_meta( $post_id, '_wplfesc_html_email_copy_from' );
+    }
+
+    if ( isset( $_POST['wplfesc_html_email_copy_from_address'] ) && ! empty( $_POST['wplfesc_html_email_copy_from_address'] ) ) {
+      update_post_meta( $post_id, '_wplfesc_html_email_copy_from_address', sanitize_text_field( $_POST['wplfesc_html_email_copy_from_address'] ) );
+    } else {
+      delete_post_meta( $post_id, '_wplfesc_html_email_copy_from_address' );
+    }
 
     // save email copy subject
-    if ( isset( $_POST['wplf_email_copy_subject'] ) && ! empty( $_POST['wplf_email_copy_subject'] ) ) {
-    	update_post_meta( $post_id, '_wplf_email_copy_subject', sanitize_text_field( $_POST['wplf_email_copy_subject'] ) );
+    if ( isset( $_POST['wplfesc_html_email_copy_subject'] ) && ! empty( $_POST['wplfesc_html_email_copy_subject'] ) ) {
+      update_post_meta( $post_id, '_wplfesc_html_email_copy_subject', sanitize_text_field( $_POST['wplfesc_html_email_copy_subject'] ) );
     } else {
-   		delete_post_meta( $post_id, '_wplf_email_copy_subject' );
-   	}
+      delete_post_meta( $post_id, '_wplfesc_html_email_copy_subject' );
+    }
 
     // save email copy content
-    if ( isset( $_POST['wplf_email_copy_content'] ) && ! empty( $_POST['wplf_email_copy_content'] ) ) {
-    	update_post_meta( $post_id, '_wplf_email_copy_content', wp_kses_post( $_POST['wplf_email_copy_content'] ) );
+    if ( isset( $_POST['wplfesc_html_email_copy_content'] ) && ! empty( $_POST['wplfesc_html_email_copy_content'] ) ) {
+      update_post_meta( $post_id, '_wplfesc_html_email_copy_content', wp_kses_post( $_POST['wplfesc_html_email_copy_content'] ) );
     } else {
-   		delete_post_meta( $post_id, '_wplf_email_copy_content' );
-   	}
+      delete_post_meta( $post_id, '_wplfesc_html_email_copy_content' );
+    }
 
     // save title format
     if ( isset( $_POST['wplf_title_format'] ) ) {
@@ -625,10 +625,10 @@ class CPT_WPLF_Form {
     ?>
       <p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
         <strong style="color:#dc3232;">
-          <?php esc_html_e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ); ?>
+          <?php esc_htmlesc_html_e( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ); ?>
         </strong>
         <br />
-        <?php esc_html_e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ); ?>
+        <?php esc_htmlesc_html_e( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ); ?>
       </p>
     <?php endif; ?>
   <?php endif; ?>
@@ -646,7 +646,7 @@ class CPT_WPLF_Form {
       $output = ob_get_clean();
 
       // enqueue our footer script here
-      wp_enqueue_script( 'wplf-form-js' );
+      wpesc_html_enqueue_script( 'wplf-form-js' );
 
       return $output;
     }
@@ -659,7 +659,7 @@ class CPT_WPLF_Form {
   /**
    * Enqueue the front end JS
    */
-  function maybe_enqueue_frontend_script() {
+  function maybeesc_html_enqueue_frontend_script() {
     global $post;
 
     // register the script, but only enqueue it if the current post contains a form in it
