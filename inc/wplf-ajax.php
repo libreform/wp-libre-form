@@ -54,7 +54,7 @@ function wplf_ajax_submit_handler() {
       if ( ! is_array( $value ) ) {
         add_post_meta( $post_id, $key, esc_html( $value ), true );
       } else {
-        add_post_meta( $post_id, $key, esc_html( wp_json_encode( $value ) ), true );
+        add_post_meta( $post_id, $key, $value, true );
       }
     }
 
