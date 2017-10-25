@@ -1,6 +1,6 @@
 <?php
 
-if ( ! classesc_html_exists( 'CPT_WPLF_Form' ) ) :
+if ( ! class_exists( 'CPT_WPLF_Form' ) ) :
 
 class CPT_WPLF_Form {
   /**
