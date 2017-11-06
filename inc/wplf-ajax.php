@@ -22,6 +22,7 @@ function wplf_ajax_submit_handler() {
 
     // form-specific validation
     $return->slug = $form->post_name;
+    $return->title = $form->post_title;
     $return = apply_filters( "wplf_{$form->post_name}_validate_submission", $return );
     $return = apply_filters( "wplf_{$form->ID}_validate_submission", $return );
   }
