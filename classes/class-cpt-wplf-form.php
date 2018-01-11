@@ -228,13 +228,15 @@ class CPT_WPLF_Form {
     }
     if ( 'submissions' === $column ) {
       // count number of submissions
-      $submissions = get_posts( array(
+    $submissions = get_posts(
+         array(
         'post_type' => 'wplf-submission',
         'posts_per_page' => -1,
         'meta_key' => '_form_id',
         'meta_value' => $post_id,
         'suppress_filters' => false,
-      ) );
+      )
+        );
 ?>
   <a href="<?php echo esc_url_raw( admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ) ); ?>">
     <?php echo count( $submissions ); ?>
@@ -317,13 +319,15 @@ class CPT_WPLF_Form {
       $meta['_wplf_thank_you'][0] : _x( 'Success!', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
-<?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
+<?php wp_editor(
+     esc_textarea( $message ), 'wplf_thank_you', array(
   'wpautop' => true,
   'media_buttons' => true,
   'textarea_name' => 'wplf_thank_you',
   'textarea_rows' => 6,
   'teeny' => true,
-  )); ?>
+  )
+    ); ?>
 </p>
 <?php
     wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
@@ -676,11 +680,15 @@ class CPT_WPLF_Form {
     );
 
     // add dynamic variables to the script's scope
-    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
+    wp_localize_script(
+        'wplf-form-js', 'ajax_object', apply_filters(
+         'wplf_ajax_object', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
-    ) ) );
+    )
+        )
+        );
   }
 
 
@@ -688,18 +696,22 @@ class CPT_WPLF_Form {
    * Shortcode for displaying a Form
    */
   public function shortcode( $shortcode_atts, $content = null ) {
-    $attributes = shortcode_atts( array(
+    $attributes = shortcode_atts(
+         array(
       'id' => null,
       'xclass' => '',
-    ), $shortcode_atts, 'libre-form' );
+    ), $shortcode_atts, 'libre-form'
+        );
 
     // we don't render id and class as <form> attributes
     $id = $attributes['id'];
     $xclass = $attributes['xclass'];
-    $attributes = array_diff_key( $shortcode_atts, array(
+    $attributes = array_diff_key(
+         $shortcode_atts, array(
       'id' => null,
       'xclass' => null,
-    ) );
+    )
+        );
 
     // display form
     return $this->wplf_form( $id, $content, $xclass, $attributes );

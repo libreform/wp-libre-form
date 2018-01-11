@@ -43,11 +43,13 @@ function wplf_ajax_submit_handler() {
     }
 
     // create submission post
-    $post_id = wp_insert_post( array(
+    $post_id = wp_insert_post(
+         array(
       'post_title'     => $post_title,
       'post_status'    => 'publish',
       'post_type'      => 'wplf-submission',
-    ));
+    )
+        );
 
     // add submission data as meta values
     foreach ( $_POST as $key => $value ) {
@@ -62,9 +64,11 @@ function wplf_ajax_submit_handler() {
     foreach ( $_FILES as $key => $file ) {
       // Is this enough security wise?
       // Currenly only supports 1 file per input
-      $attach_id = media_handle_upload( $key, 0, array(), array(
+    $attach_id = media_handle_upload(
+         $key, 0, array(), array(
         'test_form' => false,
-      ) );
+      )
+        );
 
       if ( ! is_wp_error( $attach_id ) ) {
         add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
