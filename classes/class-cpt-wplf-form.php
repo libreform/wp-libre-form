@@ -310,7 +310,7 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for fields meta box
    */
-  function metabox_thank_you( $post ) {
+  public function metabox_thank_you( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
     $message = isset( $meta['_wplf_thank_you'] ) ?
@@ -585,7 +585,7 @@ class CPT_WPLF_Form {
   /**
    * The function we display the form with
    */
-  function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
+  public function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
     global $post;
 
     if ( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
