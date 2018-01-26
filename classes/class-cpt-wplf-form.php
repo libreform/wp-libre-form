@@ -511,41 +511,52 @@ class CPT_WPLF_Form {
   protected function override_form_template( $template_content, $form_id ) {
     $this->maybe_persist_override_template( $template_content, $form_id );
 
+    static $times_content_replaced = 0;
+
     // Make the editor textarea uneditable.
     add_filter( 'the_editor', function ( $editor ) {
-        if ( ! preg_match( '%id="wp-content-editor-container"%', $editor ) ) {
-            return $editor;
-        }
+      if ( ! preg_match( '%id="wp-content-editor-container"%', $editor ) ) {
+        return $editor;
+      }
 
-        $editor = preg_replace( '%\<textarea %', '<textarea readonly="readonly" ', $editor );
+      $editor = preg_replace( '%\<textarea %', '<textarea readonly="readonly" ', $editor );
 
-        $notice = _x(
-            'This form template is being overridden by code, you must edit it in your project code',
-            'Template override notice in form edit admin view',
-            'wp-libre-form'
-        );
+      $notice = _x(
+        'This form template is being overridden by code, you must edit it in your project code',
+        'Template override notice in form edit admin view',
+        'wp-libre-form'
+      );
 
-        $notice = sprintf( '<div class="wplf-template-override-notice">%s</div>', $notice );
+      $notice = sprintf( '<div class="wplf-template-override-notice">%s</div>', $notice );
 
-        return $notice . $editor;
+      return $notice . $editor;
     } );
 
     // Custom settings for the form editor.
-      add_filter( 'wp_editor_settings', function ( $settings, $editor_id ) {
-          if ( $editor_id !== 'content' ) {
-              return $settings;
-          }
-
-          $settings['tinymce'] = false;
-          $settings['quicktags'] = false;
-          $settings['media_buttons'] = false;
-
+    add_filter( 'wp_editor_settings', function ( $settings, $editor_id ) {
+      if ( $editor_id !== 'content' ) {
           return $settings;
-      }, 10, 2 );
+      }
+
+      $settings['tinymce'] = false;
+      $settings['quicktags'] = false;
+      $settings['media_buttons'] = false;
+
+      return $settings;
+    }, 10, 2 );
 
     // Replace all editor content with template content.
-    add_filter( 'the_editor_content', function ( $content ) use ( $template_content ) {
-        return $template_content;
+    add_filter( 'the_editor_content', function ( $content ) use ( $template_content, &$times_content_replaced ) {
+      // This is hacky, yes. We only want to override the content for the first
+      // editor field we come by, meaning 99% of the time we hit the wanted form
+      // template editor field at the top of the edit view page.
+      if ( $times_content_replaced > 0 ) {
+        return $content;
+      }
+
+      $times_content_replaced++;
+
+      return $template_content;
     } );
   }
 
