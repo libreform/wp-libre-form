@@ -209,7 +209,7 @@ The attribute will render as is on the `<form>` element
 <form class="libre-form libre-form-1" data-custom-attr="contactme">
 ```
 
-## Importing forms from a static HTML template
+## Importing forms from a predefined HTML template
 
 Sometimes a project might require static forms which are not supposed to
 be editable in the admin panel.
@@ -219,12 +219,8 @@ and import them into the form admin for specific forms.
 
 ### Creating a static HTML template
 
-Importable forms are defined using standard HTML5 templates, meaning
-files ending in `.html`. The template can contain anything the regular
-WPLF form edit view can.
-
-You can create your templates in a theme, a plugin, or anywhere where
-the plugin can read files.
+The simplest way is to create a HTML5 file and read its contents. Other
+options include using Twig to render HTML templates.
 
 ### Importing a template into WPLF
 
@@ -239,19 +235,21 @@ add_filter( 'wplf_import_html_template', function ($template, $form_id) {
     $some_form_id = 123;
 
     if ($form_id === $some_form_id) {
-        return '/path/to/template/file.html';
+        // You can also render Twig templates and similar here
+        return file_get_contents('/path/to/template/file.html');
     }
 
     return $template;
 } );
 ```
 
-Now the plugin knows there is a template file which can be used for a
-form.
+The `$template` variable should be a raw HTML string. If it is set to
+`null` no template will be imported.
 
 After a template is imported for a certain form the form's editview will
 be set to read only mode, meaning you must make changes to the static
-HTML file instead of editing the form inside the admin panel.
+HTML template in code instead of editing the form inside the admin
+panel.
 
 Otherwise the form should function normally, meaning you can use WPLF
 features as always.
