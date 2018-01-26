@@ -27,6 +27,7 @@ class CPT_WPLF_Form {
     add_action( 'save_post', array( $this, 'save_cpt' ) );
     add_filter( 'content_save_pre', array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
+    add_action( 'add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2 );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
 
     // edit.php view
@@ -458,6 +459,99 @@ class CPT_WPLF_Form {
   >
 </p>
 <?php
+  }
+
+  /**
+   * Check and maybe load a static HTML template for a specific form.
+   *
+   * Hooked to `add_meta_boxes`.
+   *
+   * @param string $post_type Post type for which editor is being rendered for.
+   * @param \WP_Post $post Current post object.
+   *
+   * @return void
+   */
+  function maybe_load_imported_template( $post_type, $post ) {
+    if ( $post_type !== 'wplf-form' ) {
+      return;
+    }
+
+    $form_id = (int) $post->ID;
+
+    /**
+     * Allows importing a static HTML template for a specific form ID.
+     *
+     * If the template returned is `null` then no template is loaded.
+     *
+     * @param string|null $template_path Absolute path to a HTML file to import.
+     * @param int $form_id Form ID (WP_Post ID) to import template for.
+     */
+    $template_path = apply_filters( 'wplf_import_html_template', null, $form_id );
+
+    if ($template_path === null) {
+      return;
+    }
+
+    $this->override_form_template( $template_path, $form_id );
+  }
+
+  /**
+   * Override a forms template with an imported template file.
+   *
+   * @param string $template_path Absolute path to template HTML file.
+   * @param int $form_id ID of form we're overriding the template for.
+   *
+   * @return void
+   */
+  protected function override_form_template( $template_path, $form_id ) {
+    $contents = file_get_contents( $template_path );
+
+    /**
+     * Allows parsing the imported HTML form contents before we use it as the actual
+     * form content.
+     *
+     * @param string $contents The form HTML.
+     * @param int $form_id ID of form we are importing a template for.
+     */
+    $contents = apply_filters( 'wplf_imported_html_template_contents', $contents, $form_id );
+
+    // Make the editor textarea uneditable. Also remove TinyMCE.
+    add_filter( 'the_editor', function ( $editor ) {
+        if (!preg_match('%id="wp-content-editor-container"%', $editor)) {
+            return $editor;
+        }
+
+        $editor = preg_replace( '%\<textarea %', '<textarea readonly="readonly" ', $editor );
+
+        $editor = preg_replace( '%<div [^<>]*? class="quicktags-toolbar">.*?</div><textarea%imux', '<textarea', $editor );
+
+        return $editor;
+    } );
+
+    // Replace all editor content with template content.
+    add_filter( 'the_editor_content', function ( $content ) use ( $contents ) {
+        return $contents;
+    } );
+
+    // Add a notice about the override.
+    add_action( 'edit_form_after_title', function () use ( $template_path ) {
+        $printable_path = explode(DIRECTORY_SEPARATOR, $template_path);
+
+        if (count($printable_path) < 4) {
+            $printable_path = implode(DIRECTORY_SEPARATOR, $template_path);
+        } else {
+            $printable_path = array_reverse(array_slice(array_reverse($printable_path), 0, 4));
+
+            $printable_path = '..' . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $printable_path);
+        }
+
+        $notice = sprintf(
+            __( 'This form template is being overridden by code, the template being used is<br> <code>%s</code>', 'wplf' ),
+            $printable_path
+        );
+
+        printf('<p>%s</p>', $notice);
+    } );
   }
 
   /**

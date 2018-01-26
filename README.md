@@ -13,6 +13,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 - Email notifications of received form submissions
 - Full file upload support to Media Library with input type=file
 - Multilingual support with Polylang
+- Predefined static HTML forms via filter hooks
 
 ## Why?
 
@@ -207,3 +208,49 @@ The attribute will render as is on the `<form>` element
 ```html
 <form class="libre-form libre-form-1" data-custom-attr="contactme">
 ```
+
+## Importing forms from a static HTML template
+
+Sometimes a project might require static forms which are not supposed to
+be editable in the admin panel.
+
+This plugin allows you to define HTML forms in your project source code
+and import them into the form admin.
+
+### Creating a static HTML template
+
+Importable forms are defined using standard HTML5 templates, meaning
+files ending in `.html`.
+
+You can create your templates in a theme, a plugin, or anywhere where
+the plugin can read files.
+
+### Importing a template into wp-libre-form
+
+Once you're done creating a form template, you need to inform
+wp-libre-form about it. You can use the `wplf_register_html_template`
+filter hook for this:
+
+```php
+<?php
+
+add_filter( 'wplf_import_html_template', function ($template, $form_id) {
+    $some_form_id = 123;
+
+    if ($form_id = $some_form_id) {
+        return '/path/to/template/file.html';
+    }
+
+    return $template;
+} );
+```
+
+Now the plugin knows there is a template file which can be used for a
+form.
+
+After a template is imported for a certain form the form's editview will
+be set to read only mode, meaning you must make changes to the static
+HTML file instead of editing the form inside the admin panel.
+
+Otherwise the form should function normally, meaning you can use WPLF
+features as always.
