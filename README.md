@@ -231,12 +231,12 @@ filter hook for this:
 ```php
 <?php
 
-add_filter( 'wplf_import_html_template', function ($template, $form_id) {
+add_filter( 'wplf_import_html_template', function ( $template, $form_id ) {
     $some_form_id = 123;
 
-    if ($form_id === $some_form_id) {
+    if ( $form_id === $some_form_id ) {
         // You can also render Twig templates and similar here
-        return file_get_contents('/path/to/template/file.html');
+        return file_get_contents( '/path/to/template/file.html' );
     }
 
     return $template;
