@@ -488,7 +488,7 @@ class CPT_WPLF_Form {
      */
     $template_path = apply_filters( 'wplf_import_html_template', null, $form_id );
 
-    if ($template_path === null) {
+    if ( $template_path === null ) {
       return;
     }
 
@@ -496,7 +496,7 @@ class CPT_WPLF_Form {
   }
 
   /**
-   * Override a forms template with an imported template file.
+   * Override a form's template with an imported template file.
    *
    * @param string $template_path Absolute path to template HTML file.
    * @param int $form_id ID of form we're overriding the template for.
@@ -513,44 +513,52 @@ class CPT_WPLF_Form {
      * @param string $contents The form HTML.
      * @param int $form_id ID of form we are importing a template for.
      */
-    $contents = apply_filters( 'wplf_imported_html_template_contents', $contents, $form_id );
+    $template_contents = apply_filters( 'wplf_imported_html_template_contents', $contents, $form_id );
 
     // Make the editor textarea uneditable. Also remove TinyMCE.
     add_filter( 'the_editor', function ( $editor ) {
-        if (!preg_match('%id="wp-content-editor-container"%', $editor)) {
+        if ( ! preg_match( '%id="wp-content-editor-container"%', $editor ) ) {
             return $editor;
         }
 
         $editor = preg_replace( '%\<textarea %', '<textarea readonly="readonly" ', $editor );
 
-        $editor = preg_replace( '%<div [^<>]*? class="quicktags-toolbar">.*?</div><textarea%imux', '<textarea', $editor );
+        $editor = preg_replace(
+          '%<div [^<>]*? class="quicktags-toolbar">.*?</div><textarea%imux',
+          '<textarea',
+          $editor
+        );
 
         return $editor;
     } );
 
     // Replace all editor content with template content.
-    add_filter( 'the_editor_content', function ( $content ) use ( $contents ) {
-        return $contents;
+    add_filter( 'the_editor_content', function ( $content ) use ( $template_contents ) {
+        return $template_contents;
     } );
 
     // Add a notice about the override.
     add_action( 'edit_form_after_title', function () use ( $template_path ) {
-        $printable_path = explode(DIRECTORY_SEPARATOR, $template_path);
+      $printable_path = explode( DIRECTORY_SEPARATOR, $template_path );
 
-        if (count($printable_path) < 4) {
-            $printable_path = implode(DIRECTORY_SEPARATOR, $template_path);
-        } else {
-            $printable_path = array_reverse(array_slice(array_reverse($printable_path), 0, 4));
+      // We may not want the full system path to be shown, 4 parent directories oughta suffice.
+      if ( count( $printable_path ) < 4 ) {
+        $printable_path = implode( DIRECTORY_SEPARATOR, $printable_path );
+      } else {
+        $printable_path = array_reverse( array_slice( array_reverse( $printable_path ), 0, 4 ) );
+        $printable_path = '..' . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $printable_path );
+      }
 
-            $printable_path = '..' . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $printable_path);
-        }
+      $notice = sprintf(
+        _x(
+          'This form template is being overridden by code, the template being used is<br> <code>%s</code>',
+          'Template override notice in form edit admin view',
+          'wp-libre-form'
+        ),
+        $printable_path
+      );
 
-        $notice = sprintf(
-            __( 'This form template is being overridden by code, the template being used is<br> <code>%s</code>', 'wplf' ),
-            $printable_path
-        );
-
-        printf('<p>%s</p>', $notice);
+      printf( '<p>%s</p>', $notice );
     } );
   }
 

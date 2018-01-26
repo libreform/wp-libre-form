@@ -215,20 +215,21 @@ Sometimes a project might require static forms which are not supposed to
 be editable in the admin panel.
 
 This plugin allows you to define HTML forms in your project source code
-and import them into the form admin.
+and import them into the form admin for specific forms.
 
 ### Creating a static HTML template
 
 Importable forms are defined using standard HTML5 templates, meaning
-files ending in `.html`.
+files ending in `.html`. The template can contain anything the regular
+WPLF form edit view can.
 
 You can create your templates in a theme, a plugin, or anywhere where
 the plugin can read files.
 
-### Importing a template into wp-libre-form
+### Importing a template into WPLF
 
 Once you're done creating a form template, you need to inform
-wp-libre-form about it. You can use the `wplf_register_html_template`
+WPLF about it. You can use the `wplf_import_html_template`
 filter hook for this:
 
 ```php
@@ -237,7 +238,7 @@ filter hook for this:
 add_filter( 'wplf_import_html_template', function ($template, $form_id) {
     $some_form_id = 123;
 
-    if ($form_id = $some_form_id) {
+    if ($form_id === $some_form_id) {
         return '/path/to/template/file.html';
     }
 
