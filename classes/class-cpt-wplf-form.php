@@ -477,7 +477,7 @@ class CPT_WPLF_Form {
    * @return void
    */
   function maybe_load_imported_template( $post_type, $post ) {
-    if ( $post_type !== 'wplf-form' ) {
+    if ( $post_type !== 'wplf-form' || $post->post_status === 'auto-draft' ) {
       return;
     }
 
