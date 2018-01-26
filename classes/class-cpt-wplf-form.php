@@ -497,6 +497,10 @@ class CPT_WPLF_Form {
       return;
     }
 
+    // Clear unwanted form tags. WPLF will insert those by itself when rendering a form.
+    $template_content = preg_replace( '%<form ?[^>]*?>%', '', $template_content );
+    $template_content = preg_replace( '%</form>%', '', $template_content );
+
     $this->override_form_template( $template_content, $form_id );
   }
 

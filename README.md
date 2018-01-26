@@ -222,6 +222,9 @@ and import them into the form admin for specific forms.
 The simplest way is to create a HTML5 file and read its contents. Other
 options include using Twig to render HTML templates.
 
+Remember: WPLF will insert `form` tags on its own, meaning you only have
+to create the markup which sits directly inside the `form` tags.
+
 ### Importing a template into WPLF
 
 Once you're done creating a form template, you need to inform
