@@ -508,8 +508,10 @@ class CPT_WPLF_Form {
    *
    * @return void
    */
-  protected function override_form_template( $template_content ) {
-    // Make the editor textarea uneditable. Also remove TinyMCE.
+  protected function override_form_template( $template_content, $form_id ) {
+    $this->maybe_persist_override_template( $template_content, $form_id );
+
+    // Make the editor textarea uneditable.
     add_filter( 'the_editor', function ( $editor ) {
         if ( ! preg_match( '%id="wp-content-editor-container"%', $editor ) ) {
             return $editor;
@@ -545,6 +547,41 @@ class CPT_WPLF_Form {
     add_filter( 'the_editor_content', function ( $content ) use ( $template_content ) {
         return $template_content;
     } );
+  }
+
+  /**
+   * Check if we need to auto-persist the form template override into WP database.
+   *
+   * @param string $template Template to maybe persist.
+   * @param int $form_id Form ID to persist template for.
+   * @param bool $force Force a persist even though not required?
+   *
+   * @return void
+   */
+  protected function maybe_persist_override_template( $template, $form_id, $force = false )
+  {
+    $hash_transient = 'form_tmpl_hash_' . $form_id;
+    $template_hash = md5( $template );
+    $stored_hash = get_transient( $hash_transient );
+
+    if ( ! $force && $template_hash === $stored_hash ) {
+      return;
+    }
+
+    // Safe-guard to prevent accidental infinite loops.
+    remove_action( 'save_post', array( $this, 'save_cpt' ) );
+
+    $updated = wp_update_post( array(
+      'ID' => (int) $form_id,
+      'post_content' => $template
+    ) );
+
+    add_action( 'save_post', array( $this, 'save_cpt' ) );
+
+    // Maybe we should do something else than just silently fail if persisting failed above.
+    if ($updated) {
+        set_transient($hash_transient, $template_hash, HOUR_IN_SECONDS * 8);
+    }
   }
 
   /**
