@@ -15,7 +15,7 @@ before_install:
   - composer self-update
 
   # Install phpcs with wp-coding-standards
-  - composer create-project wp-coding-standards/wpcs:dev-master --no-dev $HOME/wpcs
+  - composer create-project wp-coding-standards/wpcs:0.12.0 --no-dev $HOME/wpcs
 
 script:
   # Check project with phps
