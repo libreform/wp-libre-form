@@ -16,7 +16,7 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
 
   $referrer = esc_url_raw( ( isset( $submission_id ) ) ? get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] );
 
-  if ( ( isset( $form_meta['_wplf_email_copy_enabled'] ) && $form_meta['_wplf_email_copy_enabled'][0] ) || isset( $submission_id ) ) {
+  if ( ( isset( $form_meta['_wplf_email_copy_enabled'] ) && $form_meta['_wplf_email_copy_enabled'][0] ) && isset( $submission_id ) ) {
 
     $to = isset( $form_meta['_wplf_email_copy_to'] ) ? $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
 
