@@ -18,4 +18,4 @@ script:
   - composer install -o --prefer-dist --no-interaction
 
   # Check project with phps
-  - ./vendor/bin/phpcs -n -p .
+  - composer run lint
