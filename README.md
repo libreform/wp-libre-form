@@ -243,7 +243,7 @@ add_filter( 'wplf_import_html_template', function ( $template, $form_id ) {
     }
 
     return $template;
-} );
+}, 10, 2 );
 ```
 
 The `$template` variable should be a raw HTML string. If it is set to
