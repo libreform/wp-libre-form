@@ -2,11 +2,15 @@
 <ruleset name="anttiviljami-wordpress">
   <description>For nicer WordPress and PHP development</description>
 
-  <!-- Don't check composer dependencies -->
-  <exclude-pattern>/vendor/</exclude-pattern>
+  <!-- Files and directories to parse -->
+  <file>./classes/</file>
+  <file>./inc/</file>
+  <file>./wp-libre-form.php</file>
 
-  <!-- Exclude language files -->
-  <exclude-pattern>/lang/</exclude-pattern>
+  <!-- Excluded directories and files -->
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <exclude-pattern>*/lang/*</exclude-pattern>
+  <exclude-pattern>*/assets/*</exclude-pattern>
 
   <!-- Disallow tabs altogether -->
   <rule ref="Generic.WhiteSpace.DisallowTabIndent.TabsUsed"/>
