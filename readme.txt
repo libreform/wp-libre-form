@@ -36,7 +36,7 @@ Required field validation, email notifications, file uploads to WP gallery and l
 
 Please contribute to this project on Github. Pull requests welcome!
 
-https://github.com/anttiviljami/wp-libre-form
+[https://github.com/anttiviljami/wp-libre-form](https://github.com/anttiviljami/wp-libre-form)
 
 == Installation ==
 

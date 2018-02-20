@@ -143,7 +143,7 @@ class CPT_WPLF_Submission {
     <option
       value="<?php echo intval( $form->ID ); ?>"
       <?php echo isset( $_REQUEST['form'] ) && intval( $_REQUEST['form'] ) === $form->ID ? 'selected' : ''; ?>
-    ><?php esc_html( $form->post_title ); ?></option>
+    ><?php echo esc_html( $form->post_title ); ?></option>
   <?php endforeach; ?>
 </select>
 <?php
