@@ -574,7 +574,7 @@ class CPT_WPLF_Form {
    * @return void
    */
   protected function maybe_persist_override_template( $template, $form_id, $force = false ) {
-    $hash_transient = 'form_tmpl_hash_' . $form_id;
+    $hash_transient = 'wplf_form_tmpl_hash_' . $form_id;
     $template_hash = md5( $template );
     $stored_hash = get_transient( $hash_transient );
 
