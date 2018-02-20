@@ -573,8 +573,7 @@ class CPT_WPLF_Form {
    *
    * @return void
    */
-  protected function maybe_persist_override_template( $template, $form_id, $force = false )
-  {
+  protected function maybe_persist_override_template( $template, $form_id, $force = false ) {
     $hash_transient = 'form_tmpl_hash_' . $form_id;
     $template_hash = md5( $template );
     $stored_hash = get_transient( $hash_transient );
@@ -588,14 +587,14 @@ class CPT_WPLF_Form {
 
     $updated = wp_update_post( array(
       'ID' => (int) $form_id,
-      'post_content' => $template
+      'post_content' => $template,
     ) );
 
     add_action( 'save_post', array( $this, 'save_cpt' ) );
 
     // Maybe we should do something else than just silently fail if persisting failed above.
-    if ($updated) {
-        set_transient($hash_transient, $template_hash, HOUR_IN_SECONDS * 8);
+    if ( $updated ) {
+        set_transient( $hash_transient, $template_hash, HOUR_IN_SECONDS * 8 );
     }
   }
 
