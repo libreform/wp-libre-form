@@ -34,8 +34,10 @@ class CPT_WPLF_Submission {
     // add custom bulk actions
     add_action( 'admin_notices', array( $this, 'wplf_submission_bulk_action_admin_notice' ) );
     add_filter( 'bulk_actions-edit-wplf-submission', array( $this, 'register_wplf_submission_bulk_actions' ) );
-    add_filter( 'handle_bulk_actions-edit-wplf-submission',
-      array( $this, 'wplf_submission_bulk_action_handler' ), 10, 3 );
+    add_filter(
+         'handle_bulk_actions-edit-wplf-submission',
+      array( $this, 'wplf_submission_bulk_action_handler' ), 10, 3
+        );
   }
 
   public static function register_cpt() {
@@ -78,7 +80,7 @@ class CPT_WPLF_Submission {
   /**
    * Custom column display for Submission CPT in edit.php
    */
-  function custom_columns_display_cpt( $column, $post_id ) {
+  public function custom_columns_display_cpt( $column, $post_id ) {
     if ( 'referrer' === $column ) {
       if ( $referrer = get_post_meta( $post_id, 'referrer', true ) ) {
         echo '<a href="' . esc_url_raw( $referrer ) . '">' . esc_url( $referrer ) . '</a>';
@@ -97,7 +99,7 @@ class CPT_WPLF_Submission {
   /**
    * Custom columns in edit.php for Forms
    */
-  function custom_columns_cpt( $columns ) {
+  public function custom_columns_cpt( $columns ) {
     $new_columns = array(
       'cb' => $columns['cb'],
       'title' => $columns['title'],
@@ -111,7 +113,7 @@ class CPT_WPLF_Submission {
   /**
    * Show a form filter in the edit.php view
    */
-  function form_filter_dropdown() {
+  public function form_filter_dropdown() {
     global $pagenow;
 
     $allowed = array( 'wplf-submission' ); // show filter on these post types (currently only one?)
@@ -127,10 +129,12 @@ class CPT_WPLF_Submission {
     if ( $transient ) {
       $forms = $transient;
     } else {
-      $forms = get_posts( array(
+    $forms = get_posts(
+         array(
         'post_per_page' => '-1',
         'post_type' => 'wplf-form',
-      ) );
+      )
+        );
 
       set_transient( 'wplf-form-filter', $forms, 15 * MINUTE_IN_SECONDS );
     }
@@ -152,7 +156,7 @@ class CPT_WPLF_Submission {
   /**
    * Filter by form in the edit.php view
    */
-  function filter_by_form( $query ) {
+  public function filter_by_form( $query ) {
     global $pagenow;
 
     if ( 'edit.php' !== $pagenow ) {
@@ -171,12 +175,12 @@ class CPT_WPLF_Submission {
     return $query;
   }
 
-  function register_wplf_submission_bulk_actions( $bulk_actions ) {
+  public function register_wplf_submission_bulk_actions( $bulk_actions ) {
     $bulk_actions['wplf_resend_copy'] = __( 'Resend email copy', 'wp-libre-form' );
     return $bulk_actions;
   }
 
-  function wplf_submission_bulk_action_handler( $redirect_to, $doaction, $post_ids ) {
+  public function wplf_submission_bulk_action_handler( $redirect_to, $doaction, $post_ids ) {
     if ( $doaction !== 'wplf_resend_copy' ) {
       return $redirect_to;
     }
@@ -192,28 +196,30 @@ class CPT_WPLF_Submission {
     return $redirect_to;
   }
 
-  function wplf_submission_bulk_action_admin_notice() {
+  public function wplf_submission_bulk_action_admin_notice() {
     if ( ! empty( $_REQUEST['wplf_resent'] ) ) {
       $count = intval( $_REQUEST['wplf_resent'] );
-      printf(
+    printf(
         '<div id="wplf-submission-bulk-resend-message" class="notice notice-success"><p>' .
-          esc_html(
+        esc_html(
              // translators: %s is number of submissions
-             _n( 'Resent email copy of %s submission.',
+            _n(
+                 'Resent email copy of %s submission.',
                  'Resent email copy of %s submissions.',
                  $count,
              'wp-libre-form'
              )
           ) .
           '</p></div>',
-        intval( $count ) );
+        intval( $count )
+        );
     }
   }
 
   /**
    * Add meta box to show fields in form
    */
-  function add_meta_boxes_cpt() {
+  public function add_meta_boxes_cpt() {
     // Shortcode meta box
     add_meta_box(
       'wplf-shortcode',
@@ -228,7 +234,7 @@ class CPT_WPLF_Submission {
   /**
    * The submission metabox callback
    */
-  function metabox_submission() {
+  public function metabox_submission() {
     global $post;
     $postmeta = get_post_meta( $post->ID );
     $fields = array_keys( $postmeta );

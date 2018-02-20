@@ -104,7 +104,7 @@ class CPT_WPLF_Form {
   /**
    * Modify post.php permalink html to show notice if form isn't publicly visible.
    */
-  function modify_permalink_html( $html, $post_id ) {
+  public function modify_permalink_html( $html, $post_id ) {
     $publicly_visible = $this->get_publicly_visible_state( $post_id );
 
     if ( get_post_type( $post_id ) === 'wplf-form' && ! $publicly_visible ) {
@@ -119,7 +119,7 @@ class CPT_WPLF_Form {
   /**
    * Disable TinyMCE editor for forms, which are simple HTML things
    */
-  function disable_tinymce( $default ) {
+  public function disable_tinymce( $default ) {
     global $post;
 
     // only for this cpt
@@ -133,7 +133,7 @@ class CPT_WPLF_Form {
   /**
    * Include custom JS on the edit screen
    */
-  function admin_post_scripts_cpt( $hook ) {
+  public function admin_post_scripts_cpt( $hook ) {
     global $post;
 
     // make sure we're on the correct view
@@ -154,7 +154,7 @@ class CPT_WPLF_Form {
   /**
    * Pre-populate form editor with default content
    */
-  function default_content_cpt( $content ) {
+  public function default_content_cpt( $content ) {
     global $pagenow;
 
     // only on post.php screen
@@ -192,7 +192,7 @@ class CPT_WPLF_Form {
   /**
    * Remove view action in edit.php for forms
    */
-  function remove_row_actions( $actions, $post ) {
+  public function remove_row_actions( $actions, $post ) {
     $publicly_visible = $this->get_publicly_visible_state( $post->ID );
 
     if ( 'wplf-form' === $post->post_type && ! $publicly_visible ) {
@@ -205,7 +205,7 @@ class CPT_WPLF_Form {
   /**
    * Custom columns in edit.php for Forms
    */
-  function custom_columns_cpt( $columns ) {
+  public function custom_columns_cpt( $columns ) {
     $new_columns = array(
       'cb' => $columns['cb'],
       'title' => $columns['title'],
@@ -220,7 +220,7 @@ class CPT_WPLF_Form {
   /**
    * Custom column display for Form CPT in edit.php
    */
-  function custom_columns_display_cpt( $column, $post_id ) {
+  public function custom_columns_display_cpt( $column, $post_id ) {
     if ( 'shortcode' === $column ) {
 ?>
 <input type="text" class="code" value='[libre-form id="<?php echo intval( $post_id ); ?>"]' readonly>
@@ -228,13 +228,15 @@ class CPT_WPLF_Form {
     }
     if ( 'submissions' === $column ) {
       // count number of submissions
-      $submissions = get_posts( array(
+    $submissions = get_posts(
+         array(
         'post_type' => 'wplf-submission',
         'posts_per_page' => -1,
         'meta_key' => '_form_id',
         'meta_value' => $post_id,
         'suppress_filters' => false,
-      ) );
+      )
+        );
 ?>
   <a href="<?php echo esc_url_raw( admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ) ); ?>">
     <?php echo count( $submissions ); ?>
@@ -247,7 +249,7 @@ class CPT_WPLF_Form {
   /**
    * Add meta box to show fields in form
    */
-  function add_meta_boxes_cpt() {
+  public function add_meta_boxes_cpt() {
     // Shortcode meta box
     add_meta_box(
       'wplf-shortcode',
@@ -301,7 +303,7 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for shortcode meta box
    */
-  function metabox_shortcode( $post ) {
+  public function metabox_shortcode( $post ) {
 ?>
 <p><input type="text" class="code" value='[libre-form id="<?php echo esc_attr( $post->ID ); ?>"]' readonly></p>
 <?php
@@ -310,20 +312,22 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for fields meta box
    */
-  function metabox_thank_you( $post ) {
+  public function metabox_thank_you( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
     $message = isset( $meta['_wplf_thank_you'] ) ?
       $meta['_wplf_thank_you'][0] : _x( 'Success!', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
-<?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
+<?php wp_editor(
+     esc_textarea( $message ), 'wplf_thank_you', array(
   'wpautop' => true,
   'media_buttons' => true,
   'textarea_name' => 'wplf_thank_you',
   'textarea_rows' => 6,
   'teeny' => true,
-  )); ?>
+  )
+    ); ?>
 </p>
 <?php
     wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
@@ -333,7 +337,7 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for form fields meta box
    */
-  function metabox_form_fields() {
+  public function metabox_form_fields() {
 ?>
 <p><?php esc_html_e( 'Fields marked with * are required', 'wp-libre-form' ); ?></p>
 <div class="wplf-form-field-container">
@@ -347,7 +351,7 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for submit email meta box
    */
-  function metabox_submit_email( $post ) {
+  public function metabox_submit_email( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
     $email_enabled = isset( $meta['_wplf_email_copy_enabled'] ) ? $meta['_wplf_email_copy_enabled'][0] : true;
@@ -438,7 +442,7 @@ class CPT_WPLF_Form {
   /**
    * Meta box callback for submission title format
    */
-  function meta_box_title_format( $post ) {
+  public function meta_box_title_format( $post ) {
     // get post meta
     $meta = get_post_meta( $post->ID );
     $default = '%name% <%email%>'; // default submission title format
@@ -463,7 +467,7 @@ class CPT_WPLF_Form {
   /**
    * Handles saving our post meta
    */
-  function save_cpt( $post_id ) {
+  public function save_cpt( $post_id ) {
     // verify nonce
     if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
       return;
@@ -577,7 +581,7 @@ class CPT_WPLF_Form {
    *
    * We apply <form> via the shortcode, you can't have nested forms anyway
    */
-  function strip_form_tags( $content ) {
+  public function strip_form_tags( $content ) {
     return preg_replace( '/<\/?form.*>/i', '', $content );
   }
 
@@ -585,7 +589,7 @@ class CPT_WPLF_Form {
   /**
    * The function we display the form with
    */
-  function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
+  public function wplf_form( $id, $content = '', $xclass = '', $attributes = [] ) {
     global $post;
 
     if ( 'publish' === get_post_status( $id ) || 'true' === $_GET['preview'] ) {
@@ -663,7 +667,7 @@ class CPT_WPLF_Form {
   /**
    * Enqueue the front end JS
    */
-  function maybe_enqueue_frontend_script() {
+  public function maybe_enqueue_frontend_script() {
     global $post;
 
     // register the script, but only enqueue it if the current post contains a form in it
@@ -676,30 +680,38 @@ class CPT_WPLF_Form {
     );
 
     // add dynamic variables to the script's scope
-    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
+    wp_localize_script(
+        'wplf-form-js', 'ajax_object', apply_filters(
+         'wplf_ajax_object', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
-    ) ) );
+    )
+        )
+        );
   }
 
 
   /**
    * Shortcode for displaying a Form
    */
-  function shortcode( $shortcode_atts, $content = null ) {
-    $attributes = shortcode_atts( array(
+  public function shortcode( $shortcode_atts, $content = null ) {
+    $attributes = shortcode_atts(
+         array(
       'id' => null,
       'xclass' => '',
-    ), $shortcode_atts, 'libre-form' );
+    ), $shortcode_atts, 'libre-form'
+        );
 
     // we don't render id and class as <form> attributes
     $id = $attributes['id'];
     $xclass = $attributes['xclass'];
-    $attributes = array_diff_key( $shortcode_atts, array(
+    $attributes = array_diff_key(
+         $shortcode_atts, array(
       'id' => null,
       'xclass' => null,
-    ) );
+    )
+        );
 
     // display form
     return $this->wplf_form( $id, $content, $xclass, $attributes );
@@ -709,7 +721,7 @@ class CPT_WPLF_Form {
   /**
    * Use the shortcode for previewing forms
    */
-  function use_shortcode_for_preview( $content ) {
+  public function use_shortcode_for_preview( $content ) {
     global $post;
     if ( ! isset( $post->post_type ) || $post->post_type !== 'wplf-form' ) {
       return $content;
@@ -721,7 +733,7 @@ class CPT_WPLF_Form {
    * Set and show 404 page for visitors trying to see single form.
    * And yes, it is a global $post. That's right.
    */
-  function maybe_set_404_for_single_form() {
+  public function maybe_set_404_for_single_form() {
     global $post;
 
     if ( ! is_singular( 'wplf-form' ) ) {
@@ -742,14 +754,14 @@ class CPT_WPLF_Form {
   /**
    * Wrapper function to check if form is publicly visible.
    */
-  function get_publicly_visible_state( $id ) {
+  public function get_publicly_visible_state( $id ) {
     return apply_filters( 'wplf-form-publicly-visible', false, $id );
   }
 
   /**
    * A very simple uglify. Just removes line breaks from html
    */
-  function minify_html( $html ) {
+  public function minify_html( $html ) {
     return str_replace( array( "\n", "\r" ), ' ', $html );
   }
 }
