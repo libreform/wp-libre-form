@@ -42,7 +42,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       return $form_content;
     }
 
-    function save_form( $post_id, $post, $update ) {
+    public function save_form( $post_id, $post, $update ) {
       unset( $post_id, $update ); // not used here so shut up linter!
 
       preg_match_all( $this->regular_expression, $post->post_content, $matches );
