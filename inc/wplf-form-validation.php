@@ -71,6 +71,18 @@ function wplf_validate_additional_fields( $return ) {
     return $return;
   }
 
+  // skip this validation if it is disabled with filter for this form
+  $form = get_post( intval( $_POST['_form_id'] ) );
+  // global disable
+  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation );
+  // disable by form id
+  $disable_validation = apply_filters( "wplf_{$_POST['_form_id']}_disable_validate_additional_fields", $disable_validation );
+  // disable by form slug
+  $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation );
+  if ( $disable_validation ) {
+    return $return;
+  }
+
   // get all fields from form
   $form_fields = explode( ',', get_post_meta( $_POST['_form_id'], '_wplf_fields', true ) );
 
