@@ -156,6 +156,25 @@ function my_email_thankyou( $return ) {
 }
 ```
 
+### Filter: wplf_disable_validate_additional_fields
+
+Dynamically generated fields are disabled by default. If you want to allow fields that are not set in the form to be submitted you can use this filter.
+
+#### Form specific hooks
+
+This filter supports form specific hooks:
+
+- `wplf_{form_id}_disable_validate_additional_fields`
+- `wplf_{form_slug}_disable_validate_additional_fields`
+
+These filters are only applied for the target form by ID or slug.
+
+Disabling additonal fields validation for all forms:
+
+```php
+add_filter( 'wplf_disable_validate_additional_fields' , __return_false );
+```
+
 ## Javascript API
 
 ### Client side callbacks
