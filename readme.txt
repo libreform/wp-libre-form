@@ -22,6 +22,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 - Email notifications of received form submissions
 - Full file upload support to Media Library with input type=file
 - Multilingual support with Polylang
+- Predefined static HTML markup for forms via filter hooks
 
 **Why?**
 

@@ -27,6 +27,7 @@ class CPT_WPLF_Form {
     add_action( 'save_post', array( $this, 'save_cpt' ) );
     add_filter( 'content_save_pre', array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
+    add_action( 'add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2 );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
 
     // edit.php view
@@ -131,7 +132,7 @@ class CPT_WPLF_Form {
   }
 
   /**
-   * Include custom JS on the edit screen
+   * Include custom JS and CSS on the edit screen
    */
   public function admin_post_scripts_cpt( $hook ) {
     global $post;
@@ -146,8 +147,13 @@ class CPT_WPLF_Form {
       return;
     }
 
+    $assets_url = plugins_url( 'assets', dirname( __FILE__ ) );
+
     // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'assets/scripts/wplf-admin-form.js', dirname( __FILE__ ) ) );
+    wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-admin-form.js' );
+
+    // enqueue the custom CSS for this view
+    wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
   }
 
 
@@ -458,6 +464,138 @@ class CPT_WPLF_Form {
   >
 </p>
 <?php
+  }
+
+  /**
+   * Check and maybe load a static HTML template for a specific form.
+   *
+   * Hooked to `add_meta_boxes`.
+   *
+   * @param string $post_type Post type for which editor is being rendered for.
+   * @param \WP_Post $post Current post object.
+   *
+   * @return void
+   */
+  function maybe_load_imported_template( $post_type, $post ) {
+    if ( $post_type !== 'wplf-form' || $post->post_status === 'auto-draft' ) {
+      return;
+    }
+
+    $form_id = (int) $post->ID;
+
+    /**
+     * Allows importing a static HTML template for a specific form ID.
+     *
+     * If the template returned is `null` then no template is loaded.
+     *
+     * @param string|null $template_content Raw HTML to import for a form.
+     * @param int $form_id Form ID (WP_Post ID) to import template for.
+     */
+    $template_content = apply_filters( 'wplf_import_html_template', null, $form_id );
+
+    if ( $template_content === null ) {
+      return;
+    }
+
+    // Clear unwanted form tags. WPLF will insert those by itself when rendering a form.
+    $template_content = preg_replace( '%<form ?[^>]*?>%', '', $template_content );
+    $template_content = preg_replace( '%</form>%', '', $template_content );
+
+    $this->override_form_template( $template_content, $form_id );
+  }
+
+  /**
+   * Override a form's template with an imported template file.
+   *
+   * @param string $template_content Raw HTML content to use for the form content.
+   * @param int $form_id ID of form we're overriding the template for.
+   *
+   * @return void
+   */
+  protected function override_form_template( $template_content, $form_id ) {
+    $this->maybe_persist_override_template( $template_content, $form_id );
+
+    static $times_content_replaced = 0;
+
+    // Make the editor textarea uneditable.
+    add_filter( 'the_editor', function ( $editor ) {
+      if ( ! preg_match( '%id="wp-content-editor-container"%', $editor ) ) {
+        return $editor;
+      }
+
+      $editor = preg_replace( '%\<textarea %', '<textarea readonly="readonly" ', $editor );
+
+      $notice = _x(
+        'This form template is being overridden by code, you must edit it in your project code',
+        'Template override notice in form edit admin view',
+        'wp-libre-form'
+      );
+
+      $notice = sprintf( '<div class="wplf-template-override-notice">%s</div>', $notice );
+
+      return $notice . $editor;
+    } );
+
+    // Custom settings for the form editor.
+    add_filter( 'wp_editor_settings', function ( $settings, $editor_id ) {
+      if ( $editor_id !== 'content' ) {
+          return $settings;
+      }
+
+      $settings['tinymce'] = false;
+      $settings['quicktags'] = false;
+      $settings['media_buttons'] = false;
+
+      return $settings;
+    }, 10, 2 );
+
+    // Replace all editor content with template content.
+    add_filter( 'the_editor_content', function ( $content ) use ( $template_content, &$times_content_replaced ) {
+      // This is hacky, yes. We only want to override the content for the first
+      // editor field we come by, meaning 99% of the time we hit the wanted form
+      // template editor field at the top of the edit view page.
+      if ( $times_content_replaced > 0 ) {
+        return $content;
+      }
+
+      $times_content_replaced++;
+
+      return $template_content;
+    } );
+  }
+
+  /**
+   * Check if we need to auto-persist the form template override into WP database.
+   *
+   * @param string $template Template to maybe persist.
+   * @param int $form_id Form ID to persist template for.
+   * @param bool $force Force a persist even though not required?
+   *
+   * @return void
+   */
+  protected function maybe_persist_override_template( $template, $form_id, $force = false ) {
+    $hash_transient = 'wplf_form_tmpl_hash_' . $form_id;
+    $template_hash = md5( $template );
+    $stored_hash = get_transient( $hash_transient );
+
+    if ( ! $force && $template_hash === $stored_hash ) {
+      return;
+    }
+
+    // Safe-guard to prevent accidental infinite loops.
+    remove_action( 'save_post', array( $this, 'save_cpt' ) );
+
+    $updated = wp_update_post( array(
+      'ID' => (int) $form_id,
+      'post_content' => $template,
+    ) );
+
+    add_action( 'save_post', array( $this, 'save_cpt' ) );
+
+    // Maybe we should do something else than just silently fail if persisting failed above.
+    if ( $updated ) {
+        set_transient( $hash_transient, $template_hash, HOUR_IN_SECONDS * 8 );
+    }
   }
 
   /**
