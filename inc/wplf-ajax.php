@@ -22,6 +22,7 @@ function wplf_ajax_submit_handler() {
 
     // form-specific validation
     $return->slug = $form->post_name;
+    $return->title = $form->post_title;
     $return = apply_filters( "wplf_{$form->post_name}_validate_submission", $return );
     $return = apply_filters( "wplf_{$form->ID}_validate_submission", $return );
   }
@@ -54,7 +55,7 @@ function wplf_ajax_submit_handler() {
       if ( ! is_array( $value ) ) {
         add_post_meta( $post_id, $key, esc_html( $value ), true );
       } else {
-        add_post_meta( $post_id, $key, esc_html( wp_json_encode( $value ) ), true );
+        add_post_meta( $post_id, $key, $value, true );
       }
     }
 
@@ -81,8 +82,13 @@ function wplf_ajax_submit_handler() {
     $return->submission_title = $post_title;
     $return->form_id = $form->ID;
 
+    $success = get_post_meta( $form->ID, '_wplf_thank_you', true );
+    $success = apply_filters( "wplf_{$form->post_name}_success_message", $success );
+    $success = apply_filters( "wplf_{$form->ID}_success_message", $success );
+    $success = apply_filters( 'wplf_success_message', $success );
+
     // return the success message for the form
-    $return->success = apply_filters( 'the_content', get_post_meta( $form->ID, '_wplf_thank_you', true ) );
+    $return->success = $success;
 
     // allow user to attach custom actions after the submission has been received
     // these could be confirmation emails, additional processing for the submission fields, e.g.

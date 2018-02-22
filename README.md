@@ -1,5 +1,5 @@
 # WP Libre Form
-[![Build Status](https://travis-ci.org/anttiviljami/wp-libre-form.svg?branch=master)](https://travis-ci.org/anttiviljami/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/stable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Total Downloads](https://poser.pugx.org/anttiviljami/wp-libre-form/downloads)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/unstable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![License](https://poser.pugx.org/anttiviljami/wp-libre-form/license)](https://packagist.org/packages/anttiviljami/wp-libre-form)
+[![Build Status](https://travis-ci.org/libreform/wp-libre-form.svg?branch=master)](https://travis-ci.org/libreform/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/stable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Total Downloads](https://poser.pugx.org/anttiviljami/wp-libre-form/downloads)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/unstable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![License](https://poser.pugx.org/anttiviljami/wp-libre-form/license)](https://packagist.org/packages/anttiviljami/wp-libre-form)
 
 Use standard HTML5 markup to create fully functional forms for WordPress
 
@@ -165,11 +165,11 @@ window.wplf.errorCallbacks.push(() => alert('Form submission failed!'));
 
 These callbacks are executed in the order they appear.
 
-To avoid running your JavaScript too early, add `wplf-form-js` to your enqueue dependencies: 
+To avoid running your JavaScript too early, add `wplf-form-js` to your enqueue dependencies:
 ```php
 wp_enqueue_script( "themejs", "/path/to/theme.js", array( "wplf-form-js" ), ... );
 ```
-Otherwise you might run into errors like "Cannot read property 'push' of undefined".  
+Otherwise you might run into errors like "Cannot read property 'push' of undefined".
 
 ## Multilingual
 

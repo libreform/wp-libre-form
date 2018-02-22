@@ -3,8 +3,8 @@ Contributors: Zuige, k1sul1, sippis
 Tags: Contact, Form, Lead, Collector, HTML, Builder
 Donate link: https://github.com/anttiviljami
 Requires at least: 4.2
-Tested up to: 4.7.4
-Stable tag: 1.4
+Tested up to: 4.8.2
+Stable tag: 1.4.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -35,7 +35,7 @@ Required field validation, email notifications, file uploads to WP gallery and l
 
 Please contribute to this project on Github. Pull requests welcome!
 
-https://github.com/anttiviljami/wp-libre-form
+[https://github.com/anttiviljami/wp-libre-form](https://github.com/anttiviljami/wp-libre-form)
 
 == Installation ==
 

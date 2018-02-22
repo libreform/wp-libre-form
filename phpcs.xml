@@ -2,11 +2,15 @@
 <ruleset name="anttiviljami-wordpress">
   <description>For nicer WordPress and PHP development</description>
 
-  <!-- Don't check composer dependencies -->
-  <exclude-pattern>/vendor/</exclude-pattern>
+  <!-- Files and directories to parse -->
+  <file>./classes/</file>
+  <file>./inc/</file>
+  <file>./wp-libre-form.php</file>
 
-  <!-- Exclude language files -->
-  <exclude-pattern>/lang/</exclude-pattern>
+  <!-- Excluded directories and files -->
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <exclude-pattern>*/lang/*</exclude-pattern>
+  <exclude-pattern>*/assets/*</exclude-pattern>
 
   <!-- Disallow tabs altogether -->
   <rule ref="Generic.WhiteSpace.DisallowTabIndent.TabsUsed"/>
@@ -100,6 +104,13 @@
     -->
     <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
 
+    <!-- <?php doesn't have to be on its own line -->
+    <exclude name="Squiz.PHP.EmbeddedPhp.ContentBeforeEnd" />
+    <exclude name="Squiz.PHP.EmbeddedPhp.ContentAfterOpen" />
+
+    <!-- Squiz.PHP.EmbeddedPhp.ContentBeforeEnd -->
+    <exclude name="Generic.ControlStructures.InlineControlStructure.NotAllowed" />
+
     <!-- These indentation rules are just wrong :) -->
     <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
 
@@ -117,6 +128,9 @@
 
     <!-- This would be nice to enforce, but plugin main file shouldn't be called class-something -->
     <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+
+    <!-- This one is just weird. -->
+    <exclude name="WordPress.Arrays.ArrayIndentation" />
 
   </rule>
 </ruleset>

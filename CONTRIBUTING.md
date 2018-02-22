@@ -14,15 +14,17 @@ This project comes with a phpcs configuration (`phpcs.xml`) you can use to check
 Run phpcs in the project root directory:
 
 ```
-phpcs --extensions=php --standard=./phpcs.xml -n -p .
+./vendor/bin/phpcs ./
 ```
 
-Before you can run phpcs, you need to install PHP Codesniffer and WordPress coding standards like so:
+You need to install the plugin's development dependencies before you can run the PHPCS checks. A regular
 
 ```
-composer create-project wp-coding-standards/wpcs:dev-master --no-dev $HOME/wpcs
+composer install
 ```
 
-Or read the official installation instructions here:
+should install all the required packages.
+
+You can read the official WPCS installation instructions here:
 
 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards
