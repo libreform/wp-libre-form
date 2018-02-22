@@ -28,6 +28,9 @@ lots more are included by default in the core of the plugin, but you can also
 add your own functionality with [hooks and APIs](#filter--action-api) provided
 by Libre Form.
 
+## Try it
+[TryoutWP](https://gettryout.com/) has provided us with a live demo, [which you can find here](http://gettryout.com/new/?template=libreform&provider=demo&redirect=wp-admin%2Fpost.php%3Fpost%3D4%26action%3Dedit ). It reflects the current release, not the master branch. 
+
 ## Screenshots
 
 ### Editing a Form
