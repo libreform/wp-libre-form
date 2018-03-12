@@ -6,6 +6,8 @@
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
 function wplf_ajax_submit_handler() {
+
+	global $shouldStoreImagesInMedia;
   $return = new stdClass();
   $return->ok = 1;
 
@@ -60,18 +62,32 @@ function wplf_ajax_submit_handler() {
     }
 
     // handle files
-    foreach ( $_FILES as $key => $file ) {
-      // Is this enough security wise?
-      // Currenly only supports 1 file per input
-      $attach_id = media_handle_upload( $key, 0, array(), array(
-        'test_form' => false,
-      ) );
+	  $plugin_path = plugin_dir_path( __FILE__ );
+        $plugin_url  = plugin_dir_url( __DIR__ ."../" );
+	  if(!is_dir($plugin_path ."../uploads")) {
+	        mkdir($plugin_path ."../uploads");
+        }
 
-      if ( ! is_wp_error( $attach_id ) ) {
-        add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
-        add_post_meta( $post_id, $key . '_attachment', $attach_id );
-      }
-    }
+		foreach ( $_FILES as $key => $file ) {
+			// Is this enough security wise?
+			// Currenly only supports 1 file per input
+			if($shouldStoreImagesInMedia) {
+				$attach_id = media_handle_upload( $key, 0, array(), array(
+					'test_form' => false,
+				) );
+
+				if ( ! is_wp_error( $attach_id ) ) {
+					add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
+					add_post_meta( $post_id, $key . '_attachment', $attach_id );
+				}
+			}else {
+					$name = date("ymdhs") . rand(0,10000). sanitize_file_name($file["name"]);
+					move_uploaded_file($file["tmp_name"], $plugin_path ."../uploads/". $name );
+					add_post_meta( $post_id, $key, $plugin_url ."uploads/".$name );
+			}
+		}
+
+
 
     // save email copy address to submission meta for later use
     $to = get_post_meta( $form->ID, '_wplf_email_copy_to', true );
