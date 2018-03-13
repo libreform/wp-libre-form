@@ -152,7 +152,9 @@ function wplf_email_copy_replace_tags( $content, $form = null, $submission_id = 
   return $content;
 }
 
+// @codingStandardsIgnoreStart Generic.CodeAnalysis.UnusedFunctionParameter
 function wplf_email_maybe_implode_serialized_value( $value, $form_id = 0, $form_name = '' ) {
+// @codingStandardsIgnoreEnd Generic.CodeAnalysis.UnusedFunctionParameter
   $value = maybe_unserialize( $value );
 
   if ( is_array( $value ) ) {
