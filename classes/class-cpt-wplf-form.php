@@ -346,16 +346,14 @@ class CPT_WPLF_Form {
   }
 
   /**
-   * Meta box callback for should
-   * files end up in media library
+   * Meta box callback for 'should files end up in media library'
    */
   public function metabox_media_library( $post ) {
 	  $meta = get_post_meta( $post->ID );
       $checked =  isset( $meta['_wplf_media_library']) && !empty($meta['_wplf_media_library'][0]) ? "checked" : "";
 ?>
-
       <input type="checkbox" <?php echo $checked ?> name="wplf_media_library">
-      <label>Add files to media library</label>
+      <label>Add files to media library</label><!-- Todo: translate -->
 <?php
       }
 

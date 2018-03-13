@@ -7,7 +7,7 @@ add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
 function wplf_ajax_submit_handler() {
 
-	global $shouldStoreImagesInMedia;
+
   $return = new stdClass();
   $return->ok = 1;
 
@@ -62,16 +62,13 @@ function wplf_ajax_submit_handler() {
     }
 
     // handle files
-	  $plugin_path = plugin_dir_path( __FILE__ );
-        $plugin_url  = plugin_dir_url( __DIR__ ."../" );
-	  if(!is_dir($plugin_path ."../uploads")) {
-	        mkdir($plugin_path ."../uploads");
-        }
-
+	  $uploads_path = wp_upload_dir();
+        $shouldStoreImagesInMediaLibrary = get_post_meta($form->ID, "_wplf_media_library",true);
+	  $counter = 0;
 		foreach ( $_FILES as $key => $file ) {
 			// Is this enough security wise?
 			// Currenly only supports 1 file per input
-			if($shouldStoreImagesInMedia) {
+			if($shouldStoreImagesInMediaLibrary) {
 				$attach_id = media_handle_upload( $key, 0, array(), array(
 					'test_form' => false,
 				) );
@@ -81,9 +78,11 @@ function wplf_ajax_submit_handler() {
 					add_post_meta( $post_id, $key . '_attachment', $attach_id );
 				}
 			} else {
-					$name = date("ymdhs") . rand(0,10000). sanitize_file_name($file["name"]);
-					move_uploaded_file($file["tmp_name"], $plugin_path ."../uploads/". $name );
-					add_post_meta( $post_id, $key, $plugin_url ."uploads/".$name );
+					$name = "lf_". date("ymdhs") . "-" . $counter . "-" . sanitize_file_name($file["name"]);
+
+					move_uploaded_file($file["tmp_name"], $uploads_path["path"]. "/".$name );
+					add_post_meta( $post_id, $key, $uploads_path["url"]."/".$name );
+					$counter++;
 			}
 		}
 
