@@ -274,6 +274,16 @@ class CPT_WPLF_Form {
       'high'
     );
 
+
+	  // Media library meta box
+	  add_meta_box(
+		  'wplf-media',
+		  "Tiedostot", //TODO: translation
+		  array( $this, 'metabox_media_library' ),
+		  'wplf-form',
+		  'side'
+	  );
+
     // Form Fields meta box
     add_meta_box(
       'wplf-fields',
@@ -335,6 +345,19 @@ class CPT_WPLF_Form {
     wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
   }
 
+  /**
+   * Meta box callback for should
+   * files end up in media library
+   */
+  public function metabox_media_library( $post ) {
+	  $meta = get_post_meta( $post->ID );
+      $checked =  isset( $meta['_wplf_media_library']) && !empty($meta['_wplf_media_library'][0]) ? "checked" : "";
+?>
+
+      <input type="checkbox" <?php echo $checked ?> name="wplf_media_library">
+      <label>Add files to media library</label>
+<?php
+      }
 
   /**
    * Meta box callback for form fields meta box
@@ -618,6 +641,13 @@ class CPT_WPLF_Form {
     if ( ! current_user_can( 'edit_post', $post_id ) ) {
       return;
     }
+
+    // save media checkbox
+	  if ( isset( $_POST['wplf_media_library'] ) ) {
+		  update_post_meta( $post_id, '_wplf_media_library', $_POST['wplf_media_library']  );
+	  } else {
+		  update_post_meta( $post_id, '_wplf_media_library', "" );
+      }
 
     // save success message
     if ( isset( $_POST['wplf_thank_you'] ) ) {

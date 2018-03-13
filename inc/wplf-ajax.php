@@ -80,13 +80,12 @@ function wplf_ajax_submit_handler() {
 					add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
 					add_post_meta( $post_id, $key . '_attachment', $attach_id );
 				}
-			}else {
+			} else {
 					$name = date("ymdhs") . rand(0,10000). sanitize_file_name($file["name"]);
 					move_uploaded_file($file["tmp_name"], $plugin_path ."../uploads/". $name );
 					add_post_meta( $post_id, $key, $plugin_url ."uploads/".$name );
 			}
 		}
-
 
 
     // save email copy address to submission meta for later use
