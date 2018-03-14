@@ -278,7 +278,7 @@ class CPT_WPLF_Form {
 	  // Media library meta box
 	  add_meta_box(
 		  'wplf-media',
-		  "Tiedostot", //TODO: translation
+		  __( 'Files', 'wp-libre-form' ),
 		  array( $this, 'metabox_media_library' ),
 		  'wplf-form',
 		  'side'
@@ -353,7 +353,7 @@ class CPT_WPLF_Form {
       $checked =  isset( $meta['_wplf_media_library']) && !empty($meta['_wplf_media_library'][0]) ? "checked" : "";
 ?>
       <input type="checkbox" <?php echo $checked ?> name="wplf_media_library">
-      <label>Add files to media library</label><!-- Todo: translate -->
+      <label><?php esc_attr_e( 'Add files to media library', 'wp-libre-form' ); ?></label>
 <?php
       }
 
