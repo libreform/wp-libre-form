@@ -81,7 +81,8 @@ function wplf_ajax_submit_handler() {
 					$name = "lf_". date("ymdhs") . "-" . $counter . "-" . sanitize_file_name($file["name"]);
 
 					move_uploaded_file($file["tmp_name"], $uploads_path["path"]. "/".$name );
-					add_post_meta( $post_id, $key, $uploads_path["url"]."/".$name );
+					add_post_meta( $post_id, $key . '_attachment', $uploads_path["url"]."/".$name  );
+					//add_post_meta( $post_id, $key, $uploads_path["url"]."/".$name );
 					$counter++;
 			}
 		}

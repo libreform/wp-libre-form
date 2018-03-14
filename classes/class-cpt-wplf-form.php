@@ -56,6 +56,9 @@ class CPT_WPLF_Form {
     // Removing wpautop isn't enough if form is used inside a ACF field or so.
     // Fitting the output to one line prevents <br> tags from appearing.
     add_filter( 'wplf_form', array( $this, 'minify_html' ) );
+
+    //before delete, remove the possible uploads
+      add_action("before_delete_post", array($this, "clean_up_entry"));
   }
 
   public static function register_cpt() {
@@ -127,8 +130,28 @@ class CPT_WPLF_Form {
     if ( 'wplf-form' === get_post_type( $post ) ) {
       return false;
     }
-
     return $default;
+  }
+
+  /**
+   * Berore permanently deleting form entry, remove attachments
+   * in the case they were not added to media library
+   */
+  public function clean_up_entry($id) {
+      $type = get_post_type($id);
+      if('wplf-submission' === $type) {
+	      $postmeta = get_post_meta($id);
+
+	      foreach ($postmeta as $key => $meta) {
+	          $m = $meta[0];
+              if(strpos($key,"attachment") !== false) {
+                  $path = str_replace(WP_HOME . "/", get_home_path(), $m);
+                  unlink($path);
+
+              }
+          }
+      }
+
   }
 
   /**
