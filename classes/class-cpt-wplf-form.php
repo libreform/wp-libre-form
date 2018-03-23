@@ -29,6 +29,7 @@ class CPT_WPLF_Form {
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2 );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
+    add_action( 'admin_notices', array( $this, 'print_notices' ), 10 );
 
     // edit.php view
     add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
@@ -177,6 +178,29 @@ class CPT_WPLF_Form {
 
     // enqueue the custom CSS for this view
     wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
+  }
+
+  public function print_notices () {
+    $post_id = ! empty( $_GET['post'] ) ? (int) $_GET['post'] : false;
+    $version_created_at = get_post_meta( $post_id, '_wplf_plugin_version', true );
+
+    if ( version_compare( $version_created_at, WPLF_VERSION, '<' ) ) {
+      ?>
+      <div class="notice notice-info">
+        <p>This form was created with WPLF version <?=$version_created_at?>,
+        and your installed WPLF version is <?=WPLF_VERSION?>.</p>
+
+        <p>There might be new features available, would you like to update the form version?</p>
+
+        <p>
+          <label>
+            <input type="checkbox" name="wplf_update_plugin_version_to_meta" value="1">
+            Yes, update when I save the form (not working yet)
+          </label>
+        </p>
+      </div>
+      <?php
+    }
   }
 
 
@@ -764,6 +788,13 @@ class CPT_WPLF_Form {
       // attributes where of course they are escaped using esc_attr() so it
       // should be fine to save the meta field without further sanitisaton
       update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
+    }
+
+    // save plugin version, update if allowed
+    $version = get_post_meta( $post_id, '_wplf_plugin_version', true );
+    if ( ! $version || isset( $_POST['wplf_update_plugin_version_to_meta'] ) ) {
+      error_log('updating');
+      update_post_meta( $post_id, '_wplf_plugin_version', WPLF_VERSION );
     }
   }
 
