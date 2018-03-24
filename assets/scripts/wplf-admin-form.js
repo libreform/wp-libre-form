@@ -63,6 +63,25 @@ $(document).ready(function() {
   }
   $('input[name="wplf_email_copy_enabled"]').change(toggleEmailCopy);
   toggleEmailCopy();
+
+  // If prompted for a form version update, create a hidden field if necessary
+  function toggleVersionUpdate() {
+    var hiddenField = $('input[name="wplf_update_plugin_version_to_meta"]');
+
+    if (hiddenField.length) {
+      hiddenField.remove();
+      return;
+    }
+
+    var checkbox = document.createElement('input')
+    checkbox.type = 'hidden';
+    checkbox.name = 'wplf_update_plugin_version_to_meta';
+    checkbox.value = 1;
+
+    $('#content').after(checkbox);
+  }
+
+  $('input[name="wplf_version_update_toggle"]').change(toggleVersionUpdate);
 });
 
 })(jQuery);

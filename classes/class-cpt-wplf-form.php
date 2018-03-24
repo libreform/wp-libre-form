@@ -180,26 +180,41 @@ class CPT_WPLF_Form {
     wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
   }
 
-  public function print_notices () {
+  public function print_notices() {
     $post_id = ! empty( $_GET['post'] ) ? (int) $_GET['post'] : false;
     $version_created_at = get_post_meta( $post_id, '_wplf_plugin_version', true );
 
-    if ( version_compare( $version_created_at, WPLF_VERSION, '<' ) ) {
-      ?>
-      <div class="notice notice-info">
-        <p>This form was created with WPLF version <?=$version_created_at?>,
-        and your installed WPLF version is <?=WPLF_VERSION?>.</p>
+    // The notice prints outside the form element
+    //  a hidden field is created or deleted when this checkbox changes
+    if ( version_compare( $version_created_at, WPLF_VERSION, '<' ) ) { ?>
+    <div class="notice notice-info">
+      <p>
+      <?php echo sprintf(
+        esc_html(
+          // translators: Placeholders indicate version numbers
+          __( 'This form was created with WPLF version %1$s, and your installed WPLF version is %2$s', 'wp-libre-form' )
+        ),
+        esc_html( $version_created_at ),
+        esc_html( WPLF_VERSION )
+      ); ?>
+      </p>
 
-        <p>There might be new features available, would you like to update the form version?</p>
+      <p>
+      <?php echo esc_html(
+        __( 'There might be new features available, would you like to update the form version?', 'wp-libre-form' )
+        ); ?>
+      </p>
 
-        <p>
-          <label>
-            <input type="checkbox" name="wplf_update_plugin_version_to_meta" value="1">
-            Yes, update when I save the form (not working yet)
-          </label>
-        </p>
-      </div>
-      <?php
+      <p>
+        <label>
+          <input type="checkbox" name="wplf_version_update_toggle" value="1">
+          <?php echo esc_html(
+          __( 'Yes, update when I save the form', 'wp-libre-form' )
+          ); ?>
+        </label>
+      </p>
+    </div>
+    <?php
     }
   }
 
