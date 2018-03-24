@@ -808,7 +808,6 @@ class CPT_WPLF_Form {
     // save plugin version, update if allowed
     $version = get_post_meta( $post_id, '_wplf_plugin_version', true );
     if ( ! $version || isset( $_POST['wplf_update_plugin_version_to_meta'] ) ) {
-      error_log('updating');
       update_post_meta( $post_id, '_wplf_plugin_version', WPLF_VERSION );
     }
   }
