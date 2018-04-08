@@ -7,7 +7,6 @@ add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
 function wplf_ajax_submit_handler() {
 
-
   $return = new stdClass();
   $return->ok = 1;
 
@@ -50,7 +49,7 @@ function wplf_ajax_submit_handler() {
       'post_title'     => $post_title,
       'post_status'    => 'publish',
       'post_type'      => 'wplf-submission',
-    ));
+    ) );
 
     // add submission data as meta values
     foreach ( $_POST as $key => $value ) {
@@ -62,31 +61,29 @@ function wplf_ajax_submit_handler() {
     }
 
     // handle files
-	  $uploads_path = wp_upload_dir();
-        $shouldStoreImagesInMediaLibrary = get_post_meta($form->ID, "_wplf_media_library",true);
-	  $counter = 0;
-		foreach ( $_FILES as $key => $file ) {
-			// Is this enough security wise?
-			// Currenly only supports 1 file per input
-			if($shouldStoreImagesInMediaLibrary) {
-				$attach_id = media_handle_upload( $key, 0, array(), array(
-					'test_form' => false,
-				) );
+    $uploads_path = wp_upload_dir();
+    $should_store_images_in_medialibrary = get_post_meta( $form->ID, '_wplf_media_library', true );
+    $counter = 0;
+    foreach ( $_FILES as $key => $file ) {
+      // Is this enough security wise?
+      // Currenly only supports 1 file per input
+      if ( $should_store_images_in_medialibrary ) {
+        $attach_id = media_handle_upload( $key, 0, array(), array(
+          'test_form' => false,
+        ) );
 
-				if ( ! is_wp_error( $attach_id ) ) {
-					add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
-					add_post_meta( $post_id, $key . '_attachment', $attach_id );
-				}
-			} else {
-					$name = "lf_". date("ymdhs") . "-" . $counter . "-" . sanitize_file_name($file["name"]);
+        if ( ! is_wp_error( $attach_id ) ) {
+          add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
+          add_post_meta( $post_id, $key . '_attachment', $attach_id );
+        }
+      } else {
+          $name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
 
-					move_uploaded_file($file["tmp_name"], $uploads_path["path"]. "/".$name );
-					add_post_meta( $post_id, $key . '_attachment', $uploads_path["url"]."/".$name  );
-					//add_post_meta( $post_id, $key, $uploads_path["url"]."/".$name );
-					$counter++;
-			}
-		}
-
+          move_uploaded_file( $file['tmp_name'], $uploads_path['path'] . '/' . $name );
+          add_post_meta( $post_id, $key . '_attachment', $uploads_path['url'] . '/' . $name );
+          $counter++;
+      }
+    }
 
     // save email copy address to submission meta for later use
     $to = get_post_meta( $form->ID, '_wplf_email_copy_to', true );

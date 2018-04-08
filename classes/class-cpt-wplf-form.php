@@ -57,8 +57,8 @@ class CPT_WPLF_Form {
     // Fitting the output to one line prevents <br> tags from appearing.
     add_filter( 'wplf_form', array( $this, 'minify_html' ) );
 
-    //before delete, remove the possible uploads
-      add_action("before_delete_post", array($this, "clean_up_entry"));
+    // before delete, remove the possible uploads
+    add_action( 'before_delete_post', array( $this, 'clean_up_entry' ) );
   }
 
   public static function register_cpt() {
@@ -137,16 +137,16 @@ class CPT_WPLF_Form {
    * Berore permanently deleting form entry, remove attachments
    * in the case they were not added to media library
    */
-  public function clean_up_entry($id) {
-      $type = get_post_type($id);
-      if('wplf-submission' === $type) {
-	      $postmeta = get_post_meta($id);
+  public function clean_up_entry( $id ) {
+      $type = get_post_type( $id );
+      if ( 'wplf-submission' === $type ) {
+        $postmeta = get_post_meta( $id );
 
-	      foreach ($postmeta as $key => $meta) {
-	          $m = $meta[0];
-              if(strpos($key,"attachment") !== false) {
-                  $path = str_replace(WP_HOME . "/", get_home_path(), $m);
-                  unlink($path);
+        foreach ( $postmeta as $key => $meta ) {
+            $m = $meta[0];
+              if ( strpos( $key, 'attachment' ) !== false ) {
+                  $path = str_replace( WP_HOME . '/', get_home_path(), $m );
+                  unlink( $path );
 
               }
           }
@@ -297,15 +297,14 @@ class CPT_WPLF_Form {
       'high'
     );
 
-
-	  // Media library meta box
-	  add_meta_box(
-		  'wplf-media',
-		  __( 'Files', 'wp-libre-form' ),
-		  array( $this, 'metabox_media_library' ),
-		  'wplf-form',
-		  'side'
-	  );
+    // Media library meta box
+    add_meta_box(
+      'wplf-media',
+      __( 'Files', 'wp-libre-form' ),
+      array( $this, 'metabox_media_library' ),
+      'wplf-form',
+      'side'
+    );
 
     // Form Fields meta box
     add_meta_box(
@@ -353,7 +352,8 @@ class CPT_WPLF_Form {
     // get post meta
     $meta = get_post_meta( $post->ID );
     $message = isset( $meta['_wplf_thank_you'] ) ?
-      $meta['_wplf_thank_you'][0] : _x( 'Success!', 'Default success message', 'wp-libre-form' );
+      $meta['_wplf_thank_you'][0]
+      : _x( 'Success!', 'Default success message', 'wp-libre-form' );
 ?>
 <p>
 <?php wp_editor( esc_textarea( $message ), 'wplf_thank_you', array(
@@ -362,23 +362,28 @@ class CPT_WPLF_Form {
   'textarea_name' => 'wplf_thank_you',
   'textarea_rows' => 6,
   'teeny' => true,
-  )); ?>
+  ) ); ?>
 </p>
 <?php
     wp_nonce_field( 'wplf_form_meta', 'wplf_form_meta_nonce' );
   }
 
   /**
-   * Meta box callback for 'should files end up in media library'
+   * Meta box callback for should files end up in media library
    */
   public function metabox_media_library( $post ) {
-	  $meta = get_post_meta( $post->ID );
-      $checked =  isset( $meta['_wplf_media_library']) && !empty($meta['_wplf_media_library'][0]) ? "checked" : "";
-?>
-      <input type="checkbox" <?php echo $checked ?> name="wplf_media_library">
-      <label><?php esc_attr_e( 'Add files to media library', 'wp-libre-form' ); ?></label>
-<?php
+      $meta    = get_post_meta( $post->ID );
+      $checked = 'checked';
+
+      if ( isset( $meta['_wplf_media_library'] ) && empty( $meta['_wplf_media_library'][0] ) ) {
+          $checked = '';
       }
+
+      echo "<input type='checkbox' " . esc_html( $checked ) . " name='wplf_media_library'>" ;
+      ?>
+      <label><?php esc_attr_e( 'Add files to media library', 'wp-libre-form' ); ?></label>
+      <?php
+  }
 
   /**
    * Meta box callback for form fields meta box
@@ -609,23 +614,6 @@ class CPT_WPLF_Form {
   }
 
   /**
-   * Meta box callback for should files end up in media library
-   */
-  public function metabox_media_library( $post ) {
-      $meta    = get_post_meta( $post->ID );
-      $checked = 'checked';
-
-      if( isset( $meta['_wplf_media_library'] ) && empty( $meta['_wplf_media_library'][0] ))  {
-          $checked = '';
-      }
-
-      echo "<input type='checkbox' " . esc_html( $checked ) . " name='wplf_media_library'>" ;
-      ?>
-      <label><?php esc_attr_e( 'Add files to media library', 'wp-libre-form' ); ?></label>
-      <?php
-  }
-
-  /**
    * Check if we need to auto-persist the form template override into WP database.
    *
    * @param string $template Template to maybe persist.
@@ -646,10 +634,12 @@ class CPT_WPLF_Form {
     // Safe-guard to prevent accidental infinite loops.
     remove_action( 'save_post', array( $this, 'save_cpt' ) );
 
-    $updated = wp_update_post( array(
+    $updated = wp_update_post(
+         array(
       'ID' => (int) $form_id,
       'post_content' => $template,
-    ) );
+    )
+        );
 
     add_action( 'save_post', array( $this, 'save_cpt' ) );
 
@@ -681,10 +671,10 @@ class CPT_WPLF_Form {
     }
 
     // save media checkbox
-	  if ( isset( $_POST['wplf_media_library'] ) ) {
-		  update_post_meta( $post_id, '_wplf_media_library', $_POST['wplf_media_library']  );
-	  } else {
-		  update_post_meta( $post_id, '_wplf_media_library', "" );
+    if ( isset( $_POST['wplf_media_library'] ) ) {
+      update_post_meta( $post_id, '_wplf_media_library', $_POST['wplf_media_library'] );
+    } else {
+      update_post_meta( $post_id, '_wplf_media_library', '' );
       }
 
     // save success message
@@ -883,7 +873,7 @@ class CPT_WPLF_Form {
     );
 
     // add dynamic variables to the script's scope
-    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
+    wp_localize_script('wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',

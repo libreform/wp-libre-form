@@ -34,8 +34,7 @@ class CPT_WPLF_Submission {
     // add custom bulk actions
     add_action( 'admin_notices', array( $this, 'wplf_submission_bulk_action_admin_notice' ) );
     add_filter( 'bulk_actions-edit-wplf-submission', array( $this, 'register_wplf_submission_bulk_actions' ) );
-    add_filter( 'handle_bulk_actions-edit-wplf-submission',
-      array( $this, 'wplf_submission_bulk_action_handler' ), 10, 3 );
+    add_filter( 'handle_bulk_actions-edit-wplf-submission', array( $this, 'wplf_submission_bulk_action_handler' ), 10, 3 );
   }
 
   public static function register_cpt() {
@@ -199,14 +198,16 @@ class CPT_WPLF_Submission {
         '<div id="wplf-submission-bulk-resend-message" class="notice notice-success"><p>' .
           esc_html(
              // translators: %s is number of submissions
-             _n( 'Resent email copy of %s submission.',
-                 'Resent email copy of %s submissions.',
-                 $count,
+            _n(
+              'Resent email copy of %s submission.',
+              'Resent email copy of %s submissions.',
+              $count,
              'wp-libre-form'
-             )
+            )
           ) .
           '</p></div>',
-        intval( $count ) );
+        intval( $count )
+      );
     }
   }
 
