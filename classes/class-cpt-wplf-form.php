@@ -609,6 +609,23 @@ class CPT_WPLF_Form {
   }
 
   /**
+   * Meta box callback for should files end up in media library
+   */
+  public function metabox_media_library( $post ) {
+      $meta    = get_post_meta( $post->ID );
+      $checked = 'checked';
+
+      if( isset( $meta['_wplf_media_library'] ) && empty( $meta['_wplf_media_library'][0] ))  {
+          $checked = '';
+      }
+
+      echo "<input type='checkbox' " . esc_html( $checked ) . " name='wplf_media_library'>" ;
+      ?>
+      <label><?php esc_attr_e( 'Add files to media library', 'wp-libre-form' ); ?></label>
+      <?php
+  }
+
+  /**
    * Check if we need to auto-persist the form template override into WP database.
    *
    * @param string $template Template to maybe persist.
