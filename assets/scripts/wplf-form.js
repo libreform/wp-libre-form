@@ -2,8 +2,6 @@
  * JS to be included on the front end pages with forms
  */
 
-
-
 window.wplf = {
   successCallbacks: [],
   errorCallbacks: [],
@@ -17,21 +15,21 @@ window.wplf = {
     // add class to enable css changes to indicate ajax loading
     form.classList.add("sending");
 
-    [].forEach.call(form.querySelectorAll(".wplf-error"), function (error) {
+    [].forEach.call(form.querySelectorAll(".wplf-error"), function(error) {
       // reset errors
       error.parentNode.removeChild(error);
     });
 
-    fetch(ajax_object.ajax_url + '?action=wplf_submit', {
+    fetch(ajax_object.ajax_url  + '?action=wplf_submit', {
       method: "POST",
       credentials: ajax_object.ajax_credentials || 'same-origin',
       body: data
-    }).then(function (response) {
+    }).then(function(response) {
       return response.text();
-    }).then(function (response) {
+    }).then(function(response) {
       response = JSON.parse(response);
 
-      if ('success' in response) {
+      if( 'success' in response ) {
         // show success message if one exists
         var success = document.createElement("p");
         success.className = "wplf-success";
@@ -40,16 +38,16 @@ window.wplf = {
         form.parentNode.insertBefore(success, form.nextSibling);
       }
 
-      if ('ok' in response && response.ok) {
+      if( 'ok' in response && response.ok ) {
         // submit succesful!
         form.parentNode.removeChild(form);
 
-        window.wplf.successCallbacks.forEach(function (func) {
+        window.wplf.successCallbacks.forEach(function(func) {
           func(response);
         });
       }
 
-      if ('error' in response) {
+      if( 'error' in response ) {
         // show error message in form
         var error = document.createElement("p");
         error.className = "wplf-error error";
@@ -57,17 +55,17 @@ window.wplf = {
 
         form.appendChild(error);
 
-        window.wplf.errorCallbacks.forEach(function (func) {
+        window.wplf.errorCallbacks.forEach(function(func) {
           func(response);
         });
       }
 
       form.classList.remove('sending');
-    }).catch(function (error) {
+    }).catch(function(error) {
       form.classList.remove("sending");
 
       if (window.wplf.errorCallbacks.length > 0) {
-        window.wplf.errorCallbacks.forEach(function (func) {
+        window.wplf.errorCallbacks.forEach(function(func) {
           func(error);
         });
       } else {
@@ -78,7 +76,7 @@ window.wplf = {
     // don't actually submit the form, causing a page reload
     e.preventDefault();
   },
-  attach: function (form) {
+  attach: function(form) {
     // form is a selector
     if (typeof form == 'string') {
       form = document.querySelectorAll(form);
@@ -86,7 +84,7 @@ window.wplf = {
 
     // form is an array of elements or a node list
     if (form.constructor === Array || form.constructor === NodeList) {
-      [].forEach.call(form, function (form) {
+      [].forEach.call(form, function(form){
         window.wplf.attach(form);
       });
       return;
@@ -95,14 +93,10 @@ window.wplf = {
     form.addEventListener("submit", window.wplf.submitHandler);
   }
 };
-
-
 (function () {
-
   var main = function () {
     [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
   };
-
   var dependencies = [];
 
   if (!window.fetch) {
@@ -151,5 +145,4 @@ window.wplf = {
   document.addEventListener('DOMContentLoaded', function () {
     initialize(dependencies, main);
   });
-
 }());
