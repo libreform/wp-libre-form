@@ -97,6 +97,7 @@ class CPT_WPLF_Form {
         'revisions',
         'custom-fields',
       ),
+      'show_in_rest' => true,
     );
 
     register_post_type( 'wplf-form', $args );
