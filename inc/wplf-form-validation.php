@@ -60,3 +60,54 @@ function wplf_validate_required_empty( $return ) {
 
   return $return;
 }
+
+/**
+ * Check that submission has only fields that are set in form
+ */
+add_filter( 'wplf_validate_submission', 'wplf_validate_additional_fields' );
+function wplf_validate_additional_fields( $return ) {
+  // skip this validation if submission has already failed
+  if ( ! $return->ok ) {
+    return $return;
+  }
+
+  // skip this validation if it is disabled with filter for this form
+  $form = get_post( intval( $_POST['_form_id'] ) );
+  // global disable
+  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation );
+  // disable by form id
+  $disable_validation = apply_filters( "wplf_{$_POST['_form_id']}_disable_validate_additional_fields", $disable_validation );
+  // disable by form slug
+  $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation );
+  if ( $disable_validation ) {
+    return $return;
+  }
+
+  // get all fields from form
+  $form_fields = explode( ',', get_post_meta( $_POST['_form_id'], '_wplf_fields', true ) );
+
+  // add all default fields
+  $default_fields = array( 'referrer', '_referrer_id', '_form_id' );
+
+  // combine fields
+  $all_fields = array_merge( $form_fields, $default_fields );
+
+  // make sure fields from all_fields are the only ones present in $_POST
+  $additional_fields = array();
+  foreach ( $_POST as $key => $value ) {
+    if ( ! in_array( $key, $all_fields ) ) {
+      // field was not in form fields
+      $additional_fields[] = $key;
+    }
+  }
+  $additional_fields = array_filter( $additional_fields ); // get rid of the empty keys
+
+  if ( ! empty( $additional_fields ) ) {
+    $return->ok = 0;
+    $return->error = __( 'Additional fields are present.', 'wp-libre-form' );
+    $return->additional_fields = $additional_fields;
+  }
+
+  return $return;
+}
+
