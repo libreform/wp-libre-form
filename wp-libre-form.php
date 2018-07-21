@@ -32,7 +32,7 @@
 
 if ( ! class_exists( 'WP_Libre_Form' ) ) :
 
-define( 'WPLF_VERSION', '1.4.3' );
+define( 'WPLF_VERSION', '1.5.0-beta' );
 
 class WP_Libre_Form {
   public static $instance;
