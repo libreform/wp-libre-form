@@ -80,7 +80,9 @@ function wplf_validate_additional_fields( $return ) {
   $disable_validation = apply_filters( "wplf_{$form->ID}_disable_validate_additional_fields", $disable_validation );
   // disable by form slug
   $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation );
-  if ( $disable_validation ) {
+  $version_high_enough = version_compare( get_post_meta( $form->ID, '_wplf_plugin_version', true ), '1.5.0', '>=' );
+
+  if ( $disable_validation || ! $version_high_enough ) {
     return $return;
   }
 
