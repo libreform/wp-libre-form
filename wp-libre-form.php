@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin name: WP Libre Form
- * Plugin URI: https://github.com/anttiviljami/wp-libre-form
+ * Plugin URI: https://github.com/hencca/wp-libre-form
  * Description: A minimal HTML form builder for WordPress; made for developers
  * Version: 1.4.3
  * Author: @anttiviljami
@@ -28,6 +28,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 
 if ( ! class_exists( 'WP_Libre_Form' ) ) :
 
