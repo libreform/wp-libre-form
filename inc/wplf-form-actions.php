@@ -2,6 +2,7 @@
 
 add_action( 'wplf_post_validate_submission', 'wplf_send_email_copy', 20 );
 function wplf_send_email_copy( $return, $submission_id = null ) {
+  // Normally $submission_id is null, but when resending copies it isn't, which is why this check exists
   if ( ! $submission_id ) {
     $submission_id = $return->submission_id;
   }
@@ -15,9 +16,9 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
   $form_meta = get_post_meta( $form_id );
 
   $referrer = esc_url_raw( ( isset( $submission_id ) ) ? get_post_meta( $submission_id, 'referrer', true ) : $_POST['referrer'] );
+  $email_enabled = ! empty( $form_meta['_wplf_email_copy_enabled'] ) ? (int) $form_meta['_wplf_email_copy_enabled'][0] : false;
 
-  if ( ( isset( $form_meta['_wplf_email_copy_enabled'] ) && $form_meta['_wplf_email_copy_enabled'][0] ) || isset( $submission_id ) ) {
-
+  if ( $email_enabled ) {
     $to = isset( $form_meta['_wplf_email_copy_to'] ) ? $form_meta['_wplf_email_copy_to'][0] : get_option( 'admin_email' );
 
     // translators: %submission-id% is replaced with submission id and %referrer% with referrer url

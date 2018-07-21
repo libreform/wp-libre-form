@@ -444,9 +444,8 @@ class CPT_WPLF_Form {
    * Meta box callback for submit email meta box
    */
   public function metabox_submit_email( $post ) {
-    // get post meta
     $meta = get_post_meta( $post->ID );
-    $email_enabled = isset( $meta['_wplf_email_copy_enabled'] ) ? $meta['_wplf_email_copy_enabled'][0] : true;
+    $email_enabled = ! empty( $meta['_wplf_email_copy_enabled'] ) ? (int) $meta['_wplf_email_copy_enabled'][0] : 0;
     $email_copy_to = isset( $meta['_wplf_email_copy_to'] ) ? $meta['_wplf_email_copy_to'][0] : '';
     $email_copy_from = isset( $meta['_wplf_email_copy_from'] ) ? $meta['_wplf_email_copy_from'][0] : '';
     $email_copy_from_address = isset( $meta['_wplf_email_copy_from_address'] ) ? $meta['_wplf_email_copy_from_address'][0] : '';
@@ -739,7 +738,7 @@ class CPT_WPLF_Form {
     if ( isset( $_POST['wplf_email_copy_enabled'] ) ) {
       update_post_meta( $post_id, '_wplf_email_copy_enabled', $_POST['wplf_email_copy_enabled'] === 'on' );
     } else {
-      update_post_meta( $post_id, '_wplf_email_copy_enabled', false );
+      update_post_meta( $post_id, '_wplf_email_copy_enabled', 0 );
     }
 
     // save email copy
