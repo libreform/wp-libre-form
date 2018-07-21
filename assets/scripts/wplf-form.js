@@ -93,56 +93,56 @@ window.wplf = {
     form.addEventListener("submit", window.wplf.submitHandler);
   }
 };
-
-var main = function () {
-  [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
-};
-
-var dependencies = [];
-
-if (!window.fetch) {
-  dependencies.push('fetch');
-}
-
-if (!window.Promise) {
-  dependencies.push('Promise');
-}
-
-
-function initialize(dependencies, app) {
-  var dependency_count = dependencies.length;
-  var dependencies_loaded = 0;
-  var is_ready = function() {
-    return dependency_count === dependencies_loaded;
+(function () {
+  var main = function () {
+    [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
   };
-  var run_when_ready = function() {
-    if (is_ready()) {
-      app();
-    }
-  };
-  var get_script = function(script) {
-    var elmnt = document.createElement('script');
-    elmnt.src = ajax_object.wplf_assets_dir + '/scripts/polyfills/' + script + '.js';
+  var dependencies = [];
 
-    return elmnt;
-  };
+  if (!window.fetch) {
+    dependencies.push('fetch');
+  }
 
-  dependencies.map(function(dependency) {
-    return dependency.toLowerCase();
-  }).map(function(dependency) {
-    return get_script(dependency);
-  }).map(function(script) {
-    script.addEventListener('load', function() {
-      dependencies_loaded++;
-      run_when_ready();
+  if (!window.Promise) {
+    dependencies.push('Promise');
+  }
+
+
+  function initialize(dependencies, app) {
+    var dependency_count = dependencies.length;
+    var dependencies_loaded = 0;
+    var is_ready = function () {
+      return dependency_count === dependencies_loaded;
+    };
+    var run_when_ready = function () {
+      if (is_ready()) {
+        app();
+      }
+    };
+    var get_script = function (script) {
+      var elmnt = document.createElement('script');
+      elmnt.src = ajax_object.wplf_assets_dir + '/scripts/polyfills/' + script + '.js';
+
+      return elmnt;
+    };
+
+    dependencies.map(function (dependency) {
+      return dependency.toLowerCase();
+    }).map(function (dependency) {
+      return get_script(dependency);
+    }).map(function (script) {
+      script.addEventListener('load', function () {
+        dependencies_loaded++;
+        run_when_ready();
+      });
+
+      return document.body.appendChild(script);
     });
 
-    return document.body.appendChild(script);
+    run_when_ready();
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    initialize(dependencies, main);
   });
-
-  run_when_ready();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  initialize(dependencies, main);
-});
+}());
