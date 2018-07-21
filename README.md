@@ -29,7 +29,7 @@ add your own functionality with [hooks and APIs](#filter--action-api) provided
 by Libre Form.
 
 ## Try it
-[TryoutWP](https://gettryout.com/) has provided us with a live demo, [which you can find here](http://gettryout.com/new/?template=libreform&provider=demo&redirect=wp-admin%2Fpost.php%3Fpost%3D4%26action%3Dedit ). It reflects the current release, not the master branch. 
+[TryoutWP](https://gettryout.com/) has provided us with a live demo, [which you can find here](http://gettryout.com/new/?template=libreform&provider=demo&redirect=wp-admin%2Fpost.php%3Fpost%3D4%26action%3Dedit ). It reflects the current release, not the master branch.
 
 ## Screenshots
 
@@ -193,6 +193,45 @@ To avoid running your JavaScript too early, add `wplf-form-js` to your enqueue d
 wp_enqueue_script( "themejs", "/path/to/theme.js", array( "wplf-form-js" ), ... );
 ```
 Otherwise you might run into errors like "Cannot read property 'push' of undefined".
+
+## REST API driven sites
+
+You can get forms out of the REST API. Just use `/wp/v2/wplf-form` to retrieve forms. You can get a singular form by using filters:
+
+`/wp/v2/wplf-form?slug=form-slug`
+
+However, if you're sending forms from a different domain than WP site URL, you'll run across a CORS issue submitting the form, which you can get around with this:
+
+```php
+add_action('wplf_pre_validate_submission', function() {
+  $origin = $_SERVER['HTTP_ORIGIN'];
+  header("Access-Control-Allow-Origin: $origin");
+  header("Access-Control-Allow-Credentials: true");
+});
+```
+Do note that the above code snippet opens your form submissions to the world.
+
+You can also use the "official" JS bundle if you want to.
+
+```javascript
+window.ajax_object = {
+  ajax_url: `${WP.url}/wp-admin/admin-ajax.php`,
+  ajax_credentials: 'include', // different origin
+  wplf_assets_dir: `${WP.url}/wp-content/plugins/wp-libre-form/assets`,
+}
+
+await new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  const timeout = setTimeout(reject, 30000)
+  script.src = `${WP.url}/wp-content/plugins/wp-libre-form/assets/scripts/wplf-form.js`
+  script.onload = (e) => {
+    clearInterval(timeout)
+    resolve()
+  }
+
+  document.body.appendChild(script)
+})
+```
 
 ## Multilingual
 
