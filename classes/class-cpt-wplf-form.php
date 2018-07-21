@@ -29,6 +29,7 @@ class CPT_WPLF_Form {
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2 );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
+    add_action( 'admin_notices', array( $this, 'print_notices' ), 10 );
 
     // edit.php view
     add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
@@ -177,6 +178,45 @@ class CPT_WPLF_Form {
 
     // enqueue the custom CSS for this view
     wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
+  }
+
+  public function print_notices() {
+    $post_id = ! empty( $_GET['post'] ) ? (int) $_GET['post'] : false;
+    $version_created_at = get_post_meta( $post_id, '_wplf_plugin_version', true );
+    $version_created_at = $version_created_at ? $version_created_at : '< 1.5';
+
+    // The notice prints outside the form element
+    //  a hidden field is created or deleted when this checkbox changes
+    if ( version_compare( $version_created_at, WPLF_VERSION, '<' ) ) { ?>
+    <div class="notice notice-info">
+      <p>
+      <?php echo sprintf(
+        esc_html(
+          // translators: Placeholders indicate version numbers
+          __( 'This form was created with WPLF version %1$s, and your installed WPLF version is %2$s', 'wp-libre-form' )
+        ),
+        esc_html( $version_created_at ),
+        esc_html( WPLF_VERSION )
+      ); ?>
+      </p>
+
+      <p>
+      <?php echo esc_html(
+        __( 'There might be new features available, would you like to update the form version?', 'wp-libre-form' )
+        ); ?>
+      </p>
+
+      <p>
+        <label>
+          <input type="checkbox" name="wplf_version_update_toggle" value="1">
+          <?php echo esc_html(
+          __( 'Yes, update when I save the form', 'wp-libre-form' )
+          ); ?>
+        </label>
+      </p>
+    </div>
+    <?php
+    }
   }
 
 
@@ -764,6 +804,12 @@ class CPT_WPLF_Form {
       // attributes where of course they are escaped using esc_attr() so it
       // should be fine to save the meta field without further sanitisaton
       update_post_meta( $post_id, '_wplf_title_format', $safe_title_format );
+    }
+
+    // save plugin version, update if allowed
+    $version = get_post_meta( $post_id, '_wplf_plugin_version', true );
+    if ( ! $version || isset( $_POST['wplf_update_plugin_version_to_meta'] ) ) {
+      update_post_meta( $post_id, '_wplf_plugin_version', WPLF_VERSION );
     }
   }
 
