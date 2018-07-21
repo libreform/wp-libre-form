@@ -939,10 +939,18 @@ class CPT_WPLF_Form {
     // we don't render id and class as <form> attributes
     $id = $attributes['id'];
     $xclass = $attributes['xclass'];
+
     $attributes = array_diff_key( $shortcode_atts, array(
       'id' => null,
       'xclass' => null,
     ) );
+
+    foreach ( $attributes as $k => $v ) {
+      if ( is_numeric( $k ) ) {
+        unset( $attributes[ $k ] );
+        $attributes[ $v ] = null; // empty value
+      }
+    }
 
     // display form
     return $this->wplf_form( $id, $content, $xclass, $attributes );
