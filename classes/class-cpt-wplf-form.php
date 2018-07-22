@@ -183,6 +183,12 @@ class CPT_WPLF_Form {
 
   public function print_notices() {
     $post_id = ! empty( $_GET['post'] ) ? (int) $_GET['post'] : false;
+    $type = get_post_type( $post_id );
+
+    if ( $type !== 'wplf-form' || ! $post_id ) {
+      return false;
+    }
+
     $version_created_at = get_post_meta( $post_id, '_wplf_plugin_version', true );
     $version_created_at = $version_created_at ? $version_created_at : '< 1.5';
 
