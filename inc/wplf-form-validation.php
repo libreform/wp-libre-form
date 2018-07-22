@@ -3,7 +3,7 @@
 /**
  * Check that Form exists
  */
-add_filter( 'wplf_validate_submission', 'wplf_validate_form_exists' );
+add_filter( 'wplf_validate_submission', 'wplf_validate_form_exists', 1 );
 function wplf_validate_form_exists( $return ) {
   // skip this validation if submission has already failed
   if ( ! $return->ok ) {
@@ -19,6 +19,10 @@ function wplf_validate_form_exists( $return ) {
     // translators: %d is form ID
     $return->error = sprintf( __( "Form id %d doesn't exist!", 'wp-libre-form' ), intval( $_POST['_form_id'] ) );
   }
+
+  $p = get_post( $_POST['_form_id'] );
+  $return->form_id = $p->ID;
+  $return->slug = $p->post_name;
   return $return;
 }
 
@@ -26,7 +30,7 @@ function wplf_validate_form_exists( $return ) {
 /**
  * Check for required fields that are empty
  */
-add_filter( 'wplf_validate_submission', 'wplf_validate_required_empty' );
+add_filter( 'wplf_validate_submission', 'wplf_validate_required_empty', 2 );
 function wplf_validate_required_empty( $return ) {
   // skip this validation if submission has already failed
   if ( ! $return->ok ) {
@@ -64,7 +68,7 @@ function wplf_validate_required_empty( $return ) {
 /**
  * Check that submission has only fields that are set in form
  */
-add_filter( 'wplf_validate_submission', 'wplf_validate_additional_fields' );
+add_filter( 'wplf_validate_submission', 'wplf_validate_additional_fields', 3 );
 function wplf_validate_additional_fields( $return ) {
   // skip this validation if submission has already failed
   if ( ! $return->ok ) {
