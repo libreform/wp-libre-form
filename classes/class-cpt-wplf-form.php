@@ -924,10 +924,13 @@ class CPT_WPLF_Form {
       true
     );
 
+    $admin_url = admin_url( 'admin-ajax.php' );
+
     // add dynamic variables to the script's scope
     wp_localize_script('wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
-      'ajax_url' => admin_url( 'admin-ajax.php' ),
+      'ajax_url' => apply_filters( 'wplf_ajax_endpoint', "$admin_url?action=wplf_submit" ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
+      'request_headers' => apply_filters( 'wplf_ajax_request_headers', '?action=wplf_submit' ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
     ) ) );
   }

@@ -20,10 +20,11 @@ window.wplf = {
       error.parentNode.removeChild(error);
     });
 
-    fetch(ajax_object.ajax_url  + '?action=wplf_submit', {
+    fetch(ajax_object.ajax_url, {
       method: "POST",
       credentials: ajax_object.ajax_credentials || 'same-origin',
-      body: data
+      body: data,
+      headers: ajax_object.request_headers || {},
     }).then(function(response) {
       return response.text();
     }).then(function(response) {
