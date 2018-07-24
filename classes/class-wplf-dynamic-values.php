@@ -4,7 +4,6 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
 
     public static $instance;
     protected $regular_expression = "/%[^%%\n]+%/";
-    protected $strings = array();
 
     public static function init() {
       if ( is_null( self::$instance ) ) {
@@ -24,7 +23,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       // Get all strings inside % placeholders
       preg_match_all( $this->regular_expression, $content, $matches );
       foreach ( $matches[0] as $match ) {
-        // match contains the braces, get rid of them.
+        // match contains the % chars, get rid of them.
         $string = trim( str_replace( array( '%' ), array( '' ), $match ) );
         $content = str_replace(
           $match,
@@ -40,7 +39,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
     }
 
     public function get_available() {
-      return apply_filters( 'wplf_dynamic_values', array (
+      return apply_filters( 'wplf_dynamic_values', array(
         'USER_ID' => 'get_current_user_id',
         'USER_EMAIL' => function () {
           $user = wp_get_current_user();
@@ -52,9 +51,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
           return $user->user_email;
         },
         'USER_NAME' => function () {
-          error_log("getting name");
           $user = wp_get_current_user();
-          error_log(print_r($user, true));
 
           if ( $user->ID === 0 ) {
             return false;
@@ -62,17 +59,17 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
 
           return "{$user->first_name} {$user->last_name}";
         },
-        'DATE' => function () { return date('U'); },
+        'TIMESTAMP' => function () {
+          return date( 'U' );
+        },
       ) );
     }
 
-    public function populate_value ( $string, $data = [] ) {
+    public function populate_value( $string, $data = [] ) {
       $available = $this->get_available();
 
-      if (!empty($available[$string]) && is_callable($available[$string])) {
-        return $available[$string]($data);
-      } else {
-        error_log("No callable found for $string");
+      if ( ! empty( $available[ $string ] ) && is_callable( $available[ $string ] ) ) {
+        return $available[ $string ]($data);
       }
     }
   }
