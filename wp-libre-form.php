@@ -47,6 +47,7 @@ class WP_Libre_Form {
   private function __construct() {
     require_once 'classes/class-cpt-wplf-form.php';
     require_once 'classes/class-cpt-wplf-submission.php';
+    require_once 'classes/class-wplf-dynamic-values.php';
     require_once 'inc/wplf-ajax.php';
 
     // default functionality
@@ -56,6 +57,7 @@ class WP_Libre_Form {
     // init our plugin classes
     CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
+    WPLF_Dynamic_Values::init();
 
     add_action( 'after_setup_theme', array( $this, 'init_polylang_support' ) );
 

@@ -849,7 +849,7 @@ class CPT_WPLF_Form {
       $content = apply_filters( "wplf_{$form->ID}_form", $content );
 
       // run default filters after. The user probably wants to filter original content, not modified by WP
-      $content = apply_filters( 'wplf_form', $content );
+      $content = apply_filters( 'wplf_form', $content, $id, $xclass, $attributes );
 
       ob_start();
 ?>
