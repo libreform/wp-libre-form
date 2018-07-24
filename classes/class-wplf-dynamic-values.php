@@ -3,7 +3,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
   class WPLF_Dynamic_Values {
 
     public static $instance;
-    protected $regular_expression = "/%[^{}\n]+%/";
+    protected $regular_expression = "/%[^%%\n]+%/";
     protected $strings = array();
 
     public static function init() {
