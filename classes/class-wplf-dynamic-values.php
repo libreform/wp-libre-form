@@ -38,7 +38,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       return $content;
     }
 
-    public function get_available() {
+    public static function get_available() {
       return apply_filters( 'wplf_dynamic_values', array(
         'USER_ID' => 'get_current_user_id',
         'USER_EMAIL' => function () {
@@ -66,7 +66,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
     }
 
     public function populate_value( $string, $data = [] ) {
-      $available = $this->get_available();
+      $available = self::get_available();
 
       if ( ! empty( $available[ $string ] ) && is_callable( $available[ $string ] ) ) {
         return $available[ $string ]($data);

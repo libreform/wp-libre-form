@@ -334,6 +334,16 @@ class CPT_WPLF_Form {
       'high'
     );
 
+    // Dynamic values
+    add_meta_box(
+      'wplf-shortcode',
+      __( 'Dynamic values', 'wp-libre-form' ),
+      array( $this, 'metabox_dynamic_values' ),
+      'wplf-form',
+      'normal',
+      'high'
+    );
+
     // Messages meta box
     add_meta_box(
       'wplf-messages',
@@ -389,6 +399,22 @@ class CPT_WPLF_Form {
   public function metabox_shortcode( $post ) {
 ?>
 <p><input type="text" class="code" value='[libre-form id="<?php echo esc_attr( $post->ID ); ?>"]' readonly></p>
+<?php
+  }
+
+  /**
+   * Meta box callback for dynamic values meta box
+   */
+  public function metabox_dynamic_values( $post ) {
+    unset( $post ); ?>
+    <select name="wplf-dynamic-values">
+    <?php foreach ( ( WPLF_Dynamic_Values::get_available() ) as $k => $v ) {
+      $key = sanitize_text_field( $k );
+
+      // WPCS won't STFU. It's wrong. Again.
+      echo "<option value='$key'>$key</option>"; // @codingStandardsIgnoreLine
+    } ?>
+    </select>
 <?php
   }
 
