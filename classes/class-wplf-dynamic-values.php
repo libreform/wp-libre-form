@@ -39,9 +39,28 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
     }
 
     public static function get_available() {
-      return apply_filters( 'wplf_dynamic_values', array(
-        'USER_ID' => 'get_current_user_id',
-        'USER_EMAIL' => function () {
+      $register = function( $value, $callback, $labels = array() ) use ( &$available ) {
+        if ( ! is_callable( $callback ) ) {
+          throw new Exception( '$callback is not callable' );
+        }
+
+        $available[ $value ] = [
+          'callback' => $callback,
+          'labels' => array_merge([
+            'name' => $value,
+            'description' => esc_html__( 'No description provided', 'wp-libre-form' ),
+          ], $labels),
+        ];
+
+        return $available;
+      };
+
+      return apply_filters( 'wplf_dynamic_values', array_merge(
+        $register('USER_ID', 'get_current_user_id', [
+          'name' => esc_html__( 'User ID', 'wp-libre-form' ),
+          'description' => esc_html__( 'Get current user ID. Prints 0 if user isn\'t logged in.', 'wp-libre-form' ),
+        ]),
+        $register('USER_EMAIL', function () {
           $user = wp_get_current_user();
 
           if ( $user->ID === 0 ) {
@@ -49,8 +68,11 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
           }
 
           return $user->user_email;
-        },
-        'USER_NAME' => function () {
+        }, [
+          'name' => esc_html__( 'User email', 'wp-libre-form' ),
+          'description' => esc_html__( 'Get user email, if it exists.', 'wp-libre-form' ),
+        ]),
+        $register('USER_NAME', function () {
           $user = wp_get_current_user();
 
           if ( $user->ID === 0 ) {
@@ -58,10 +80,18 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
           }
 
           return "{$user->first_name} {$user->last_name}";
-        },
-        'TIMESTAMP' => function () {
+        }, [
+          'name' => esc_html__( 'User name', 'wp-libre-form' ),
+          'description' => esc_html__( 'Get user name, if it exists.', 'wp-libre-form' ),
+        ]),
+        $register('TIMESTAMP', function () {
           return date( 'U' );
-        },
+        }, [
+          'name' => esc_html__( 'Timestamp', 'wp-libre-form' ),
+          'description' => esc_html__(
+            'Get UNIX epoch at the time of form render. Can be used to determine how long did it take for the user to fill the form.'
+          ),
+        ])
       ) );
     }
 
