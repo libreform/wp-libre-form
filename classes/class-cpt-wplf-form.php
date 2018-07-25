@@ -408,13 +408,18 @@ class CPT_WPLF_Form {
   public function metabox_dynamic_values( $post ) {
     unset( $post ); ?>
     <select name="wplf-dynamic-values">
-    <?php foreach ( ( WPLF_Dynamic_Values::get_available() ) as $k => $v ) {
-      $key = sanitize_text_field( $k );
+      <option><?php esc_html_e( 'Choose a dynamic value', 'wp-libre-form' ); ?></option>
 
-      // WPCS won't STFU. It's wrong. Again.
-      echo "<option value='$key'>$key</option>"; // @codingStandardsIgnoreLine
-    } ?>
+      <?php foreach ( ( WPLF_Dynamic_Values::get_available() ) as $k => $v ) {
+        $key = sanitize_text_field( $k );
+        $labels = wp_json_encode( $v['labels'] );
+
+        // WPCS won't STFU. It's wrong. Again.
+        echo "<option value='$key' data-labels='$labels'>$key</option>"; // @codingStandardsIgnoreLine
+      } ?>
     </select>
+
+    <div class="wplf-dynamic-values-description"></div>
 <?php
   }
 
