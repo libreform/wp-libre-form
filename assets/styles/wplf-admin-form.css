@@ -9,3 +9,12 @@
     color: #666;
     font-style: italic;
 }
+
+.wplf-dynamic-values-help {
+  display: none;
+  margin-top: 1rem;
+}
+
+.wplf-dynamic-values-help .description {
+  margin-bottom: 2rem;
+}

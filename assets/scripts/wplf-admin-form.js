@@ -82,6 +82,26 @@ $(document).ready(function() {
   }
 
   $('input[name="wplf_version_update_toggle"]').change(toggleVersionUpdate);
+
+  function showDynamicValueInfo(e) {
+    var target = e.target;
+    var value = target.value;
+    var help = $('.wplf-dynamic-values-help');
+    var desc = help.find('.description');
+    var usage = help.find('.usage span');
+
+    if (value) {
+      var option = target.querySelector('option[value="' + value + '"]');
+      var labels = JSON.parse(option.getAttribute('data-labels'));
+      desc.html(labels.description);
+      usage.text('%' + value + '%');
+      help.show();
+    } else {
+      help.hide();
+    }
+  }
+
+  $('select[name="wplf-dynamic-values"]').change(showDynamicValueInfo);
 });
 
 })(jQuery);

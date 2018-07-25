@@ -408,18 +408,26 @@ class CPT_WPLF_Form {
   public function metabox_dynamic_values( $post ) {
     unset( $post ); ?>
     <select name="wplf-dynamic-values">
-      <option><?php esc_html_e( 'Choose a dynamic value', 'wp-libre-form' ); ?></option>
+      <option default value=""><?php esc_html_e( 'Choose a dynamic value', 'wp-libre-form' ); ?></option>
 
       <?php foreach ( ( WPLF_Dynamic_Values::get_available() ) as $k => $v ) {
         $key = sanitize_text_field( $k );
-        $labels = wp_json_encode( $v['labels'] );
+        $labels = $v['labels'];
+        $stringified = wp_json_encode( $labels );
 
         // WPCS won't STFU. It's wrong. Again.
-        echo "<option value='$key' data-labels='$labels'>$key</option>"; // @codingStandardsIgnoreLine
+        echo "<option value='$key' data-labels='$stringified'>$labels[name]</option>"; // @codingStandardsIgnoreLine
       } ?>
     </select>
 
-    <div class="wplf-dynamic-values-description"></div>
+    <!-- Shown with JS. -->
+    <div class="wplf-dynamic-values-help">
+      <div class="description"></div>
+      <div class="usage">
+        <strong><?php esc_html_e( 'Usage', 'wp-libre-form' ); ?>:&nbsp;</strong>
+        <span></span>
+      </div>
+    </div>
 <?php
   }
 
