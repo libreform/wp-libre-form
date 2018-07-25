@@ -98,8 +98,8 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
     public function populate_value( $string, $data = [] ) {
       $available = self::get_available();
 
-      if ( ! empty( $available[ $string ] ) && is_callable( $available[ $string ] ) ) {
-        return $available[ $string ]($data);
+      if ( ! empty( $available[ $string ] ) && is_callable( $available[ $string ]['callback'] ) ) {
+        return $available[ $string ]['callback']($data);
       }
     }
   }
