@@ -8,6 +8,7 @@ window.wplf = {
   submitHandler: function (e) {
     var form = e.target;
     var data = new FormData(form);
+    var submitButtons = form.querySelectorAll('[type="submit"]');
 
     // Pass language if it exists.
     ajax_object.lang && data.append('lang', ajax_object.lang);
@@ -19,6 +20,11 @@ window.wplf = {
       // reset errors
       error.parentNode.removeChild(error);
     });
+    
+    // disable submit buttons
+    submitButtons.forEach(function (button) {
+      button.disabled = true;
+    });
 
     fetch(ajax_object.ajax_url  + '?action=wplf_submit', {
       method: "POST",
@@ -28,6 +34,11 @@ window.wplf = {
       return response.text();
     }).then(function(response) {
       response = JSON.parse(response);
+      
+      // enable submit buttons
+      submitButtons.forEach(function (button) {
+        button.disabled = false;
+      });
 
       if( 'success' in response ) {
         // show success message if one exists
