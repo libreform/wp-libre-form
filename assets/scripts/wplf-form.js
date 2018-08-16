@@ -11,6 +11,7 @@ window.wplf = {
     
     // prevent submitting the form again when a submission is already in progress
     if (form.classList.contains('sending')) {
+      e.preventDefault();
       return; 
     }
 
