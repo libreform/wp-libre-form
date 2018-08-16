@@ -8,6 +8,12 @@ window.wplf = {
   submitHandler: function (e) {
     var form = e.target;
     var data = new FormData(form);
+    
+    // prevent submitting the form again when a submission is already in progress
+    if (form.classList.contains('sending')) {
+      e.preventDefault();
+      return; 
+    }
 
     // Pass language if it exists.
     ajax_object.lang && data.append('lang', ajax_object.lang);
@@ -28,7 +34,7 @@ window.wplf = {
       return response.text();
     }).then(function(response) {
       response = JSON.parse(response);
-
+      
       if( 'success' in response ) {
         // show success message if one exists
         var success = document.createElement("p");
