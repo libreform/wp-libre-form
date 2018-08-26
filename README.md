@@ -217,6 +217,10 @@ $wplf->plugins->register([
 ]);
 ```
 
+If you use spaces in the name, you can access the plugin instance like this:
+
+`wplf()->plugins->{"Your plugin"}->somePublicMethod()`
+
 ## Javascript API
 
 ### Client side callbacks
