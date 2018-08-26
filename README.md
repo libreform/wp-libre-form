@@ -198,6 +198,25 @@ add_filter('wplf_dynamic_values', function($values) {
 // <input type="text" placeholder="%SOMETHING%" name="something">
 ```
 
+## Plugins
+1.5 exposes a new function, `wplf()`. It simply returns the class instance of WP Libre Form.
+
+It allows you to register your plugin as a WP Libre Form plugin, which in turn allows you to expose an API and a settings page for your plugin, should you want to.
+
+```php
+$wplf = wplf();
+$plugin = new YourPlugin();
+
+$wplf->plugins->register([
+  "name" => "YourPlugin", // The name you wish to show on the WPLF plugin page. Willl also be used to access public methods in your plugin
+  "description" => "What your plugin does in a sentence or two",
+  "link" => "https://toyourplugin.com", // Plugin URL. Can be wordpress.org or pretty much any URL where you can download the plugin
+  "version" => YOUR_PLUGIN_VERSION, // Define a constant containing your plugin version
+  "instance" => $plugin, // Your plugin, instantiated. Users can access your public methods
+  "settings_page" => [$plugin, "render_settings_page"], // Function that renders your settings page, or a string that contains the link to it. Leave empty to disable.
+]);
+```
+
 ## Javascript API
 
 ### Client side callbacks
