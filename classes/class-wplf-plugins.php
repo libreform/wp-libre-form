@@ -66,25 +66,25 @@ class WPLF_Plugins {
     ?>
 
     <article class="wplf-plugin-box">
-      <h3><?php echo sanitize_text_field( $name ); ?></h3>
+      <h3><?php echo esc_html( $name ); ?></h3>
       <div class="wplf-plugin-box__meta">
         <?php if ( $version ) { ?>
           <span class="wplf-plugin-box__meta--version">
-            <?php echo sanitize_text_field( $version ); ?>
+            <?php echo esc_html( $version ); ?>
           </span>
         <?php } ?>
 
         <div class="wplf-plugin-box__meta--links">
           <?php if ( $link ) {
-            $link = sanitize_text_field( $link );
+            $link = esc_attr( $link );
             ?>
             <a
-              href="<?php echo $link; ?>"
+              href="<?php echo esc_attr( $link ); ?>"
               class="button button-primary"
               target="_blank"
               rel="noreferrer noopener"
             >
-              <?php echo __( 'Plugin page', 'wp-libre-form' ); ?>
+              <?php echo esc_html__( 'Plugin page', 'wp-libre-form' ); ?>
             </a>
           <?php } ?>
 
@@ -92,18 +92,18 @@ class WPLF_Plugins {
             $settings_page = sanitize_text_field( $settings_page );
             ?>
             <a
-              href="<?php echo $settings_page; ?>"
+              href="<?php echo esc_attr( $settings_page ); ?>"
               class="button button-primary"
               target="_blank"
               rel="noreferrer noopener"
             >
-              <?php echo __( 'Plugin settings', 'wp-libre-form' ); ?>
+              <?php echo esc_html__( 'Plugin settings', 'wp-libre-form' ); ?>
             </a>
           <?php } ?>
         </div>
 
       </div>
-      <p><?php echo sanitize_text_field( $description ); ?></p>
+      <p><?php echo esc_html( $description ); ?></p>
     </article>
     <?php
   }
@@ -121,40 +121,40 @@ class WPLF_Plugins {
     <div class="wplf-plugins">
       <header class="wplf-plugins-menu nav-tab-wrapper">
         <a href="#" class="nav-tab" data-page="General">
-          <?php echo __( 'General', 'wp-libre-form' ); ?>
+          <?php echo esc_html__( 'General', 'wp-libre-form' ); ?>
         </a>
         <?php foreach ( $plugins_with_options as $plugin ) {
           $name = sanitize_text_field( $plugin['name'] ); ?>
-          <a href="#" class="nav-tab" data-page="<?php echo $name; ?>">
-            <?php echo $name; ?>
+          <a href="#" class="nav-tab" data-page="<?php echo esc_attr( $name ); ?>">
+            <?php echo esc_html( $name ); ?>
           </a>
         <?php } ?>
       </header>
 
       <div class="wplf-plugins-page" data-page="General">
-        <h1><?php echo __( 'WP Libre Form plugins', 'wp-libre-form' ); ?></h1>
+        <h1><?php echo esc_html__( 'WP Libre Form plugins', 'wp-libre-form' ); ?></h1>
         <p>
-          <?php echo __(
+          <?php echo esc_html__(
             'The core of WP Libre Form is kept small and simple, for a reason.',
             'wp-libre-form'
           ); ?>
         </p>
         <p>
-          <?php echo __(
+          <?php echo esc_html__(
             "Simplicity comes with drawbacks, and chances are that the feature you're looking for doesn't exist.
 Plugins help remedy the problem.",
             'wp-libre-form'
           ); ?>
         </p>
 
-        <h2><?php echo __( 'Enabled plugins', 'wp-libre-form' ); ?></h1>
+        <h2><?php echo esc_html__( 'Enabled plugins', 'wp-libre-form' ); ?></h1>
         <div class="wplf-plugin-list">
           <?php foreach ( $enabled as $plugin ) {
             $this->render_plugin( $plugin );
           } ?>
         </div>
 
-        <h2><?php echo __( 'Available plugins', 'wp-libre-form' ); ?></h1>
+        <h2><?php echo esc_html__( 'Available plugins', 'wp-libre-form' ); ?></h1>
 
         <div class="wplf-plugin-list">
           <?php foreach ( $available as $plugin ) {
@@ -167,7 +167,7 @@ Plugins help remedy the problem.",
       <?php foreach ( $plugins_with_options as $plugin ) {
         $name = sanitize_text_field( $plugin['name'] );
       ?>
-      <div class="wplf-plugins-page" data-page="<?php echo $name; ?>">
+      <div class="wplf-plugins-page" data-page="<?php echo esc_attr( $name ); ?>">
         <?php $plugin['settings_page'](); ?>
       </div>
       <?php } ?>
