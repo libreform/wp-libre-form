@@ -2,7 +2,7 @@
 
 class WPLF_Plugins {
   public static $instance;
-  private $plugins;
+  private $plugins = array();
 
   public function __get( $key ) {
     if ( ! empty( $this->plugins[ $key ] ) ) {
@@ -186,20 +186,26 @@ Plugins help remedy the problem.",
           ); ?>
         </p>
 
-        <h2><?php echo esc_html__( 'Enabled plugins', 'wp-libre-form' ); ?></h1>
-        <div class="wplf-plugin-list">
-          <?php foreach ( $enabled as $plugin ) {
-            $this->render_plugin( $plugin );
-          } ?>
-        </div>
 
-        <h2><?php echo esc_html__( 'Available plugins', 'wp-libre-form' ); ?></h1>
+        <?php if ( ! empty( $enabled ) ) { ?>
+          <h2><?php echo esc_html__( 'Enabled plugins', 'wp-libre-form' ); ?></h1>
 
-        <div class="wplf-plugin-list">
-          <?php foreach ( $available as $plugin ) {
-            $this->render_plugin( $plugin );
-          } ?>
-        </div>
+          <div class="wplf-plugin-list">
+            <?php foreach ( $enabled as $plugin ) {
+              $this->render_plugin( $plugin );
+            } ?>
+          </div>
+        <?php } ?>
+
+        <?php if ( ! empty( $available ) ) { ?>
+          <h2><?php echo esc_html__( 'Available plugins', 'wp-libre-form' ); ?></h1>
+
+          <div class="wplf-plugin-list">
+            <?php foreach ( $available as $plugin ) {
+              $this->render_plugin( $plugin );
+            } ?>
+          </div>
+        <?php } ?>
 
       </div>
 
@@ -215,7 +221,7 @@ Plugins help remedy the problem.",
   }
 
   private function get_enabled_plugins() {
-    return $this->plugins;
+    return apply_filters( 'wplf_enabled_plugins', $this->plugins );
   }
 
   private function get_available_plugins() {
@@ -251,7 +257,7 @@ Plugins help remedy the problem.",
     }
         );
 
-    return $list;
+    return apply_filters( 'wplf_available_plugins', $list );
   }
 
   /**
