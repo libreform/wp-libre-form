@@ -45,10 +45,17 @@ class WPLF_Plugins {
   }
 
   private function render_plugin( $plugin = array() ) {
+    $plugin = $this->fill_plugin_data( $plugin );
     $name = $plugin['name'];
     $version = $plugin['version'];
     $link = $plugin['link'];
     $description = $plugin['description'];
+    $settings_page = $plugin['settings_page'];
+
+    $settings_page_presumed_link = false;
+    if ( gettype( $settings_page ) === 'string' ) {
+      $settings_page_presumed_link = true;
+    }
     ?>
 
     <article class="wplf-plugin-box">
@@ -60,18 +67,34 @@ class WPLF_Plugins {
           </span>
         <?php } ?>
 
-        <?php if ( $link ) {
-          $link = sanitize_text_field( $link );
-          ?>
-          <a
-            href="<?php echo $link; ?>"
-            class="wplf-plugin-box__meta--link button button-primary"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <?php echo __( 'Plugin page', 'wp-libre-form' ); ?>
-          </a>
-        <?php } ?>
+        <div class="wplf-plugin-box__meta--links">
+          <?php if ( $link ) {
+            $link = sanitize_text_field( $link );
+            ?>
+            <a
+              href="<?php echo $link; ?>"
+              class="button button-primary"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <?php echo __( 'Plugin page', 'wp-libre-form' ); ?>
+            </a>
+          <?php } ?>
+
+          <?php if ( $settings_page_presumed_link ) {
+            $settings_page = sanitize_text_field( $settings_page );
+            ?>
+            <a
+              href="<?php echo $settings_page; ?>"
+              class="button button-primary"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <?php echo __( 'Plugin settings', 'wp-libre-form' ); ?>
+            </a>
+          <?php } ?>
+        </div>
+
       </div>
       <p><?php echo sanitize_text_field( $description ); ?></p>
     </article>
@@ -88,12 +111,13 @@ class WPLF_Plugins {
     ?>
     <div class="wplf-plugins">
       <header class="wplf-plugins-menu nav-tab-wrapper">
-        <a href="#" class="nav-tab">
+        <a href="#" class="nav-tab" data-page="General">
           <?php echo __( 'General', 'wp-libre-form' ); ?>
         </a>
-        <?php foreach ( $plugins_with_options as $plugin ) { ?>
-          <a href="#" class="nav-tab">
-            <?php echo sanitize_text_field( $plugin['name'] ); ?>
+        <?php foreach ( $plugins_with_options as $plugin ) {
+          $name = sanitize_text_field( $plugin['name' ]); ?>
+          <a href="#" class="nav-tab" data-page="<?php echo $name; ?>">
+            <?php echo $name; ?>
           </a>
         <?php } ?>
       </header>
@@ -148,19 +172,17 @@ Plugins help remedy the problem.",
 
   private function get_available_plugins() {
     $list = [
-      [
+      $this->fill_plugin_data( [
         'name' => 'Export',
-        'version' => null,
         'link' => 'https://github.com/libreform/export',
         'description' => 'Add CSV export functionality',
-      ],
+      ] ),
 
-      [
+      $this->fill_plugin_data( [
         'name' => 'Formbuilder',
-        'version' => null,
         'link' => 'https://github.com/k1sul1/wp-libre-formbuilder',
         'description' => "Writing HTML isn't for everyone. Add a visual builder with this plugin.",
-      ]
+      ] )
     ];
 
     // Remove already installed plugins
@@ -178,15 +200,27 @@ Plugins help remedy the problem.",
     return $list;
   }
 
-  public function register( $data = array() ) {
-    $data = array_merge( array(
+  /**
+   * Helper function to avoid having to !empty() check everything
+   *
+   * @param array $data
+   */
+  private function fill_plugin_data( $data = array() ) {
+    return array_merge( array(
       'name' => null,
       'description' => null,
       'version' => null,
       'link' => null,
       'settings_page' => null,
     ), $data );
+  }
 
-    $this->plugins[] = $data;
+  /**
+   * Register a plugin for WP Libre Form
+   *
+   * @param array $data
+   */
+  public function register( $data = array() ) {
+    $this->plugins[] = $this->fill_plugin_data( $data );
   }
 }
