@@ -5,7 +5,7 @@
 
   menu.on('click', '.nav-tab', function(e) {
     var item = $(e.target);
-    var page = e.target.textContent.trim();
+    var page = item.attr('data-page');
     var target = $('.wplf-plugins-page[data-page="' + page + '"]');
 
     item.siblings().removeClass('nav-tab-active');
