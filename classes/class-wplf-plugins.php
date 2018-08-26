@@ -41,6 +41,17 @@ class WPLF_Plugins {
       wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-plugins.css' );
     }, 10, 1
         );
+
+    add_action( 'admin_notices', function() {
+      $this->notify_about_feature(
+        esc_html__(
+          "Hey! Did you notice that WP Libre Form now lists plugins that extend it's functionality, go check them out!",
+          'wp-libre-form'
+        ),
+        get_admin_url() . 'edit.php?post_type=wplf-form&page=wplf-plugins',
+        'wplf-plugins-notice-dismissed'
+      );
+    } );
   }
 
   public static function init() {
@@ -49,6 +60,34 @@ class WPLF_Plugins {
     }
 
     return self::$instance;
+  }
+
+  public function notify_about_feature( $message = '', $link = '', $option_name = null ) {
+    if ( ! $option_name ) return;
+
+    if ( ! empty( $_POST[ $option_name ] ) ) {
+      update_option( $option_name, 'true' );
+      $dismissed = true;
+    } else {
+      $dismissed = get_option( $option_name, 'false' ) === 'true';
+    }
+
+    if ( $dismissed ) return;
+    ?>
+    <div class="notice notice-info wplf-notice-feature-plugin">
+      <form method="post" action="<?php echo esc_attr( $link ); ?>">
+        <input type="hidden" name="<?php echo esc_attr( $option_name ); ?>" value="true">
+        <p>
+          <?php echo esc_html( $message ); ?>
+        </p>
+        <p>
+          <button class="button button-primary">
+            <?php echo esc_html__( 'View feature and close this notice', 'wp-libre-form' ); ?>
+          </button>
+        </p>
+      </form>
+    </div>
+    <?php
   }
 
   private function render_plugin( $plugin = array() ) {
