@@ -4,16 +4,17 @@ class WPLF_Plugins {
   public static $instance;
   private $plugins;
 
-  public function __get($key) {
+  public function __get( $key ) {
     if ( ! empty( $this->plugins[ $key ] ) ) {
       return $this->plugins[ $key ]['instance'];
     }
 
-    throw new Exception('No plugin found with that name');
+    throw new Exception( 'No plugin found with that name' );
   }
 
   private function __construct() {
-    add_action( 'admin_menu', function() {
+    add_action(
+         'admin_menu', function() {
       add_submenu_page(
         'edit.php?post_type=wplf-form',
         __( 'WP Libre Form plugins', 'wp-libre-form' ),
@@ -22,9 +23,11 @@ class WPLF_Plugins {
         'wplf-plugins',
         array( $this, 'render_admin_page' )
       );
-    } );
+    }
+        );
 
-    add_action( 'admin_enqueue_scripts', function( $hook ) {
+    add_action(
+         'admin_enqueue_scripts', function( $hook ) {
       if ( $hook !== 'wplf-form_page_wplf-plugins' ) {
         return;
       }
@@ -36,7 +39,8 @@ class WPLF_Plugins {
 
       // enqueue the custom CSS for this view
       wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-plugins.css' );
-    }, 10, 1 );
+    }, 10, 1
+        );
   }
 
   public static function init() {
@@ -107,9 +111,11 @@ class WPLF_Plugins {
   public function render_admin_page() {
     $available = $this->get_available_plugins();
     $enabled = $this->get_enabled_plugins();
-    $plugins_with_options = array_filter( $enabled, function( $plugin ) {
+    $plugins_with_options = array_filter(
+         $enabled, function( $plugin ) {
       return ! empty( $plugin['settings_page'] ) && is_callable( $plugin['settings_page'] );
-    } );
+    }
+        );
 
     ?>
     <div class="wplf-plugins">
@@ -118,7 +124,7 @@ class WPLF_Plugins {
           <?php echo __( 'General', 'wp-libre-form' ); ?>
         </a>
         <?php foreach ( $plugins_with_options as $plugin ) {
-          $name = sanitize_text_field( $plugin['name' ]); ?>
+          $name = sanitize_text_field( $plugin['name'] ); ?>
           <a href="#" class="nav-tab" data-page="<?php echo $name; ?>">
             <?php echo $name; ?>
           </a>
@@ -129,7 +135,7 @@ class WPLF_Plugins {
         <h1><?php echo __( 'WP Libre Form plugins', 'wp-libre-form' ); ?></h1>
         <p>
           <?php echo __(
-            "The core of WP Libre Form is kept small and simple, for a reason.",
+            'The core of WP Libre Form is kept small and simple, for a reason.',
             'wp-libre-form'
           ); ?>
         </p>
@@ -175,30 +181,36 @@ Plugins help remedy the problem.",
 
   private function get_available_plugins() {
     $list = [
-      'Export' => $this->fill_plugin_data( [
+      'Export' => $this->fill_plugin_data(
+           [
         'name' => 'Export',
         'link' => 'https://github.com/libreform/export',
         'description' => 'Add CSV export functionality',
-      ] ),
+      ]
+          ),
 
-      'Formbuilder' => $this->fill_plugin_data( [
+      'Formbuilder' => $this->fill_plugin_data(
+           [
         'name' => 'Formbuilder',
         'link' => 'https://github.com/k1sul1/wp-libre-formbuilder',
         'description' => "Writing HTML isn't for everyone. Add a visual builder with this plugin.",
-      ] )
+      ]
+          ),
     ];
 
     // Remove already installed plugins
     $enabled = $this->get_enabled_plugins();
-    $list = array_filter($list, function($plugin) use ($enabled) {
-      foreach ($enabled as $name => $p) {
-        if ($name === $plugin['name']) {
+    $list = array_filter(
+        $list, function( $plugin ) use ( $enabled ) {
+      foreach ( $enabled as $name => $p ) {
+        if ( $name === $plugin['name'] ) {
           return false;
         }
       }
 
       return true;
-    });
+    }
+        );
 
     return $list;
   }
@@ -209,14 +221,16 @@ Plugins help remedy the problem.",
    * @param array $data
    */
   private function fill_plugin_data( $data = array() ) {
-    return array_merge( array(
+    return array_merge(
+         array(
       'name' => null,
       'description' => null,
       'instance' => null,
       'version' => null,
       'link' => null,
       'settings_page' => null,
-    ), $data );
+    ), $data
+        );
   }
 
   /**
@@ -228,13 +242,13 @@ Plugins help remedy the problem.",
     $data = $this->fill_plugin_data( $data );
 
     if ( empty( $data['name'] ) ) {
-      throw new Exception('Must provide a name for the plugin to be registered');
-    } else if ( empty( $data['instance'] ) ) {
-      throw new Exception('Must provide plugin instance for the plugin to be registered');
-    } else if ( empty( $data['link'] ) ) {
-      throw new Exception('Must provide a link to a page which instructs the user on how to download the plugin to be registered');
-    } else if ( empty( $data['version'] ) ) {
-      throw new Exception('Must provide a version for the plugin to be registered');
+      throw new Exception( 'Must provide a name for the plugin to be registered' );
+    } elseif ( empty( $data['instance'] ) ) {
+      throw new Exception( 'Must provide plugin instance for the plugin to be registered' );
+    } elseif ( empty( $data['link'] ) ) {
+      throw new Exception( 'Must provide a link to a page which instructs the user on how to download the plugin to be registered' );
+    } elseif ( empty( $data['version'] ) ) {
+      throw new Exception( 'Must provide a version for the plugin to be registered' );
     }
 
     $this->plugins[ $data['name'] ] = $data;
