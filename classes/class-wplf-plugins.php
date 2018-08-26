@@ -4,6 +4,14 @@ class WPLF_Plugins {
   public static $instance;
   private $plugins;
 
+  public function __get($key) {
+    if ( ! empty( $this->plugins[ $key ] ) ) {
+      return $this->plugins[ $key ]['instance'];
+    }
+
+    throw new Exception('No plugin found with that name');
+  }
+
   private function __construct() {
     add_action( 'admin_menu', function() {
       add_submenu_page(
@@ -16,24 +24,19 @@ class WPLF_Plugins {
       );
     } );
 
-    add_action( 'admin_enqueue_scripts', array( $this, 'admin_assets' ), 10, 1 );
-  }
+    add_action( 'admin_enqueue_scripts', function( $hook ) {
+      if ( $hook !== 'wplf-form_page_wplf-plugins' ) {
+        return;
+      }
 
-  /**
-   * Include custom JS and CSS on the plugins page
-   */
-  public function admin_assets( $hook ) {
-    if ( $hook !== 'wplf-form_page_wplf-plugins' ) {
-      return;
-    }
+      $assets_url = plugins_url( 'assets', dirname( __FILE__ ) );
 
-    $assets_url = plugins_url( 'assets', dirname( __FILE__ ) );
+      // enqueue the custom JS for this view
+      wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-plugins.js', [], false, true );
 
-    // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-plugins.js', [], false, true );
-
-    // enqueue the custom CSS for this view
-    wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-plugins.css' );
+      // enqueue the custom CSS for this view
+      wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-plugins.css' );
+    }, 10, 1 );
   }
 
   public static function init() {
@@ -172,13 +175,13 @@ Plugins help remedy the problem.",
 
   private function get_available_plugins() {
     $list = [
-      $this->fill_plugin_data( [
+      'Export' => $this->fill_plugin_data( [
         'name' => 'Export',
         'link' => 'https://github.com/libreform/export',
         'description' => 'Add CSV export functionality',
       ] ),
 
-      $this->fill_plugin_data( [
+      'Formbuilder' => $this->fill_plugin_data( [
         'name' => 'Formbuilder',
         'link' => 'https://github.com/k1sul1/wp-libre-formbuilder',
         'description' => "Writing HTML isn't for everyone. Add a visual builder with this plugin.",
@@ -188,8 +191,8 @@ Plugins help remedy the problem.",
     // Remove already installed plugins
     $enabled = $this->get_enabled_plugins();
     $list = array_filter($list, function($plugin) use ($enabled) {
-      foreach ($enabled as $p) {
-        if ($p['name'] === $plugin['name']) {
+      foreach ($enabled as $name => $p) {
+        if ($name === $plugin['name']) {
           return false;
         }
       }
@@ -209,6 +212,7 @@ Plugins help remedy the problem.",
     return array_merge( array(
       'name' => null,
       'description' => null,
+      'instance' => null,
       'version' => null,
       'link' => null,
       'settings_page' => null,
@@ -221,6 +225,18 @@ Plugins help remedy the problem.",
    * @param array $data
    */
   public function register( $data = array() ) {
-    $this->plugins[] = $this->fill_plugin_data( $data );
+    $data = $this->fill_plugin_data( $data );
+
+    if ( empty( $data['name'] ) ) {
+      throw new Exception('Must provide a name for the plugin to be registered');
+    } else if ( empty( $data['instance'] ) ) {
+      throw new Exception('Must provide plugin instance for the plugin to be registered');
+    } else if ( empty( $data['link'] ) ) {
+      throw new Exception('Must provide a link to a page which instructs the user on how to download the plugin to be registered');
+    } else if ( empty( $data['version'] ) ) {
+      throw new Exception('Must provide a version for the plugin to be registered');
+    }
+
+    $this->plugins[ $data['name'] ] = $data;
   }
 }
