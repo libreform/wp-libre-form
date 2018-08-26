@@ -11,11 +11,6 @@
   overflow: hidden;
 }
 
-.wplf-plugins-page[data-page="General"] {
-  display: block;
-}
-
-
 .wplf-plugin-list {
   overflow: hidden;
 }
@@ -38,7 +33,7 @@
   color: #ccc;
 }
 
-.wplf-plugin-box__meta--link {
+.wplf-plugin-box__meta--links {
   float: right;
 }
 
