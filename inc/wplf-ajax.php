@@ -6,6 +6,7 @@
 add_action( 'wp_ajax_wplf_submit', 'wplf_ajax_submit_handler' );
 add_action( 'wp_ajax_nopriv_wplf_submit', 'wplf_ajax_submit_handler' );
 function wplf_ajax_submit_handler() {
+
   $return = new stdClass();
   $return->ok = 1;
 
@@ -22,6 +23,7 @@ function wplf_ajax_submit_handler() {
 
     // form-specific validation
     $return->slug = $form->post_name;
+    $return->title = $form->post_title;
     $return = apply_filters( "wplf_{$form->post_name}_validate_submission", $return );
     $return = apply_filters( "wplf_{$form->ID}_validate_submission", $return );
   }
@@ -47,28 +49,39 @@ function wplf_ajax_submit_handler() {
       'post_title'     => $post_title,
       'post_status'    => 'publish',
       'post_type'      => 'wplf-submission',
-    ));
+    ) );
 
     // add submission data as meta values
     foreach ( $_POST as $key => $value ) {
       if ( ! is_array( $value ) ) {
         add_post_meta( $post_id, $key, esc_html( $value ), true );
       } else {
-        add_post_meta( $post_id, $key, esc_html( wp_json_encode( $value ) ), true );
+        add_post_meta( $post_id, $key, $value, true );
       }
     }
 
     // handle files
+    $uploads_path = wp_upload_dir();
+    $should_store_images_in_medialibrary = get_post_meta( $form->ID, '_wplf_media_library', true );
+    $counter = 0;
     foreach ( $_FILES as $key => $file ) {
       // Is this enough security wise?
       // Currenly only supports 1 file per input
-      $attach_id = media_handle_upload( $key, 0, array(), array(
-        'test_form' => false,
-      ) );
+      if ( $should_store_images_in_medialibrary ) {
+        $attach_id = media_handle_upload( $key, 0, array(), array(
+          'test_form' => false,
+        ) );
 
-      if ( ! is_wp_error( $attach_id ) ) {
-        add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
-        add_post_meta( $post_id, $key . '_attachment', $attach_id );
+        if ( ! is_wp_error( $attach_id ) ) {
+          add_post_meta( $post_id, $key, wp_get_attachment_url( $attach_id ) );
+          add_post_meta( $post_id, $key . '_attachment', $attach_id );
+        }
+      } else {
+          $name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
+
+          move_uploaded_file( $file['tmp_name'], $uploads_path['path'] . '/' . $name );
+          add_post_meta( $post_id, $key . '_attachment', $uploads_path['url'] . '/' . $name );
+          $counter++;
       }
     }
 

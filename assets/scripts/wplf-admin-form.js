@@ -56,13 +56,32 @@ $(document).ready(function() {
   // display email copy field if the feature is enabled
   function toggleEmailCopy() {
     if( $('input[name="wplf_email_copy_enabled"]:checked').length > 0 ) {
-      $('input[name="wplf_email_copy_to"]').show();
+      $('p.wplf-email-copy-to-field').show();
     } else {
-      $('input[name="wplf_email_copy_to"]').hide();
+      $('p.wplf-email-copy-to-field').hide();
     }
   }
   $('input[name="wplf_email_copy_enabled"]').change(toggleEmailCopy);
   toggleEmailCopy();
+
+  // If prompted for a form version update, create a hidden field if necessary
+  function toggleVersionUpdate() {
+    var hiddenField = $('input[name="wplf_update_plugin_version_to_meta"]');
+
+    if (hiddenField.length) {
+      hiddenField.remove();
+      return;
+    }
+
+    var checkbox = document.createElement('input')
+    checkbox.type = 'hidden';
+    checkbox.name = 'wplf_update_plugin_version_to_meta';
+    checkbox.value = 1;
+
+    $('#content').after(checkbox);
+  }
+
+  $('input[name="wplf_version_update_toggle"]').change(toggleVersionUpdate);
 });
 
 })(jQuery);

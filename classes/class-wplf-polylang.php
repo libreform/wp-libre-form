@@ -42,7 +42,7 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
       return $form_content;
     }
 
-    function save_form( $post_id, $post, $update ) {
+    public function save_form( $post_id, $post, $update ) {
       unset( $post_id, $update ); // not used here so shut up linter!
 
       preg_match_all( $this->regular_expression, $post->post_content, $matches );
@@ -87,7 +87,11 @@ if ( ! class_exists( 'WPLF_Polylang' ) ) {
     }
 
     public function ajax_object( $array ) {
-      $array['lang'] = pll_current_language();
+      if ( function_exists( 'pll_current_language' ) ) {
+        $array['lang'] = pll_current_language();
+      } else {
+        $array['lang'] = null;
+      }
       return $array;
     }
 
