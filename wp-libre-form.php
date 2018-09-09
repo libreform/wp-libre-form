@@ -36,6 +36,7 @@ define( 'WPLF_VERSION', '1.5.0-beta' );
 
 class WP_Libre_Form {
   public static $instance;
+  public $plugins;
 
   public static function init() {
     if ( is_null( self::$instance ) ) {
@@ -48,6 +49,7 @@ class WP_Libre_Form {
     require_once 'classes/class-cpt-wplf-form.php';
     require_once 'classes/class-cpt-wplf-submission.php';
     require_once 'classes/class-wplf-dynamic-values.php';
+    require_once 'classes/class-wplf-plugins.php';
     require_once 'inc/wplf-ajax.php';
 
     // default functionality
@@ -58,6 +60,8 @@ class WP_Libre_Form {
     CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
     WPLF_Dynamic_Values::init();
+
+    $this->plugins = WPLF_Plugins::init();
 
     add_action( 'after_setup_theme', array( $this, 'init_polylang_support' ) );
 
@@ -117,5 +121,12 @@ class WP_Libre_Form {
 
 endif;
 
-// init the plugin
-WP_Libre_Form::init();
+/**
+ * Expose a global function for less awkward usage
+ */
+function wplf() {
+  // init the plugin
+  return WP_Libre_Form::init();
+}
+
+wplf();
