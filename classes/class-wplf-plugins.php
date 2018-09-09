@@ -188,7 +188,7 @@ class WPLF_Plugins {
             'wp-libre-form'
           ); ?>
           <?php echo esc_html__(
-            "Making your own plugin is easy too.",
+            'Making your own plugin is easy too.',
             'wp-libre-form'
           ); ?>
         </p>
