@@ -47,6 +47,7 @@ class WP_Libre_Form {
   private function __construct() {
     require_once 'classes/class-cpt-wplf-form.php';
     require_once 'classes/class-cpt-wplf-submission.php';
+    require_once 'classes/class-wplf-dynamic-values.php';
     require_once 'inc/wplf-ajax.php';
 
     // default functionality
@@ -56,10 +57,13 @@ class WP_Libre_Form {
     // init our plugin classes
     CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
+    WPLF_Dynamic_Values::init();
 
     add_action( 'after_setup_theme', array( $this, 'init_polylang_support' ) );
 
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
+
+    add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 
     // flush rewrites on activation since we have slugs for our cpts
     register_activation_hook( __FILE__, array( 'WP_Libre_Form', 'flush_rewrites' ) );
@@ -83,6 +87,14 @@ class WP_Libre_Form {
     if ( ! $loaded ) {
       $loaded = load_muplugin_textdomain( 'wp-libre-form', dirname( plugin_basename( __FILE__ ) ) . '/lang/' );
     }
+  }
+
+  public function register_rest_routes() {
+    register_rest_route( 'wplf/v1', 'submit', [
+      'methods' => 'POST',
+      'callback' => 'wplf_ajax_submit_handler', // admin-ajax handler, works but...
+      // The REST API handbook discourages from using $_POST, and instead use $request->get_params()
+    ]);
   }
 
   /**

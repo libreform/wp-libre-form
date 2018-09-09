@@ -334,6 +334,16 @@ class CPT_WPLF_Form {
       'high'
     );
 
+    // Dynamic values
+    add_meta_box(
+      'wplf-shortcode',
+      __( 'Dynamic values', 'wp-libre-form' ),
+      array( $this, 'metabox_dynamic_values' ),
+      'wplf-form',
+      'normal',
+      'high'
+    );
+
     // Messages meta box
     add_meta_box(
       'wplf-messages',
@@ -389,6 +399,35 @@ class CPT_WPLF_Form {
   public function metabox_shortcode( $post ) {
 ?>
 <p><input type="text" class="code" value='[libre-form id="<?php echo esc_attr( $post->ID ); ?>"]' readonly></p>
+<?php
+  }
+
+  /**
+   * Meta box callback for dynamic values meta box
+   */
+  public function metabox_dynamic_values( $post ) {
+    unset( $post ); ?>
+    <select name="wplf-dynamic-values">
+      <option default value=""><?php esc_html_e( 'Choose a dynamic value', 'wp-libre-form' ); ?></option>
+
+      <?php foreach ( ( WPLF_Dynamic_Values::get_available() ) as $k => $v ) {
+        $key = sanitize_text_field( $k );
+        $labels = $v['labels'];
+        $stringified = wp_json_encode( $labels );
+
+        // WPCS won't STFU. It's wrong. Again.
+        echo "<option value='$key' data-labels='$stringified'>$labels[name]</option>"; // @codingStandardsIgnoreLine
+      } ?>
+    </select>
+
+    <!-- Shown with JS. -->
+    <div class="wplf-dynamic-values-help">
+      <div class="description"></div>
+      <div class="usage">
+        <strong><?php esc_html_e( 'Usage', 'wp-libre-form' ); ?>:&nbsp;</strong>
+        <span></span>
+      </div>
+    </div>
 <?php
   }
 
@@ -849,7 +888,7 @@ class CPT_WPLF_Form {
       $content = apply_filters( "wplf_{$form->ID}_form", $content );
 
       // run default filters after. The user probably wants to filter original content, not modified by WP
-      $content = apply_filters( 'wplf_form', $content );
+      $content = apply_filters( 'wplf_form', $content, $id, $xclass, $attributes );
 
       ob_start();
 ?>
@@ -924,10 +963,13 @@ class CPT_WPLF_Form {
       true
     );
 
+    $admin_url = admin_url( 'admin-ajax.php' );
+
     // add dynamic variables to the script's scope
     wp_localize_script('wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
-      'ajax_url' => admin_url( 'admin-ajax.php' ),
+      'ajax_url' => apply_filters( 'wplf_ajax_endpoint', "$admin_url?action=wplf_submit" ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
+      'request_headers' => apply_filters( 'wplf_ajax_request_headers', '?action=wplf_submit' ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
     ) ) );
   }

@@ -14,6 +14,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 - Full file upload support to Media Library with input type=file
 - Multilingual support with Polylang
 - Predefined static HTML forms via filter hooks
+- Dynamic values, like %USER_EMAIL% for pre-populating form data
 
 ## Why?
 
@@ -173,6 +174,28 @@ Disabling additonal fields validation for all forms:
 
 ```php
 add_filter( 'wplf_disable_validate_additional_fields' , __return_false );
+```
+
+### Filter: wplf_dynamic_values
+
+Add or customize dynamic values available in forms.
+
+#### Example: new value
+
+```php
+add_filter('wplf_dynamic_values', function($values) {
+  $values['SOMETHING'] = [
+    'callback' => function() { return 'something'; },
+    'labels' => [
+      'name' => 'Something',
+      'description' => 'Something really useful.'
+    ],
+  ];
+
+  return $values;
+});
+
+// <input type="text" placeholder="%SOMETHING%" name="something">
 ```
 
 ## Javascript API
