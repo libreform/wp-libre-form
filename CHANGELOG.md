@@ -7,3 +7,7 @@
 - Forms now save version at which they were created, this allows us to change functionalities without breaking forms
    - If a form is created with an older version, you will be prompted to update the creation version
 - Forms are now exposed to REST API
+- Plugins API
+  - Any plugin can register itself as a WPLF plugin
+  - Lets you expose your plugin methods
+  - Settings page support
