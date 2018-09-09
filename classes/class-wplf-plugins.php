@@ -148,7 +148,7 @@ class WPLF_Plugins {
   }
 
   public function render_admin_page() {
-    $available = $this->get_available_plugins();
+    $recommended = $this->get_recommended_plugins();
     $enabled = $this->get_enabled_plugins();
     $plugins_with_options = array_filter(
          $enabled, function( $plugin ) {
@@ -180,8 +180,15 @@ class WPLF_Plugins {
         </p>
         <p>
           <?php echo esc_html__(
-            "Simplicity comes with drawbacks, and chances are that the feature you're looking for doesn't exist.
-Plugins help remedy the problem.",
+            "If the core doesn't offer enough features for you, you can install a plugin for more functionality.",
+            'wp-libre-form'
+          ); ?>
+          <?php echo esc_html__(
+            "Below you'll find your active plugins and some recommendations. ",
+            'wp-libre-form'
+          ); ?>
+          <?php echo esc_html__(
+            "Making your own plugin is easy too.",
             'wp-libre-form'
           ); ?>
         </p>
@@ -197,11 +204,11 @@ Plugins help remedy the problem.",
           </div>
         <?php } ?>
 
-        <?php if ( ! empty( $available ) ) { ?>
-          <h2><?php echo esc_html__( 'Available plugins', 'wp-libre-form' ); ?></h1>
+        <?php if ( ! empty( $recommended ) ) { ?>
+          <h2><?php echo esc_html__( 'Recommended plugins', 'wp-libre-form' ); ?></h1>
 
           <div class="wplf-plugin-list">
-            <?php foreach ( $available as $plugin ) {
+            <?php foreach ( $recommended as $plugin ) {
               $this->render_plugin( $plugin );
             } ?>
           </div>
@@ -224,13 +231,13 @@ Plugins help remedy the problem.",
     return apply_filters( 'wplf_enabled_plugins', $this->plugins );
   }
 
-  private function get_available_plugins() {
+  private function get_recommended_plugins() {
     $list = [
       'Export' => $this->fill_plugin_data(
            [
         'name' => 'Export',
         'link' => 'https://github.com/libreform/export',
-        'description' => 'Add CSV export functionality',
+        'description' => 'Add CSV export functionality.',
       ]
           ),
 
@@ -257,7 +264,7 @@ Plugins help remedy the problem.",
     }
         );
 
-    return apply_filters( 'wplf_available_plugins', $list );
+    return apply_filters( 'wplf_recommended_plugins', $list );
   }
 
   /**
