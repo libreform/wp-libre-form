@@ -336,7 +336,7 @@ class CPT_WPLF_Form {
 
     // Dynamic values
     add_meta_box(
-      'wplf-shortcode',
+      'wplf-dynamic-values',
       __( 'Dynamic values', 'wp-libre-form' ),
       array( $this, 'metabox_dynamic_values' ),
       'wplf-form',
