@@ -1,5 +1,5 @@
 <?php
-if ( ! class_exists( 'WPLF_Polylang' ) ) {
+if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
   class WPLF_Dynamic_Values {
 
     public static $instance;
