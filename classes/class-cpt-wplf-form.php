@@ -38,6 +38,7 @@ class CPT_WPLF_Form {
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );
     add_filter( 'user_can_richedit', array( $this, 'disable_tinymce' ) );
+    add_filter( 'use_block_editor_for_post_type', array( $this, 'disable_gutenberg'), 10, 2 );
 
     // front end
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
@@ -133,6 +134,17 @@ class CPT_WPLF_Form {
       return false;
     }
     return $default;
+  }
+
+  /**
+   *  Disable Gutenberg editor
+   */
+  public function disable_gutenberg( $is_enabled, $post_type ) {
+    if( $post_type === 'wplf-form') {
+      return false;
+    }
+
+    return $is_enabled;
   }
 
   /**
