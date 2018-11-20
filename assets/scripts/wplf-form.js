@@ -61,6 +61,10 @@ window.wplf = {
         error.textContent = response.error;
 
         form.appendChild(error);
+        
+        if (ajax_object.debug) {
+          console.error("WP Libre Form error: ", response);
+        }
 
         window.wplf.errorCallbacks.forEach(function(func) {
           func(response);
