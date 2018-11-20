@@ -79,7 +79,7 @@ function wplf_validate_additional_fields( $return ) {
   $form = get_post( intval( $_POST['_form_id'] ) );
   // global disable
   $disable_validation = false;
-  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation );
+  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation, $form );
   // disable by form id
   $disable_validation = apply_filters( "wplf_{$form->ID}_disable_validate_additional_fields", $disable_validation );
   // disable by form slug
