@@ -983,7 +983,7 @@ class CPT_WPLF_Form {
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'request_headers' => (object) apply_filters( 'wplf_ajax_request_headers', [] ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
-      'debug' => defined('WP_DEBUG') && WP_DEBUG
+      'debug' => defined( 'WP_DEBUG' ) && WP_DEBUG
     ) ) );
   }
 
