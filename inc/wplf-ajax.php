@@ -78,6 +78,9 @@ function wplf_ajax_submit_handler() {
     $should_store_images_in_medialibrary = get_post_meta( $form->ID, '_wplf_media_library', true );
     $counter = 0;
     foreach ( $_FILES as $key => $file ) {
+      // skip empty upload fields
+      if ( empty($file['tmp_name'] ) continue;
+      
       // Is this enough security wise?
       // Currenly only supports 1 file per input
       if ( $should_store_images_in_medialibrary ) {
@@ -90,11 +93,11 @@ function wplf_ajax_submit_handler() {
           add_post_meta( $post_id, $key . '_attachment', $attach_id );
         }
       } else {
-          $name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
+        $name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
 
-          move_uploaded_file( $file['tmp_name'], $uploads_path['path'] . '/' . $name );
-          add_post_meta( $post_id, $key . '_attachment', $uploads_path['url'] . '/' . $name );
-          $counter++;
+        move_uploaded_file( $file['tmp_name'], $uploads_path['path'] . '/' . $name );
+        add_post_meta( $post_id, $key . '_attachment', $uploads_path['url'] . '/' . $name );
+        $counter++;
       }
     }
 
