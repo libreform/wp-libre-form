@@ -79,7 +79,7 @@ function wplf_ajax_submit_handler() {
     $counter = 0;
     foreach ( $_FILES as $key => $file ) {
       // skip empty upload fields
-      if ( empty( $file['tmp_name'] ) continue;
+      if ( empty( $file['tmp_name'] ) ) continue;
       
       // Is this enough security wise?
       // Currenly only supports 1 file per input
