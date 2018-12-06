@@ -5,6 +5,7 @@
 window.wplf = {
   successCallbacks: [],
   errorCallbacks: [],
+  beforeSendCallbacks: [],
   submitHandler: function (e) {
     var form = e.target;
     var data = new FormData(form);
@@ -24,6 +25,10 @@ window.wplf = {
     [].forEach.call(form.querySelectorAll(".wplf-error"), function(error) {
       // reset errors
       error.parentNode.removeChild(error);
+    });
+    
+    window.wplf.beforeSendCallbacks.forEach(function(func) {
+      func(form);
     });
 
     fetch(ajax_object.ajax_url, {
