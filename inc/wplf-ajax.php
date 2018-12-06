@@ -93,13 +93,13 @@ function wplf_ajax_submit_handler() {
           add_post_meta( $post_id, $key . '_attachment', $attach_id );
         }
       } else {
-          $file['field_name'] = $key;
+        $file['field_name'] = $key;
 
-          $file_name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
-          $file_name = apply_filters( 'wplf_uploaded_file_name', $file_name, $file, $post_id );
+        $default_file_name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . $file['name'];
+        $file_name = sanitize_file_name( apply_filters( 'wplf_uploaded_file_name', $default_file_name, $file, $post_id ) );
 
-          $file_path = $uploads_path['path'] . '/' . $file_name;
-          $file_path = apply_filters( 'wplf_uploaded_file_path', $file_path, $file, $post_id );
+        $file_path = $uploads_path['path'] . '/' . $file_name;
+        $file_path = apply_filters( 'wplf_uploaded_file_path', $file_path, $file, $post_id );
 
         move_uploaded_file( $file['tmp_name'], $file_path );
         add_post_meta( $post_id, $key . '_attachment', $file_path );
