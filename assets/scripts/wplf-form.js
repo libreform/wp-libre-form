@@ -5,6 +5,7 @@
 window.wplf = {
   successCallbacks: [],
   errorCallbacks: [],
+  abortRequest: false,
   submitHandler: function (e) {
     var form = e.target;
     var data = new FormData(form);
@@ -26,59 +27,62 @@ window.wplf = {
       error.parentNode.removeChild(error);
     });
 
-    fetch(ajax_object.ajax_url, {
-      method: "POST",
-      credentials: ajax_object.ajax_credentials || 'same-origin',
-      body: data,
-      headers: ajax_object.request_headers || {},
-    }).then(function(response) {
-      return response.text();
-    }).then(function(response) {
-      response = JSON.parse(response);
-      
-      if( 'success' in response ) {
-        // show success message if one exists
-        var success = document.createElement("p");
-        success.className = "wplf-success";
-        success.innerHTML = response.success;
+    if (!window.wplf.abortRequest) {
+      fetch(ajax_object.ajax_url, {
+        method: "POST",
+        credentials: ajax_object.ajax_credentials || 'same-origin',
+        body: data,
+        headers: ajax_object.request_headers || {},
+      }).then(function(response) {
+        return response.text();
+      }).then(function(response) {
+        response = JSON.parse(response);
 
-        form.parentNode.insertBefore(success, form.nextSibling);
-      }
+        if( 'success' in response ) {
+          // show success message if one exists
+          var success = document.createElement("p");
+          success.className = "wplf-success";
+          success.innerHTML = response.success;
 
-      if( 'ok' in response && response.ok ) {
-        // submit succesful!
-        form.parentNode.removeChild(form);
+          form.parentNode.insertBefore(success, form.nextSibling);
+        }
 
-        window.wplf.successCallbacks.forEach(function(func) {
-          func(response);
-        });
-      }
+        if( 'ok' in response && response.ok ) {
+          // submit succesful!
+          form.parentNode.removeChild(form);
 
-      if( 'error' in response ) {
-        // show error message in form
-        var error = document.createElement("p");
-        error.className = "wplf-error error";
-        error.textContent = response.error;
+          window.wplf.successCallbacks.forEach(function(func) {
+            func(response);
+          });
+        }
 
-        form.appendChild(error);
+        if( 'error' in response ) {
+          // show error message in form
+          var error = document.createElement("p");
+          error.className = "wplf-error error";
+          error.textContent = response.error;
 
-        window.wplf.errorCallbacks.forEach(function(func) {
-          func(response);
-        });
-      }
+          form.appendChild(error);
 
-      form.classList.remove('sending');
-    }).catch(function(error) {
-      form.classList.remove("sending");
+          window.wplf.errorCallbacks.forEach(function(func) {
+            func(response);
+          });
+        }
 
-      if (window.wplf.errorCallbacks.length > 0) {
-        window.wplf.errorCallbacks.forEach(function(func) {
-          func(error);
-        });
-      } else {
-        console.warn("Fetch error: ", error);
-      }
-    });
+        form.classList.remove('sending');
+      }).catch(function(error) {
+        form.classList.remove("sending");
+
+        if (window.wplf.errorCallbacks.length > 0) {
+          window.wplf.errorCallbacks.forEach(function(func) {
+            func(error);
+          });
+        } else {
+          console.warn("Fetch error: ", error);
+        }
+      });
+    }
+    window.wplf.abortRequest = false
 
     // don't actually submit the form, causing a page reload
     e.preventDefault();
