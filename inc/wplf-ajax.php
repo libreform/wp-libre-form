@@ -32,6 +32,16 @@ function wplf_ajax_submit_handler() {
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
 
+    // create submission post
+    $post_id = wp_insert_post( array(
+      'post_title'     => '',
+      'post_status'    => 'publish',
+      'post_type'      => 'wplf-submission',
+    ) );
+    
+    // exposes $post_id in $_POST to be able to use in the title
+    $_POST['_post_id'] = $post_id;
+    
     // substitute the %..% tags with field values
     $post_title = $title_format;
 
@@ -43,13 +53,12 @@ function wplf_ajax_submit_handler() {
       }
       $post_title = preg_replace( '/%.+?%/', $replace, $post_title, 1 );
     }
-
-    // create submission post
-    $post_id = wp_insert_post( array(
-      'post_title'     => $post_title,
-      'post_status'    => 'publish',
-      'post_type'      => 'wplf-submission',
-    ) );
+    
+    // save the title
+    wp_update_post( [
+      'ID'         => $post_id,
+      'post_title' => $post_title,
+    ] );
 
     // add submission data as meta values
     foreach ( $_POST as $key => $value ) {
