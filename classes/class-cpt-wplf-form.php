@@ -598,6 +598,8 @@ class CPT_WPLF_Form {
 ?>
 <p><?php esc_html_e( 'Submissions from this form will use this formatting in their title.', 'wp-libre-form' ); ?></p>
 <p><?php esc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' ); ?></p>
+<?php // translators: %submission-id% is not meant to be translated  ?>
+<p><?php esc_html_e( 'In addition, you may use %submission-id%.', 'wp-libre-form' ); ?></p>
 <p>
   <input
     type="text"
