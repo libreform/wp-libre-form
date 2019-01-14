@@ -50,7 +50,7 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     if ( isset( $form_meta['_wplf_email_copy_from'][0] ) ) {
       $from = wplf_email_copy_replace_tags( $form_meta['_wplf_email_copy_from'][0], $form, $submission_id );
       $from_address = wplf_email_copy_replace_tags( $form_meta['_wplf_email_copy_from_address'][0], $form, $submission_id );
-      $headers[] = "From: $from <$from_address>";
+      $headers .= "From: $from <$from_address>";
     }
 
     if ( isset( $form_meta['_wplf_email_copy_content'] ) ) {
