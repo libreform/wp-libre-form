@@ -38,7 +38,7 @@ class CPT_WPLF_Form {
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );
     add_filter( 'user_can_richedit', array( $this, 'disable_tinymce' ) );
-    add_filter( 'use_block_editor_for_post_type', array( $this, 'disable_gutenberg'), 10, 2 );
+    add_filter( 'use_block_editor_for_post_type', array( $this, 'disable_gutenberg' ), 10, 2 );
 
     // front end
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
@@ -140,7 +140,7 @@ class CPT_WPLF_Form {
    *  Disable Gutenberg editor
    */
   public function disable_gutenberg( $is_enabled, $post_type ) {
-    if( $post_type === 'wplf-form') {
+    if ( $post_type === 'wplf-form' ) {
       return false;
     }
 
@@ -978,7 +978,7 @@ class CPT_WPLF_Form {
     $admin_url = admin_url( 'admin-ajax.php' );
 
     // add dynamic variables to the script's scope
-    wp_localize_script('wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
+    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
       'ajax_url' => apply_filters( 'wplf_ajax_endpoint', "$admin_url?action=wplf_submit" ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'request_headers' => (object) apply_filters( 'wplf_ajax_request_headers', [] ),
