@@ -176,6 +176,25 @@ Disabling additonal fields validation for all forms:
 add_filter( 'wplf_disable_validate_additional_fields' , '__return_true' );
 ```
 
+### Filter: wplf_allowed_additional_form_fields
+
+You can provide your own set of allowed field names, instead of disabling additional field validation entirely.
+
+#### Form specific hooks
+
+This filter supports form specific hooks:
+
+- `wplf_{form_id}_allowed_additional_form_fields`
+- `wplf_{form_slug}_allowed_additional_form_fields`
+
+These filters are only applied for the target form by ID or slug.
+
+Disabling additonal fields validation for all forms:
+
+```php
+add_filter( 'wplf_allowed_additional_form_fields' , ['dynamic-field-name'] );
+```
+
 ### Filter: wplf_dynamic_values
 
 Add or customize dynamic values available in forms.

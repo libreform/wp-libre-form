@@ -101,8 +101,14 @@ function wplf_validate_additional_fields( $return ) {
   // add all default fields
   $default_fields = array( 'referrer', '_referrer_id', '_form_id', 'lang' );
 
+  // add all custom fields, form spesific filters
+  $custom_fields = array();
+  $custom_fields = apply_filters( "wplf_allowed_additional_form_fields", $custom_fields, $form );
+  $custom_fields = apply_filters( "wplf_{$form->ID}_allowed_additional_form_fields", $custom_fields, $form );
+  $custom_fields = apply_filters( "wplf_{$form->post_name}_allowed_additional_form_fields", $custom_fields, $form );
+
   // combine fields
-  $all_fields = array_merge( $form_fields, $default_fields );
+  $all_fields = array_merge( $form_fields, $custom_fields, $default_fields );
 
   // make sure fields from all_fields are the only ones present in $_POST
   $additional_fields = array();
