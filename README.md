@@ -173,7 +173,7 @@ These filters are only applied for the target form by ID or slug.
 Disabling additonal fields validation for all forms:
 
 ```php
-add_filter( 'wplf_disable_validate_additional_fields' , __return_false );
+add_filter( 'wplf_disable_validate_additional_fields' , '__return_true' );
 ```
 
 ### Filter: wplf_dynamic_values
