@@ -941,16 +941,19 @@ class CPT_WPLF_Form {
     // @codingStandardsIgnoreStart
     echo $content;
     // @codingStandardsIgnoreEnd
-  
+
   if ( is_archive() ) :
-      global $wp;
-      $current_url = add_query_arg( $wp->query_string, '', home_url( $wp->request ) ); ?>
-      <input type="hidden" name="referrer" value="<?php echo $current_url ?>">
-      <input type="hidden" name="_referrer_id" value="archive">
-      <input type="hidden" name="_referrer_archive_title" value="<?php echo get_the_archive_title() ?>">
+    global $wp;
+    $current_url = home_url( $wp->request );
+    if ( empty( get_option( 'permalink_structure' ) ) ) {
+      $current_url = add_query_arg( $wp->query_string, '', home_url( $wp->request ) );
+    } ?>
+    <input type="hidden" name="referrer" value="<?php echo $current_url ?>">
+    <input type="hidden" name="_referrer_id" value="archive">
+    <input type="hidden" name="_referrer_archive_title" value="<?php echo get_the_archive_title() ?>">
   <?php else : ?>
-      <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
-      <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ); ?>">
+    <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
+    <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ); ?>">
   <?php endif; ?>
   <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
 </form>
