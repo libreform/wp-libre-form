@@ -75,15 +75,20 @@ function wplf_validate_additional_fields( $return ) {
     return $return;
   }
 
-  // skip this validation if it is disabled with filter for this form
+  // skip this validation if it is disabled with filter
   $form = get_post( intval( $_POST['_form_id'] ) );
-  // global disable
   $disable_validation = false;
-  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation );
+
+  // global disable
+  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation, $form );
+
   // disable by form id
-  $disable_validation = apply_filters( "wplf_{$form->ID}_disable_validate_additional_fields", $disable_validation );
+  $disable_validation = apply_filters( "wplf_{$form->ID}_disable_validate_additional_fields", $disable_validation, $form );
+
   // disable by form slug
-  $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation );
+  $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation, $form );
+
+  // test form version and disable if form created before version 1.5.0
   $version_high_enough = version_compare( get_post_meta( $form->ID, '_wplf_plugin_version', true ), '1.5.0', '>=' );
 
   if ( $disable_validation || ! $version_high_enough ) {
