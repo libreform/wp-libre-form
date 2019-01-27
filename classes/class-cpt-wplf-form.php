@@ -197,6 +197,11 @@ class CPT_WPLF_Form {
     // enqueue the custom JS for this view
     wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-admin-form.js' );
 
+    // add dynamic variables to the script's scope
+    wp_localize_script( 'wplf-form-edit-js', 'wplf_form_edit', apply_filters( 'wplf_form_edit_variables', array(
+      'has_unfiltered_html' => current_user_can( 'unfiltered_html') ? true : false, // WP turns it into a number...
+    ) ) );
+
     // enqueue the custom CSS for this view
     wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
   }
