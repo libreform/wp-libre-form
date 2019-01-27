@@ -40,6 +40,7 @@ function wplf_ajax_submit_handler() {
     ) );
 
     // exposes $post_id in $_POST to be able to use in the title
+    // hacky, but uses less memory than a copy of $_POST
     $_POST['submission-id'] = $post_id;
 
     // substitute the %..% tags with field values
