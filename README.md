@@ -70,6 +70,15 @@ You can also install the plugin by directly uploading the zip file as instructed
 2. Upload to the plugin to /wp-content/plugins/ via the WordPress plugin uploader or your preferred method
 3. Activate the plugin
 
+## Multisite (WordPress Network) support
+
+WP Libre Form works fine in WordPress Network (multisite). There's some gotchas:
+
+- Plugin must be activated in each site, not on network level
+- Only Super Admins can edit forms.
+  - This is because Network strips dangerous input like iframes & input fields from the content.
+  - Can be worked around by installing [Unfiltered MU](https://wordpress.org/plugins/unfiltered-mu/)
+
 ## Filter / Action API
 
 ### Filter: wplf_validate_submission
