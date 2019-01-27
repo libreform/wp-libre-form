@@ -3,7 +3,7 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
   class WPLF_Dynamic_Values {
 
     public static $instance;
-    protected $regular_expression = "/## \w+ ##/";
+    protected $regular_expression = '/## \w+ ##/';
 
     public static function init() {
       if ( is_null( self::$instance ) ) {
