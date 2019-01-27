@@ -761,14 +761,6 @@ class CPT_WPLF_Form {
    * Handles saving our post meta
    */
   public function save_cpt( $post_id ) {
-    if ( is_multisite() && ! current_user_can( 'unfiltered_html' ) ) {
-      wp_die(
-        '<h1>' . esc_html__( 'You do not have unfiltered_html capability', 'wp-libre-form' ) . '</h1>' .
-        '<p>' . esc_html__( 'Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form' ) . '</p>',
-        403
-      );
-    }
-
     // verify nonce
     if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
       return;
@@ -779,6 +771,14 @@ class CPT_WPLF_Form {
     // only for this cpt
     if ( ! isset( $_POST['post_type'] ) || 'wplf-form' !== $_POST['post_type'] ) {
       return;
+    }
+
+    if ( is_multisite() && ! current_user_can( 'unfiltered_html' ) ) {
+      wp_die(
+        '<h1>' . esc_html__( 'You do not have unfiltered_html capability', 'wp-libre-form' ) . '</h1>' .
+        '<p>' . esc_html__( 'Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form' ) . '</p>',
+        403
+      );
     }
 
     // check permissions.
