@@ -198,6 +198,25 @@ add_filter('wplf_dynamic_values', function($values) {
 // <input type="text" placeholder="%SOMETHING%" name="something">
 ```
 
+
+### Filter: wplf_uploaded_file_name
+If you choose to not add uploaded files to the media library, you can change the file upload name.
+
+```php
+add_filter('wplf_uploaded_file_name', function($name, $file, $id) {
+  return "my_".$name;
+}, 10, 3);
+```
+
+### Filter: wplf_uploaded_file_path
+If you choose to not add uploaded files to the media library, you can change the file upload path.
+
+```php
+add_filter('wplf_uploaded_file_path', function($name, $file, $id) {
+  return $name.".userfile";
+}, 10, 3);
+```
+
 ## Plugins
 1.5 exposes a new function, `wplf()`. It simply returns the class instance of WP Libre Form.
 

@@ -17,10 +17,10 @@ function wplf_ajax_submit_handler() {
   // @see: wplf-form-validation.php
   $return = apply_filters( 'wplf_validate_submission', $return );
 
-  if ( $return->ok ) {
-    // form existence has already been validated via filters
-    $form = get_post( intval( $_POST['_form_id'] ) );
+  // form existence has already been validated via filters
+  $form = get_post( intval( $_POST['_form_id'] ) );
 
+  if ( $return->ok ) {
     // form-specific validation
     $return->slug = $form->post_name;
     $return->title = $form->post_title;
@@ -93,10 +93,16 @@ function wplf_ajax_submit_handler() {
           add_post_meta( $post_id, $key . '_attachment', $attach_id );
         }
       } else {
-        $name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
+        $file['field_name'] = $key;
 
-        move_uploaded_file( $file['tmp_name'], $uploads_path['path'] . '/' . $name );
-        add_post_meta( $post_id, $key . '_attachment', $uploads_path['url'] . '/' . $name );
+        $default_file_name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . $file['name'];
+        $file_name = sanitize_file_name( apply_filters( 'wplf_uploaded_file_name', $default_file_name, $file, $post_id ) );
+
+        $file_path = $uploads_path['path'] . '/' . $file_name;
+        $file_path = apply_filters( 'wplf_uploaded_file_path', $file_path, $file, $post_id );
+
+        move_uploaded_file( $file['tmp_name'], $file_path );
+        add_post_meta( $post_id, $key . '_attachment', $file_path );
         $counter++;
       }
     }
