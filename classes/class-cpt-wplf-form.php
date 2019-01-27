@@ -90,6 +90,9 @@ class CPT_WPLF_Form {
       'menu_icon'           => 'dashicons-archive',
       'query_var'           => false,
       'capability_type'     => 'post',
+      'capabilities'        => array(
+        'unfiltered_html',
+      ),
       'has_archive'         => false,
       'hierarchical'        => false,
       'menu_position'       => null,
