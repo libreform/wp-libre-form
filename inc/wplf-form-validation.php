@@ -103,7 +103,7 @@ function wplf_validate_additional_fields( $return ) {
 
   // add all custom fields, form spesific filters
   $custom_fields = array();
-  $custom_fields = apply_filters( "wplf_allowed_additional_form_fields", $custom_fields, $form );
+  $custom_fields = apply_filters( 'wplf_allowed_additional_form_fields', $custom_fields, $form );
   $custom_fields = apply_filters( "wplf_{$form->ID}_allowed_additional_form_fields", $custom_fields, $form );
   $custom_fields = apply_filters( "wplf_{$form->post_name}_allowed_additional_form_fields", $custom_fields, $form );
 
