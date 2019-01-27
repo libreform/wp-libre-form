@@ -2,45 +2,161 @@
  * JS to be included on the front end pages with forms
  */
 
-window.wplf = {
-  successCallbacks: [],
-  errorCallbacks: [],
-  beforeSendCallbacks: [],
-  submitHandler: function (e) {
-    var form = e.target;
+document.addEventListener('DOMContentLoaded', function() {
+  'use strict';
+  var WPLF_DATA = window.WPLF_DATA;
+
+  function WPLF () {
+    this.forms = {};
+
+    var dependencies = [];
+
+    if (!window.fetch) {
+      dependencies.push('fetch');
+    }
+
+    if (!window.Promise) {
+      dependencies.push('Promise');
+    }
+
+    var dependency_count = dependencies.length;
+    var dependencies_loaded = 0;
+    var is_ready = function () {
+      return dependency_count === dependencies_loaded;
+    };
+    var run_when_ready = function () {
+      if (is_ready()) {
+        // app();
+      }
+    };
+    var get_script = function (script) {
+      var elmnt = document.createElement('script');
+      elmnt.src = WPLF_DATA.wplf_assets_dir + '/scripts/polyfills/' + script + '.js';
+
+      return elmnt;
+    };
+
+    dependencies.map(function (dependency) {
+      return dependency.toLowerCase();
+    }).map(function (dependency) {
+      return get_script(dependency);
+    }).map(function (script) {
+      script.addEventListener('load', function () {
+        dependencies_loaded++;
+        run_when_ready();
+      });
+
+      return document.body.appendChild(script);
+    });
+
+    run_when_ready();
+  }
+
+  WPLF.prototype.attach = function attach (element) {
+    if (element instanceof HTMLFormElement !== true) {
+      throw new Error('Unable to attach WPLF to element', element);
+    }
+
+    var form = new WPLF_Form(element);
+    console.log(form, this);
+    this.forms[form.form] = form;
+
+    return this.forms[element];
+  }
+
+  WPLF.prototype.detach = function detach (element) {
+    if (element instanceof HTMLFormElement !== true) {
+      throw new Error('Unable to detach WPLF from element', element);
+    }
+
+    this.forms[element].removeSubmitHandler();
+    delete this.forms[element];
+
+    return this
+  }
+
+
+  function WPLF_Form(element) {
+    this.form = element;
+    this.submitState = null; // null | 'submitting' | 'success' | 'error'
+    this.submitHandler = null;
+    this.callbacks = {
+      beforeSend: {},
+      success: {},
+      error: {}
+    };
+
+
+    console.log('hi', element, this)
+    this.addSubmitHandler();
+  }
+
+  WPLF_Form.prototype.addCallback = function addCallback(name, type, callback) {
+    this.callbacks[type][name] = callback;
+
+    return this;
+  }
+
+  WPLF_Form.prototype.removeCallback = function removeCallback(name, type) {
+    delete this.callbacks[type][name];
+
+    return this;
+  }
+
+  WPLF_Form.prototype.addSubmitHandler = function addSubmitHandler(handler) {
+    this.submitHandler = (handler || this.submit).bind(this)
+    this.form.addEventListener('submit', this.submitHandler);
+
+    return this;
+  }
+
+  WPLF_Form.prototype.removeSubmitHandler = function removeSubmitHandler() {
+    this.form.removeEventListener('submit', this.submitHandler);
+    this.submitHandler = null;
+
+    return this;
+  }
+
+  WPLF_Form.prototype.submit = function submit (e) {
+    console.log('triggered submit', this)
+    var form = this.form;
     var data = new FormData(form);
-    
-    // prevent submitting the form again when a submission is already in progress
-    if (form.classList.contains('sending')) {
-      e.preventDefault();
-      return; 
+
+    e.preventDefault();
+
+    // Prevent double submissions by blocking send if it's already in progress
+    if (this.form.submitState === 'sending') {
+      return;
     }
 
     // Pass language if it exists.
-    ajax_object.lang && data.append('lang', ajax_object.lang);
+    WPLF_DATA.lang && data.append('lang', WPLF_DATA.lang);
 
     // add class to enable css changes to indicate ajax loading
-    form.classList.add("sending");
+    form.classList.add('sending');
+    form.submitState = 'submitting';
 
     [].forEach.call(form.querySelectorAll(".wplf-error"), function(error) {
       // reset errors
       error.parentNode.removeChild(error);
     });
-    
-    window.wplf.beforeSendCallbacks.forEach(function(func) {
-      func(form);
+
+    Object.keys(this.callbacks.beforeSend).forEach(function(key) {
+      this.callbacks.beforeSend[key](form, this);
     });
 
-    fetch(ajax_object.ajax_url, {
+    fetch(WPLF_DATA.ajax_url, {
       method: "POST",
-      credentials: ajax_object.ajax_credentials || 'same-origin',
+      credentials: WPLF_DATA.ajax_credentials || 'same-origin',
       body: data,
-      headers: ajax_object.request_headers || {},
+      headers: WPLF_DATA.request_headers || {},
     }).then(function(response) {
       return response.text();
-    }).then(function(response) {
+    }.bind(this)).then(function(response) {
       response = JSON.parse(response);
-      
+
+      console.log(response)
+
       if( 'success' in response ) {
         // show success message if one exists
         var success = document.createElement("p");
@@ -54,8 +170,9 @@ window.wplf = {
         // submit succesful!
         form.parentNode.removeChild(form);
 
-        window.wplf.successCallbacks.forEach(function(func) {
-          func(response);
+        this.submitStatus = 'success';
+        Object.keys(this.callbacks.success).forEach(function(key) {
+          this.callbacks.success[key](response, this);
         });
       }
 
@@ -67,26 +184,48 @@ window.wplf = {
 
         form.appendChild(error);
 
-        window.wplf.errorCallbacks.forEach(function(func) {
-          func(response);
+        this.submitStatus = 'error';
+        this.callbacks.error.forEach(function(func) {
+          func(response, this);
+        });
+
+        Object.keys(this.callbacks.error).forEach(function(key) {
+          this.callbacks.error[key](response, this);
         });
       }
 
       form.classList.remove('sending');
-    }).catch(function(error) {
+    }.bind(this)).catch(function(error) {
       form.classList.remove("sending");
 
-      if (window.wplf.errorCallbacks.length > 0) {
-        window.wplf.errorCallbacks.forEach(function(func) {
-          func(error);
+      if (this.callbacks.error.length > 0) {
+        Object.keys(this.callbacks.error).forEach(function(key) {
+          this.callbacks.error[key](response, this);
         });
       } else {
         console.warn("Fetch error: ", error);
       }
-    });
+    }.bind(this));
 
     // don't actually submit the form, causing a page reload
     e.preventDefault();
+  }
+
+  window.WPLF = new WPLF();
+
+  if (WPLF_DATA.autoinit === '1') {
+    [].forEach.call(
+      document.querySelectorAll(".libre-form"),
+      window.WPLF.attach.bind(window.WPLF)
+    );
+  }
+})
+
+/* window.wplf = {
+  successCallbacks: [],
+  errorCallbacks: [],
+  beforeSendCallbacks: [],
+  submitHandler: function (e) {
   },
   attach: function(form) {
     // form is a selector
@@ -109,52 +248,9 @@ window.wplf = {
   var main = function () {
     [].forEach.call(document.querySelectorAll(".libre-form"), window.wplf.attach);
   };
-  var dependencies = [];
-
-  if (!window.fetch) {
-    dependencies.push('fetch');
-  }
-
-  if (!window.Promise) {
-    dependencies.push('Promise');
-  }
-
-
-  function initialize(dependencies, app) {
-    var dependency_count = dependencies.length;
-    var dependencies_loaded = 0;
-    var is_ready = function () {
-      return dependency_count === dependencies_loaded;
-    };
-    var run_when_ready = function () {
-      if (is_ready()) {
-        app();
-      }
-    };
-    var get_script = function (script) {
-      var elmnt = document.createElement('script');
-      elmnt.src = ajax_object.wplf_assets_dir + '/scripts/polyfills/' + script + '.js';
-
-      return elmnt;
-    };
-
-    dependencies.map(function (dependency) {
-      return dependency.toLowerCase();
-    }).map(function (dependency) {
-      return get_script(dependency);
-    }).map(function (script) {
-      script.addEventListener('load', function () {
-        dependencies_loaded++;
-        run_when_ready();
-      });
-
-      return document.body.appendChild(script);
-    });
-
-    run_when_ready();
-  }
 
   document.addEventListener('DOMContentLoaded', function () {
     initialize(dependencies, main);
   });
 }());
+ */
