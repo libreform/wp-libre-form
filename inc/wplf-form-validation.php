@@ -108,12 +108,12 @@ function wplf_validate_additional_fields( $return ) {
     }
   }
   $additional_fields = array_filter( $additional_fields ); // get rid of the empty keys
-  
+
   // support archive referrer, do not keep field _referrer_archive_title as a additional field
   if ( 'archive' === $all_fields['_referrer_id'] && array_key_exists( '_refererr_archive_title', $additional_fields ) ) {
     unset( $additional_fields['_referrer_archive_title'] );
   }
-  
+
   if ( ! empty( $additional_fields ) ) {
     $return->ok = 0;
     $return->error = __( 'Additional fields are present.', 'wp-libre-form' );
