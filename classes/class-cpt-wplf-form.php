@@ -90,12 +90,6 @@ class CPT_WPLF_Form {
       'menu_icon'           => 'dashicons-archive',
       'query_var'           => false,
       'capability_type'     => 'post',
-      'capabilities'        => (is_multisite()
-        ? array(
-          'unfiltered_html',
-        )
-        : array()
-      ),
       'has_archive'         => false,
       'hierarchical'        => false,
       'menu_position'       => null,
@@ -767,6 +761,14 @@ class CPT_WPLF_Form {
    * Handles saving our post meta
    */
   public function save_cpt( $post_id ) {
+    if ( is_multisite() && !current_user_can('unfiltered_html') ) {
+      wp_die(
+        '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
+        '<p>' . __('You are not allowed to edit posts in this post type.') . '</p>',
+        40
+      );
+    }
+
     // verify nonce
     if ( ! isset( $_POST['wplf_form_meta_nonce'] ) ) {
       return;
