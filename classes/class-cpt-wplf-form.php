@@ -763,9 +763,9 @@ class CPT_WPLF_Form {
   public function save_cpt( $post_id ) {
     if ( is_multisite() && !current_user_can('unfiltered_html') ) {
       wp_die(
-        '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
-        '<p>' . __('You are not allowed to edit posts in this post type.') . '</p>',
-        40
+        '<h1>' . __( 'You do not have unfiltered_html capability', 'wp-libre-form' ) . '</h1>' .
+        '<p>' . __( 'Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form' ) . '</p>',
+        403
       );
     }
 
