@@ -80,7 +80,7 @@ function wplf_ajax_submit_handler() {
     foreach ( $_FILES as $key => $file ) {
       // skip empty upload fields
       if ( empty( $file['tmp_name'] ) ) continue;
-      
+
       // Is this enough security wise?
       // Currenly only supports 1 file per input
       if ( $should_store_images_in_medialibrary ) {
