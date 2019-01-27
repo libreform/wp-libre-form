@@ -92,6 +92,11 @@ class CPT_WPLF_Form {
       'capability_type'     => 'post',
       'capabilities'        => array(
         'unfiltered_html',
+        'edit_post',
+        'read_post',
+        'edit_posts',
+        'delete_post',
+        'publish_posts',
       ),
       'has_archive'         => false,
       'hierarchical'        => false,
