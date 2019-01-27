@@ -99,7 +99,7 @@ function wplf_validate_additional_fields( $return ) {
   $form_fields = explode( ',', get_post_meta( $form->ID, '_wplf_fields', true ) );
 
   // add all default fields
-  $default_fields = array( 'referrer', '_referrer_id', '_form_id' );
+  $default_fields = array( 'referrer', '_referrer_id', '_form_id', 'lang' );
 
   // combine fields
   $all_fields = array_merge( $form_fields, $default_fields );
