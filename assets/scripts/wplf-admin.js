@@ -125,7 +125,7 @@ function showDynamicValueInfo(e) {
     var option = target.querySelector('option[value="' + value + '"]');
     var labels = JSON.parse(option.getAttribute('data-labels'));
     desc.html(labels.description);
-    usage.text('%' + value + '%');
+    usage.text('## ' + value + ' ##');
     help.show();
   } else {
     help.hide();

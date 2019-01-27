@@ -3,7 +3,7 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
   class WPLF_Dynamic_Values {
 
     public static $instance;
-    protected $regular_expression = "/%[^%%\n]+%/";
+    protected $regular_expression = "/## \w+ ##/";
 
     public static function init() {
       if ( is_null( self::$instance ) ) {
@@ -20,11 +20,11 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
     }
 
     public function render_form( $content, $id, $xclass, $attributes ) {
-      // Get all strings inside % placeholders
+      // Get all strings inside ## placeholders
       preg_match_all( $this->regular_expression, $content, $matches );
       foreach ( $matches[0] as $match ) {
-        // match contains the % chars, get rid of them.
-        $string = trim( str_replace( array( '%' ), array( '' ), $match ) );
+        // match contains the ## chars, get rid of them.
+        $string = trim( str_replace( array( '##' ), array( '' ), $match ) );
         $content = str_replace(
           $match,
           $this->populate_value(
