@@ -90,13 +90,11 @@ class CPT_WPLF_Form {
       'menu_icon'           => 'dashicons-archive',
       'query_var'           => false,
       'capability_type'     => 'post',
-      'capabilities'        => array(
-        'unfiltered_html',
-        'edit_post',
-        'read_post',
-        'edit_posts',
-        'delete_post',
-        'publish_posts',
+      'capabilities'        => (is_multisite()
+        ? array(
+          'unfiltered_html',
+        )
+        : array()
       ),
       'has_archive'         => false,
       'hierarchical'        => false,
@@ -199,7 +197,7 @@ class CPT_WPLF_Form {
 
     // add dynamic variables to the script's scope
     wp_localize_script( 'wplf-form-edit-js', 'wplf_form_edit', apply_filters( 'wplf_form_edit_variables', array(
-      'has_unfiltered_html' => current_user_can( 'unfiltered_html') ? true : false, // WP turns it into a number...
+      'has_unfiltered_html' => is_multisite() ? current_user_can( 'unfiltered_html') : true , // WP turns it into a number...
     ) ) );
 
     // enqueue the custom CSS for this view

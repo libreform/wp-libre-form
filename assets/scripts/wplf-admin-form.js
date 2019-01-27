@@ -7,7 +7,7 @@ $(document).ready(function() {
   var data = window.wplf_form_edit
 
   // Prevent users who can't save the post from editing it
-  if (data.has_unfiltered_html !== '0') {
+  if (data.has_unfiltered_html !== '1') {
     $('#title').prop('disabled', true);
     $('#content').prop('disabled', true);
     $('#publish').remove();
