@@ -963,7 +963,7 @@ class CPT_WPLF_Form {
   <?php endif; ?>
     <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
   <?php if ( apply_filters( 'wplf_honeypot', true ) ) :
-    $honeypot_name =apply_filters( 'wplf_honeypot_field_name', 'send_hugs_to_developers' );  ?>
+    $honeypot_name = apply_filters( 'wplf_honeypot_field_name', 'send_hugs_to_developers' );  ?>
     <input type="checkbox" name="<?php echo esc_attr( $honeypot_name ) ?>" value="1" style="display:none !important" tabindex="-1" autocomplete="off">
   <?php endif; ?>
 </form>
