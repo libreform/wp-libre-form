@@ -962,6 +962,7 @@ class CPT_WPLF_Form {
     <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ); ?>">
   <?php endif; ?>
   <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
+  <input type="checkbox" name="send_hugs_to_developers" value="1" style="display:none !important" tabindex="-1" autocomplete="off">
 </form>
 <?php
       $output = ob_get_clean();

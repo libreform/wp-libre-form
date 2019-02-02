@@ -9,6 +9,13 @@ function wplf_ajax_submit_handler() {
 
   $return = new stdClass();
   $return->ok = 1;
+  $return->spam = false;
+  $return->spam_save = true;
+
+  // allow save spam setting filtering
+  $return->spam_save = apply_filters( "wplf_save_spam", $return->spam_save );
+  $return->spam_save = apply_filters( "wplf_{$form->post_name}_save_spam", $return->spam_save );
+  $return->spam_save = apply_filters( "wplf_{$form->ID}_save_spam", $return->spam_save );
 
   // allow user to pre-process the post fields
   do_action( 'wplf_pre_validate_submission' );
@@ -28,14 +35,27 @@ function wplf_ajax_submit_handler() {
     $return = apply_filters( "wplf_{$form->ID}_validate_submission", $return );
   }
 
+  // if message is spam and spam messages should not be saved as trash, return error.
+  if ( $return->spam && ! $return->spam_save ) {
+    $return->ok = 0;
+    $return->error = __( 'Something went wrong, please try again.', 'wp-libre-form' );
+  }
+
   if ( $return->ok ) {
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
 
+
+    // change post status to trash if spam, WP core cleans trash every 30 days
+    $post_status = 'publish';
+    if ( $return->spam ) {
+      $post_status = 'trash';
+    }
+
     // create submission post
     $post_id = wp_insert_post( array(
       'post_title'     => '',
-      'post_status'    => 'publish',
+      'post_status'    => $post_status,
       'post_type'      => 'wplf-submission',
     ) );
 
@@ -71,6 +91,20 @@ function wplf_ajax_submit_handler() {
       } else {
         add_post_meta( $post_id, $key, $value, true );
       }
+    }
+
+    // bail if spam submission
+    if ( $return->spam ) {
+      // mark submission as a spam
+      add_post_meta( $post_id, '_is_spam', true, true );
+
+      // set return
+      $return->ok = 0;
+      $return->error = __( 'Something went wrong, please try again.', 'wp-libre-form' );
+
+      // respond with json
+      wp_send_json( $return );
+      wp_die();
     }
 
     // handle files

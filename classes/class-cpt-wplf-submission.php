@@ -30,6 +30,7 @@ class CPT_WPLF_Submission {
     add_action( 'manage_posts_custom_column', array( $this, 'custom_columns_display_cpt' ), 10, 2 );
     add_action( 'restrict_manage_posts', array( $this, 'form_filter_dropdown' ) );
     add_filter( 'pre_get_posts', array( $this, 'filter_by_form' ) );
+    add_filter( 'display_post_states', array( $this, 'post_states' ), 10, 2 );
 
     // add custom bulk actions
     add_action( 'admin_notices', array( $this, 'wplf_submission_bulk_action_admin_notice' ) );
@@ -172,6 +173,23 @@ class CPT_WPLF_Submission {
     }
 
     return $query;
+  }
+
+  /**
+   *  Show if message is marked as spam
+   */
+  public static function post_states( $post_states, $post ) {
+    if ( 'wplf-submission' !== $post->post_type ) {
+      return $post_states;
+    }
+
+    $is_spam = get_post_meta( $post->ID, '_is_spam', true );
+
+    if ( $is_spam ) {
+      $post_states['wplf_is_spam'] = __( 'Spam', 'wp-libre-form' );
+    }
+
+    return $post_states;
   }
 
   public function register_wplf_submission_bulk_actions( $bulk_actions ) {
