@@ -13,7 +13,7 @@ function wplf_ajax_submit_handler() {
   $return->spam_save = true;
 
   // allow save spam setting filtering
-  $return->spam_save = apply_filters( "wplf_save_spam", $return->spam_save );
+  $return->spam_save = apply_filters( 'wplf_save_spam', $return->spam_save );
   $return->spam_save = apply_filters( "wplf_{$form->post_name}_save_spam", $return->spam_save );
   $return->spam_save = apply_filters( "wplf_{$form->ID}_save_spam", $return->spam_save );
 
@@ -44,7 +44,6 @@ function wplf_ajax_submit_handler() {
   if ( $return->ok ) {
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
-
 
     // change post status to trash if spam, WP core cleans trash every 30 days
     $post_status = 'publish';
