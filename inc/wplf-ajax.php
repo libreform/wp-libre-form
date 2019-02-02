@@ -12,11 +12,6 @@ function wplf_ajax_submit_handler() {
   $return->spam = false;
   $return->spam_save = true;
 
-  // allow save spam setting filtering
-  $return->spam_save = apply_filters( 'wplf_save_spam', $return->spam_save );
-  $return->spam_save = apply_filters( "wplf_{$form->post_name}_save_spam", $return->spam_save );
-  $return->spam_save = apply_filters( "wplf_{$form->ID}_save_spam", $return->spam_save );
-
   // allow user to pre-process the post fields
   do_action( 'wplf_pre_validate_submission' );
 
@@ -33,6 +28,11 @@ function wplf_ajax_submit_handler() {
     $return->title = $form->post_title;
     $return = apply_filters( "wplf_{$form->post_name}_validate_submission", $return );
     $return = apply_filters( "wplf_{$form->ID}_validate_submission", $return );
+
+    // allow save spam setting filtering
+    $return->spam_save = apply_filters( 'wplf_save_spam', $return->spam_save );
+    $return->spam_save = apply_filters( "wplf_{$form->post_name}_save_spam", $return->spam_save );
+    $return->spam_save = apply_filters( "wplf_{$form->ID}_save_spam", $return->spam_save );
   }
 
   // if message is spam and spam messages should not be saved as trash, return error.
