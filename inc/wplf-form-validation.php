@@ -36,8 +36,15 @@ function wplf_validate_check_honeypot( $return ) {
     return $return;
   }
 
+  // skip this validation if honeypot is turned off
+  if ( ! apply_filters( 'wplf_honeypot', true ) ) {
+    return $return;
+  }
+
   // check if honeypot exists and has some value, mark as spam if true
-  if ( ! empty( $_POST['send_hugs_to_developers'] ) && true === (bool) $_POST['send_hugs_to_developers'] ) {
+  $honeypot_name = apply_filters( 'wplf_honeypot_field_name', 'send_hugs_to_developers' );
+
+  if ( ! empty( $_POST[ $honeypot_name ] ) && true === (bool) $_POST[ $honeypot_name ] ) {
     $return->spam = true;
   }
 
