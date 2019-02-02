@@ -46,6 +46,10 @@ class CPT_WPLF_Form {
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
 
+    add_filter( 'template_include', array( $this, 'template_include' ) );
+    add_filter( 'the_content', array( $this, 'the_content' ) );
+    add_filter( 'the_title', array( $this, 'wp_title' ) );
+
     // default filters for the_content, but we don't want to use actual the_content
     add_filter( 'wplf_form', 'convert_smilies' );
     add_filter( 'wplf_form', 'convert_chars' );
@@ -61,6 +65,74 @@ class CPT_WPLF_Form {
 
     // before delete, remove the possible uploads
     add_action( 'before_delete_post', array( $this, 'clean_up_entry' ) );
+  }
+
+  public static function the_content( $content ) {
+    if ( ! isset( $_GET['wplf-form'] ) ) {
+      return $content;
+    }
+
+    if ( ! isset( $_GET['wplf-form'] )
+      || ! is_numeric( $_GET['wplf-form'] )
+      || 'publish' !== get_post_status( $_GET['wplf-form'] )
+      || 'wplf-form' !== get_post_type( $_GET['wplf-form'] )
+    ) {
+      return $content;
+    }
+
+    if ( ! current_user_can( 'edit_posts' ) ) {
+      return $content;
+    }
+
+    $content = '<p style="background:#f5f5f5;border-left:4px solid #dc3232;padding:6px 12px;">
+      <strong style="color:#dc3232;">
+        ' . esc_html__( 'This form preview URL is not public and cannot be shared.', 'wp-libre-form' ) . '
+      </strong>
+      <br />
+      ' . esc_html__( 'Non-logged in visitors will see a 404 error page instead.', 'wp-libre-form' ) . '
+    </p>';
+    $content .= do_shortcode( '[libre-form id="' . $_GET['wplf-form'] . '"]' );
+    return $content;
+  }
+
+  public static function wp_title( $title ) {
+    if ( ! isset( $_GET['wplf-form'] ) ) {
+      return $title;
+    }
+
+    if ( ! isset( $_GET['wplf-form'] )
+      || ! is_numeric( $_GET['wplf-form'] )
+      || 'publish' !== get_post_status( $_GET['wplf-form'] )
+      || 'wplf-form' !== get_post_type( $_GET['wplf-form'] )
+    ) {
+      return $title;
+    }
+
+    if ( ! current_user_can( 'edit_posts' ) ) {
+      return $title;
+    }
+
+   return __( 'Libre Form preview', 'wp-libre-form' );
+  }
+
+  public static function template_include( $template ) {
+    if ( ! isset( $_GET['wplf-form'] ) ) {
+      return $template;
+    }
+
+    if ( ! isset( $_GET['wplf-form'] )
+      || ! is_numeric( $_GET['wplf-form'] )
+      || 'publish' !== get_post_status( $_GET['wplf-form'] )
+      || 'wplf-form' !== get_post_type( $_GET['wplf-form'] )
+    ) {
+      return $template;
+    }
+
+    if ( ! current_user_can( 'edit_posts' ) ) {
+      return $template;
+    }
+
+    return get_page_template();
   }
 
   public static function register_cpt() {
@@ -82,8 +154,8 @@ class CPT_WPLF_Form {
 
     $args = array(
       'labels'              => $labels,
-      'public'              => true,
-      'publicly_queryable'  => true,
+      'public'              => false,
+      'publicly_queryable'  => false,
       'exclude_from_search' => true,
       'show_ui'             => true,
       'show_in_menu'        => true,
@@ -93,9 +165,7 @@ class CPT_WPLF_Form {
       'has_archive'         => false,
       'hierarchical'        => false,
       'menu_position'       => null,
-      'rewrite'             => array(
-        'slug' => 'libre-forms',
-      ),
+      'rewrite'             => null,
       'supports'            => array(
         'title',
         'editor',
