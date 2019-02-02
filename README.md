@@ -14,6 +14,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 - Full file upload support to Media Library with input type=file
 - Multilingual support with Polylang
 - Predefined static HTML forms via filter hooks
+- Dynamic values, like %USER_EMAIL% for pre-populating form data
 
 ## Why?
 
@@ -172,8 +173,91 @@ These filters are only applied for the target form by ID or slug.
 Disabling additonal fields validation for all forms:
 
 ```php
-add_filter( 'wplf_disable_validate_additional_fields' , __return_false );
+add_filter( 'wplf_disable_validate_additional_fields' , '__return_true' );
 ```
+
+### Filter: wplf_allowed_additional_form_fields
+
+You can provide your own set of allowed field names, instead of disabling additional field validation entirely.
+
+#### Form specific hooks
+
+This filter supports form specific hooks:
+
+- `wplf_{form_id}_allowed_additional_form_fields`
+- `wplf_{form_slug}_allowed_additional_form_fields`
+
+These filters are only applied for the target form by ID or slug.
+
+Disabling additonal fields validation for all forms:
+
+```php
+add_filter( 'wplf_allowed_additional_form_fields' , ['dynamic-field-name'] );
+```
+
+### Filter: wplf_dynamic_values
+
+Add or customize dynamic values available in forms.
+
+#### Example: new value
+
+```php
+add_filter('wplf_dynamic_values', function($values) {
+  $values['SOMETHING'] = [
+    'callback' => function() { return 'something'; },
+    'labels' => [
+      'name' => 'Something',
+      'description' => 'Something really useful.'
+    ],
+  ];
+
+  return $values;
+});
+
+// <input type="text" placeholder="%SOMETHING%" name="something">
+```
+
+
+### Filter: wplf_uploaded_file_name
+If you choose to not add uploaded files to the media library, you can change the file upload name.
+
+```php
+add_filter('wplf_uploaded_file_name', function($name, $file, $id) {
+  return "my_".$name;
+}, 10, 3);
+```
+
+### Filter: wplf_uploaded_file_path
+If you choose to not add uploaded files to the media library, you can change the file upload path.
+
+```php
+add_filter('wplf_uploaded_file_path', function($name, $file, $id) {
+  return $name.".userfile";
+}, 10, 3);
+```
+
+## Plugins
+1.5 exposes a new function, `wplf()`. It simply returns the class instance of WP Libre Form.
+
+It allows you to register your plugin as a WP Libre Form plugin, which in turn allows you to expose an API and a settings page for your plugin, should you want to.
+
+```php
+$wplf = wplf();
+$plugin = new YourPlugin();
+
+$wplf->plugins->register([
+  "name" => "YourPlugin", // The name you wish to show on the WPLF plugin page. Willl also be used to access public methods in your plugin
+  "description" => "What your plugin does in a sentence or two",
+  "link" => "https://toyourplugin.com", // Plugin URL. Can be wordpress.org or pretty much any URL where you can download the plugin
+  "version" => YOUR_PLUGIN_VERSION, // Define a constant containing your plugin version
+  "instance" => $plugin, // Your plugin, instantiated. Users can access your public methods
+  "settings_page" => [$plugin, "render_settings_page"], // Function that renders your settings page, or a string that contains the link to it. Leave empty to disable.
+]);
+```
+
+If you use spaces in the name, you can access the plugin instance like this:
+
+`wplf()->plugins->{"Your plugin"}->somePublicMethod()`
 
 ## Javascript API
 

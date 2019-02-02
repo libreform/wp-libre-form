@@ -75,15 +75,20 @@ function wplf_validate_additional_fields( $return ) {
     return $return;
   }
 
-  // skip this validation if it is disabled with filter for this form
+  // skip this validation if it is disabled with filter
   $form = get_post( intval( $_POST['_form_id'] ) );
-  // global disable
   $disable_validation = false;
-  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation );
+
+  // global disable
+  $disable_validation = apply_filters( 'wplf_disable_validate_additional_fields', $disable_validation, $form );
+
   // disable by form id
-  $disable_validation = apply_filters( "wplf_{$form->ID}_disable_validate_additional_fields", $disable_validation );
+  $disable_validation = apply_filters( "wplf_{$form->ID}_disable_validate_additional_fields", $disable_validation, $form );
+
   // disable by form slug
-  $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation );
+  $disable_validation = apply_filters( "wplf_{$form->post_name}_disable_validate_additional_fields", $disable_validation, $form );
+
+  // test form version and disable if form created before version 1.5.0
   $version_high_enough = version_compare( get_post_meta( $form->ID, '_wplf_plugin_version', true ), '1.5.0', '>=' );
 
   if ( $disable_validation || ! $version_high_enough ) {
@@ -94,10 +99,16 @@ function wplf_validate_additional_fields( $return ) {
   $form_fields = explode( ',', get_post_meta( $form->ID, '_wplf_fields', true ) );
 
   // add all default fields
-  $default_fields = array( 'referrer', '_referrer_id', '_form_id' );
+  $default_fields = array( 'referrer', '_referrer_id', '_form_id', 'lang' );
+
+  // add all custom fields, form spesific filters
+  $custom_fields = array();
+  $custom_fields = apply_filters( 'wplf_allowed_additional_form_fields', $custom_fields, $form );
+  $custom_fields = apply_filters( "wplf_{$form->ID}_allowed_additional_form_fields", $custom_fields, $form );
+  $custom_fields = apply_filters( "wplf_{$form->post_name}_allowed_additional_form_fields", $custom_fields, $form );
 
   // combine fields
-  $all_fields = array_merge( $form_fields, $default_fields );
+  $all_fields = array_merge( $form_fields, $custom_fields, $default_fields );
 
   // make sure fields from all_fields are the only ones present in $_POST
   $additional_fields = array();
@@ -108,6 +119,11 @@ function wplf_validate_additional_fields( $return ) {
     }
   }
   $additional_fields = array_filter( $additional_fields ); // get rid of the empty keys
+
+  // support archive referrer, do not keep field _referrer_archive_title as a additional field
+  if ( 'archive' === $all_fields['_referrer_id'] && array_key_exists( '_refererr_archive_title', $additional_fields ) ) {
+    unset( $additional_fields['_referrer_archive_title'] );
+  }
 
   if ( ! empty( $additional_fields ) ) {
     $return->ok = 0;

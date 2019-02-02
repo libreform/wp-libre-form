@@ -17,10 +17,10 @@ function wplf_ajax_submit_handler() {
   // @see: wplf-form-validation.php
   $return = apply_filters( 'wplf_validate_submission', $return );
 
-  if ( $return->ok ) {
-    // form existence has already been validated via filters
-    $form = get_post( intval( $_POST['_form_id'] ) );
+  // form existence has already been validated via filters
+  $form = get_post( intval( $_POST['_form_id'] ) );
 
+  if ( $return->ok ) {
     // form-specific validation
     $return->slug = $form->post_name;
     $return->title = $form->post_title;
@@ -31,6 +31,17 @@ function wplf_ajax_submit_handler() {
   if ( $return->ok ) {
     // the title is the value of whatever the first field was in the form
     $title_format = get_post_meta( $form->ID, '_wplf_title_format', true );
+
+    // create submission post
+    $post_id = wp_insert_post( array(
+      'post_title'     => '',
+      'post_status'    => 'publish',
+      'post_type'      => 'wplf-submission',
+    ) );
+
+    // exposes $post_id in $_POST to be able to use in the title
+    // hacky, but uses less memory than a copy of $_POST
+    $_POST['submission-id'] = $post_id;
 
     // substitute the %..% tags with field values
     $post_title = $title_format;
@@ -44,12 +55,14 @@ function wplf_ajax_submit_handler() {
       $post_title = preg_replace( '/%.+?%/', $replace, $post_title, 1 );
     }
 
-    // create submission post
-    $post_id = wp_insert_post( array(
-      'post_title'     => $post_title,
-      'post_status'    => 'publish',
-      'post_type'      => 'wplf-submission',
-    ) );
+    // save the title
+    wp_update_post( [
+      'ID'         => $post_id,
+      'post_title' => $post_title,
+    ] );
+
+    // don't save the post id in meta
+    unset( $_POST['submission-id'] );
 
     // add submission data as meta values
     foreach ( $_POST as $key => $value ) {
@@ -65,6 +78,9 @@ function wplf_ajax_submit_handler() {
     $should_store_images_in_medialibrary = get_post_meta( $form->ID, '_wplf_media_library', true );
     $counter = 0;
     foreach ( $_FILES as $key => $file ) {
+      // skip empty upload fields
+      if ( empty( $file['tmp_name'] ) ) continue;
+
       // Is this enough security wise?
       // Currenly only supports 1 file per input
       if ( $should_store_images_in_medialibrary ) {
@@ -77,11 +93,17 @@ function wplf_ajax_submit_handler() {
           add_post_meta( $post_id, $key . '_attachment', $attach_id );
         }
       } else {
-          $name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . sanitize_file_name( $file['name'] );
+        $file['field_name'] = $key;
 
-          move_uploaded_file( $file['tmp_name'], $uploads_path['path'] . '/' . $name );
-          add_post_meta( $post_id, $key . '_attachment', $uploads_path['url'] . '/' . $name );
-          $counter++;
+        $default_file_name = 'lf_' . date( 'ymdhs' ) . '-' . $counter . '-' . $file['name'];
+        $file_name = sanitize_file_name( apply_filters( 'wplf_uploaded_file_name', $default_file_name, $file, $post_id ) );
+
+        $file_path = $uploads_path['path'] . '/' . $file_name;
+        $file_path = apply_filters( 'wplf_uploaded_file_path', $file_path, $file, $post_id );
+
+        move_uploaded_file( $file['tmp_name'], $file_path );
+        add_post_meta( $post_id, $key . '_attachment', $file_path );
+        $counter++;
       }
     }
 

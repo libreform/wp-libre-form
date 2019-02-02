@@ -38,6 +38,7 @@ class CPT_WPLF_Form {
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );
     add_filter( 'user_can_richedit', array( $this, 'disable_tinymce' ) );
+    add_filter( 'use_block_editor_for_post_type', array( $this, 'disable_gutenberg' ), 10, 2 );
 
     // front end
     add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
@@ -133,6 +134,17 @@ class CPT_WPLF_Form {
       return false;
     }
     return $default;
+  }
+
+  /**
+   *  Disable Gutenberg editor
+   */
+  public function disable_gutenberg( $is_enabled, $post_type ) {
+    if ( $post_type === 'wplf-form' ) {
+      return false;
+    }
+
+    return $is_enabled;
   }
 
   /**
@@ -334,6 +346,16 @@ class CPT_WPLF_Form {
       'high'
     );
 
+    // Dynamic values
+    add_meta_box(
+      'wplf-dynamic-values',
+      __( 'Dynamic values', 'wp-libre-form' ),
+      array( $this, 'metabox_dynamic_values' ),
+      'wplf-form',
+      'normal',
+      'high'
+    );
+
     // Messages meta box
     add_meta_box(
       'wplf-messages',
@@ -389,6 +411,35 @@ class CPT_WPLF_Form {
   public function metabox_shortcode( $post ) {
 ?>
 <p><input type="text" class="code" value='[libre-form id="<?php echo esc_attr( $post->ID ); ?>"]' readonly></p>
+<?php
+  }
+
+  /**
+   * Meta box callback for dynamic values meta box
+   */
+  public function metabox_dynamic_values( $post ) {
+    unset( $post ); ?>
+    <select name="wplf-dynamic-values">
+      <option default value=""><?php esc_html_e( 'Choose a dynamic value', 'wp-libre-form' ); ?></option>
+
+      <?php foreach ( ( WPLF_Dynamic_Values::get_available() ) as $k => $v ) {
+        $key = sanitize_text_field( $k );
+        $labels = $v['labels'];
+        $stringified = wp_json_encode( $labels );
+
+        // WPCS won't STFU. It's wrong. Again.
+        echo "<option value='$key' data-labels='$stringified'>$labels[name]</option>"; // @codingStandardsIgnoreLine
+      } ?>
+    </select>
+
+    <!-- Shown with JS. -->
+    <div class="wplf-dynamic-values-help">
+      <div class="description"></div>
+      <div class="usage">
+        <strong><?php esc_html_e( 'Usage', 'wp-libre-form' ); ?>:&nbsp;</strong>
+        <span></span>
+      </div>
+    </div>
 <?php
   }
 
@@ -547,6 +598,12 @@ class CPT_WPLF_Form {
 ?>
 <p><?php esc_html_e( 'Submissions from this form will use this formatting in their title.', 'wp-libre-form' ); ?></p>
 <p><?php esc_html_e( 'You may use any field values enclosed in "%" markers.', 'wp-libre-form' ); ?></p>
+<p>
+  <?php
+    // translators: %submission-id% is not meant to be translated
+    esc_html_e( 'In addition, you may use %submission-id%.', 'wp-libre-form' );
+  ?>
+ </p>
 <p>
   <input
     type="text"
@@ -849,7 +906,7 @@ class CPT_WPLF_Form {
       $content = apply_filters( "wplf_{$form->ID}_form", $content );
 
       // run default filters after. The user probably wants to filter original content, not modified by WP
-      $content = apply_filters( 'wplf_form', $content );
+      $content = apply_filters( 'wplf_form', $content, $id, $xclass, $attributes );
 
       ob_start();
 ?>
@@ -890,9 +947,20 @@ class CPT_WPLF_Form {
     // @codingStandardsIgnoreStart
     echo $content;
     // @codingStandardsIgnoreEnd
-  ?>
-  <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
-  <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ); ?>">
+
+  if ( is_archive() ) :
+    global $wp;
+    $current_url = home_url( $wp->request );
+    if ( empty( get_option( 'permalink_structure' ) ) ) {
+      $current_url = add_query_arg( $wp->query_string, '', home_url( $wp->request ) );
+    } ?>
+    <input type="hidden" name="referrer" value="<?php echo esc_attr( $current_url ); ?>">
+    <input type="hidden" name="_referrer_id" value="archive">
+    <input type="hidden" name="_referrer_archive_title" value="<?php echo esc_attr( get_the_archive_title() ); ?>">
+  <?php else : ?>
+    <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
+    <input type="hidden" name="_referrer_id" value="<?php echo esc_attr( get_the_id() ); ?>">
+  <?php endif; ?>
   <input type="hidden" name="_form_id" value="<?php echo esc_attr( $id ); ?>">
 </form>
 <?php
@@ -924,10 +992,13 @@ class CPT_WPLF_Form {
       true
     );
 
+    $admin_url = admin_url( 'admin-ajax.php' );
+
     // add dynamic variables to the script's scope
-    wp_localize_script('wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
-      'ajax_url' => admin_url( 'admin-ajax.php' ),
+    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
+      'ajax_url' => apply_filters( 'wplf_ajax_endpoint', "$admin_url?action=wplf_submit" ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
+      'request_headers' => (object) apply_filters( 'wplf_ajax_request_headers', [] ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
     ) ) );
   }

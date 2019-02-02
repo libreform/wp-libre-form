@@ -3,7 +3,7 @@
  * Plugin name: WP Libre Form
  * Plugin URI: https://github.com/hencca/wp-libre-form
  * Description: A minimal HTML form builder for WordPress; made for developers
- * Version: 1.4.3
+ * Version: 1.5.0.1
  * Author: @anttiviljami
  * Author URI: https://github.com/anttiviljami/
  * License: GPLv3
@@ -32,10 +32,11 @@
 
 if ( ! class_exists( 'WP_Libre_Form' ) ) :
 
-define( 'WPLF_VERSION', '1.5.0-beta' );
+define( 'WPLF_VERSION', '1.5.0.1' );
 
 class WP_Libre_Form {
   public static $instance;
+  public $plugins;
 
   public static function init() {
     if ( is_null( self::$instance ) ) {
@@ -47,6 +48,8 @@ class WP_Libre_Form {
   private function __construct() {
     require_once 'classes/class-cpt-wplf-form.php';
     require_once 'classes/class-cpt-wplf-submission.php';
+    require_once 'classes/class-wplf-dynamic-values.php';
+    require_once 'classes/class-wplf-plugins.php';
     require_once 'inc/wplf-ajax.php';
 
     // default functionality
@@ -56,10 +59,15 @@ class WP_Libre_Form {
     // init our plugin classes
     CPT_WPLF_Form::init();
     CPT_WPLF_Submission::init();
+    WPLF_Dynamic_Values::init();
+
+    $this->plugins = WPLF_Plugins::init();
 
     add_action( 'after_setup_theme', array( $this, 'init_polylang_support' ) );
 
     add_action( 'plugins_loaded', array( $this, 'load_our_textdomain' ) );
+
+    add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 
     // flush rewrites on activation since we have slugs for our cpts
     register_activation_hook( __FILE__, array( 'WP_Libre_Form', 'flush_rewrites' ) );
@@ -85,6 +93,14 @@ class WP_Libre_Form {
     }
   }
 
+  public function register_rest_routes() {
+    register_rest_route( 'wplf/v1', 'submit', [
+      'methods' => 'POST',
+      'callback' => 'wplf_ajax_submit_handler', // admin-ajax handler, works but...
+      // The REST API handbook discourages from using $_POST, and instead use $request->get_params()
+    ]);
+  }
+
   /**
    * Enable Polylang support
    */
@@ -105,5 +121,12 @@ class WP_Libre_Form {
 
 endif;
 
-// init the plugin
-WP_Libre_Form::init();
+/**
+ * Expose a global function for less awkward usage
+ */
+function wplf() {
+  // init the plugin
+  return WP_Libre_Form::init();
+}
+
+wplf();
