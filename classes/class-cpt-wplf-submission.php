@@ -130,10 +130,14 @@ class CPT_WPLF_Submission {
     if ( $transient ) {
       $forms = $transient;
     } else {
-      $forms = get_posts( array(
+      $query = new WP_Query( array(
         'post_per_page' => '-1',
         'post_type' => 'wplf-form',
+        'no_found_rows' => true,
+        'update_post_meta_cache' => false,
+        'update_post_term_cache' => false,
       ) );
+      $forms = $query->get_posts();
 
       set_transient( 'wplf-form-filter', $forms, 15 * MINUTE_IN_SECONDS );
     }
