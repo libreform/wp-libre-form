@@ -131,7 +131,7 @@ class CPT_WPLF_Submission {
       $forms = $transient;
     } else {
       $query = new WP_Query( array(
-        'post_per_page' => '-1',
+        'posts_per_page' => '-1',
         'post_type' => 'wplf-form',
         'no_found_rows' => true,
         'update_post_meta_cache' => false,
