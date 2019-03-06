@@ -119,9 +119,10 @@ function wplf_validate_additional_fields( $return ) {
     }
   }
   $additional_fields = array_filter( $additional_fields ); // get rid of the empty keys
+  $referrer_id = isset( $all_fields['_referrer_id'] ) ? $all_fields['_referrer_id'] : null;
 
   // support archive referrer, do not keep field _referrer_archive_title as a additional field
-  if ( 'archive' === $all_fields['_referrer_id'] && array_key_exists( '_refererr_archive_title', $additional_fields ) ) {
+  if ( 'archive' === $referrer_id && array_key_exists( '_refererr_archive_title', $additional_fields ) ) {
     unset( $additional_fields['_referrer_archive_title'] );
   }
 
