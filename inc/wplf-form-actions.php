@@ -166,8 +166,8 @@ function wplf_email_maybe_implode_serialized_value( $value, $form_id = 0, $form_
 
   if ( is_array( $value ) ) {
     $implode_glue = apply_filters( 'wplf_email_array_field_implode_glue', ', ' );
-    $implode_glue = apply_filters( "wplf_{$form->post_name}_email_array_field_implode_glue", $implode_glue );
-    $implode_glue = apply_filters( "wplf_{$form->ID}_email_array_field_implode_glue", $implode_glue );
+    $implode_glue = apply_filters( "wplf_{$form_name}_email_array_field_implode_glue", $implode_glue );
+    $implode_glue = apply_filters( "wplf_{$form_id}_email_array_field_implode_glue", $implode_glue );
 
     $value = implode( $implode_glue, $value );
   }
