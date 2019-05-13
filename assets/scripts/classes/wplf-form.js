@@ -11,8 +11,7 @@ export class WPLF_Form {
       error: {}
     };
 
-    this.key = '_' + Math.random().toString(36).substr(2, 9)
-    console.log('hi', element, this)
+    this.key = '_' + Math.random().toString(36).substr(2, 9);
     this.addSubmitHandler();
   }
 
@@ -30,7 +29,6 @@ export class WPLF_Form {
 
   addSubmitHandler(handler) {
     this.submitHandler = (handler || function(e) {
-      console.log('triggered submit', this);
       e.preventDefault();
 
       // Prevent double submissions by blocking send if it's already in progress
@@ -54,8 +52,6 @@ export class WPLF_Form {
         ).then(
           function(response) {
             response = JSON.parse(response);
-
-            console.log(response)
 
             if( 'success' in response ) {
               // show success message if one exists
@@ -85,9 +81,6 @@ export class WPLF_Form {
               this.form.appendChild(error);
 
               this.submitStatus = 'error';
-              this.callbacks.error.forEach(function(func) {
-                func(response, this);
-              });
 
               Object.keys(this.callbacks.error).forEach(function(key) {
                 this.callbacks.error[key](response, this);
@@ -110,6 +103,7 @@ export class WPLF_Form {
         }.bind(this)
       );
     }).bind(this)
+
     this.form.addEventListener('submit', this.submitHandler);
 
     return this;
