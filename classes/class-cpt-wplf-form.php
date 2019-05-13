@@ -184,13 +184,11 @@ class CPT_WPLF_Form {
       return;
     }
 
-    $assets_url = plugins_url( 'assets', dirname( __FILE__ ) );
-
     // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-admin-form.js' );
+    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'dist/wplf-admin.js', dirname( __FILE__ ) ) );
 
     // enqueue the custom CSS for this view
-    wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
+    wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'assets/styles/wplf-admin-form.css', dirname( __FILE__ ) ) );
   }
 
   public function print_notices() {
@@ -986,7 +984,7 @@ class CPT_WPLF_Form {
     // register the script, but only enqueue it if the current post contains a form in it
     wp_register_script(
       'wplf-form-js',
-      plugins_url( 'assets/scripts/wplf-form.js', dirname( __FILE__ ) ),
+      plugins_url( 'dist/wplf-frontend.js', dirname( __FILE__ ) ),
       apply_filters( 'wplf_frontend_script_dependencies', array() ),
       WPLF_VERSION,
       true
