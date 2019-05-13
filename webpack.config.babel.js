@@ -11,7 +11,7 @@ export default ({ NODE_ENV: env }) => ({
     filename: '[name].js',
     libraryTarget: 'umd',
     globalObject: 'this',
-    // libraryExport: 'default',
+    libraryExport: 'default',
     library: 'WPLF'
   },
   externals: {
