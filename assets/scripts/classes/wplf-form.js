@@ -28,7 +28,7 @@ export class WPLF_Form {
   }
 
   addSubmitHandler(handler) {
-    this.submitHandler = (handler || function(e) {
+    this.submitHandler = (handler || (e => {
       e.preventDefault();
 
       // Prevent double submissions by blocking send if it's already in progress
@@ -38,24 +38,21 @@ export class WPLF_Form {
 
       // add class to enable css changes to indicate ajax loading
       this.form.classList.add('sending');
-      [].forEach.call(this.form.querySelectorAll(".wplf-error"), function(error) {
+      [].forEach.call(this.form.querySelectorAll(".wplf-error"), error => {
         // reset errors
         error.parentNode.removeChild(error);
       });
 
 
       this.send()
+        .then(r => r.text())
         .then(
-          function(response) {
-            return response.text();
-          }.bind(this)
-        ).then(
-          function(response) {
-            response = JSON.parse(response);
+          r => {
+            const response = JSON.parse(r);
 
             if( 'success' in response ) {
               // show success message if one exists
-              var success = document.createElement("p");
+              const success = document.createElement("p");
               success.className = "wplf-success";
               success.innerHTML = response.success;
 
@@ -67,14 +64,14 @@ export class WPLF_Form {
               this.form.parentNode.removeChild(this.form);
 
               this.submitStatus = 'success';
-              Object.keys(this.callbacks.success).forEach(function(key) {
+              Object.keys(this.callbacks.success).forEach(key => {
                 this.callbacks.success[key](response, this);
               });
             }
 
             if( 'error' in response ) {
               // show error message in form
-              var error = document.createElement("p");
+              const error = document.createElement("p");
               error.className = "wplf-error error";
               error.textContent = response.error;
 
@@ -82,27 +79,27 @@ export class WPLF_Form {
 
               this.submitStatus = 'error';
 
-              Object.keys(this.callbacks.error).forEach(function(key) {
+              Object.keys(this.callbacks.error).forEach(key => {
                 this.callbacks.error[key](response, this);
               });
             }
 
             this.form.classList.remove('sending');
-          }.bind(this)
+          }
         ).catch(
-          function(error) {
+          error => {
             this.form.classList.remove("sending");
 
             if (this.callbacks.error.length > 0) {
-              Object.keys(this.callbacks.error).forEach(function(key) {
+              Object.keys(this.callbacks.error).forEach(key => {
                 this.callbacks.error[key](response, this);
               });
             } else {
               console.warn("Fetch error: ", error);
             }
-        }.bind(this)
+        }
       );
-    }).bind(this)
+    }))
 
     this.form.addEventListener('submit', this.submitHandler);
 
@@ -117,15 +114,15 @@ export class WPLF_Form {
   }
 
   send() {
-    var form = this.form;
-    var data = new FormData(form);
+    const form = this.form;
+    const data = new FormData(form);
 
     // Pass language if it exists.
     globalData.lang && data.append('lang', globalData.lang);
 
     form.submitState = 'submitting';
 
-    Object.keys(this.callbacks.beforeSend).forEach(function(key) {
+    Object.keys(this.callbacks.beforeSend).forEach(key => {
       this.callbacks.beforeSend[key](form, this);
     });
 
@@ -134,6 +131,6 @@ export class WPLF_Form {
       credentials: globalData.ajax_credentials || 'same-origin',
       body: data,
       headers: globalData.request_headers || {},
-    })
+    });
   }
 }

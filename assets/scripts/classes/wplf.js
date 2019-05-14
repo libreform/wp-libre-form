@@ -13,7 +13,7 @@ function loadPolyfill(name) {
   script.src = globalData.wplf_assets_dir + '/scripts/polyfills/' + name + '.js';
 
   console.log('loading', name, globalData)
-  script.addEventListener('load', function () {
+  script.addEventListener('load', () => {
     depsLoaded++;
     console.log('loaded', name)
 
@@ -36,7 +36,7 @@ if (!window.Promise) {
 
 export class WPLF {
   forms = {
-
+    // '_g67a8z2kw': WPLF_Form
   }
 
   constructor() {
@@ -51,53 +51,70 @@ export class WPLF {
 
   initialize() {
     if (globalData.autoinit === '1') {
-      console.log('autoiniting');
       [].forEach.call(
         document.querySelectorAll(".libre-form"),
         form => this.attach(form)
       );
-    } else {
-      console.log('not autoiniting')
     }
   }
 
   isReady() {
-    return isReady()
+    return isReady();
   }
 
   whenReady(cb = () => null) {
     window.addEventListener('message', e => {
       if (typeof e.data === 'string' && e.data.indexOf('[WPLF] Polyfills loaded') === 0) {
-        console.log('now ready')
         cb(this);
       }
     });
   }
 
   findFormsById(id) {
-    return Object.keys(this.forms).reduce(function(acc, key) {
-      var form = this.forms[key]
+    return Object.keys(this.forms).reduce((acc, key) => {
+      const wplfForm = this.forms[key];
 
-      if (parseInt(form.form.getAttribute('data-form-id'), 10) === parseInt(id, 10)) {
-        acc.push(form)
+      if (parseInt(wplfForm.form.getAttribute('data-form-id'), 10) === parseInt(id, 10)) {
+        acc.push(wplfForm);
       }
 
-      return acc
-    }.bind(this), []);
+      return acc;
+    }, []);
   }
 
-  attach(element) {
+  attach(elementOrWplfForm) {
+    if (elementOrWplfForm instanceof WPLF_Form) {
+      const wplfForm = elementOrWplfForm;
+
+      this.forms[wplfForm.key] = wplfForm;
+
+      return wplfForm;
+    }
+
+    const element = elementOrWplfForm;
+    
     if (element instanceof HTMLFormElement !== true) {
       throw new Error('Unable to attach WPLF to element', element);
     }
 
-    const form = new WPLF_Form(element);
-    this.forms[form.key] = form;
+    const wplfForm = new WPLF_Form(element);
+    this.forms[wplfForm.key] = wplfForm;
 
-    return this.forms[form.key];
+    return wplfForm;
   }
 
-  detach(element) {
+  detach(elementOrWplfForm) {
+    if (elementOrWplfForm instanceof WPLF_Form) {
+      const wplfForm = elementOrWplfForm;
+
+      this.forms[wplfForm.key].removeSubmitHandler();
+      delete this.forms[wplfForm.key];
+
+      return true;
+    }
+
+    const element = elementOrWplfForm;
+
     if (element instanceof HTMLFormElement !== true) {
       throw new Error('Unable to detach WPLF from element', element);
     }
@@ -105,6 +122,6 @@ export class WPLF {
     this.forms[element].removeSubmitHandler();
     delete this.forms[element];
 
-    return this
+    return true;
   }
 }
