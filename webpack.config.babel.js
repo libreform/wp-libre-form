@@ -23,6 +23,9 @@ export default ({ NODE_ENV: env }) => ({
     //   root: '_'
     // }
   },
+  optimization: {
+    minimize: env === 'production',
+  },
   module: {
     rules: [
       {

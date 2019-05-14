@@ -12,10 +12,8 @@ function loadPolyfill(name) {
   const script = document.createElement('script');
   script.src = globalData.wplf_assets_dir + '/scripts/polyfills/' + name + '.js';
 
-  console.log('loading', name, globalData)
   script.addEventListener('load', () => {
     depsLoaded++;
-    console.log('loaded', name)
 
     if (isReady()) {
       window.postMessage('[WPLF] Polyfills loaded', '*')
@@ -48,6 +46,9 @@ export class WPLF {
       this.whenReady(() => this.initialize());
     }
   }
+
+  // Expose WPLF_Form
+  Form = WPLF_Form
 
   initialize() {
     if (globalData.autoinit === '1') {

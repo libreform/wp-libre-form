@@ -2,6 +2,10 @@ import globalData from '../global-data';
 
 export class WPLF_Form {
   constructor(element) {
+    if (element instanceof HTMLFormElement !== true) {
+      throw new Error('Form element invalid or missing');
+    }
+
     this.form = element;
     this.submitState = null; // null | 'submitting' | 'success' | 'error'
     this.submitHandler = null;
