@@ -51,6 +51,25 @@ export class WPLF {
   Form = WPLF_Form
 
   initialize() {
+    const compatibilityLayer = {
+      beforeSendCallbacks: [],
+      errorCallbacks: [],
+      successCallbacks: [],
+
+      attach: form => this.attach(form),
+      submitHandler: event => { // Too much work to support properly. I'd be surprised if anyone even used this.
+        event.preventDefault();
+
+        alert('Form can\'t be submitted due to configuration error. WP Libre Form 2.0 doesn\'t support the legacy wplf.submitHandler.')
+      }
+    };
+
+    // _listenForWPLFMessage('Legacy callback', () => {
+      // This isn't needed, just use runCallback in wplf-form
+    // })
+
+    window.wplf = compatibilityLayer; // Old "API" was in window.wplf
+
     if (globalData.autoinit === '1') {
       [].forEach.call(
         document.querySelectorAll(".libre-form"),
@@ -63,12 +82,16 @@ export class WPLF {
     return isReady();
   }
 
-  whenReady(cb = () => null) {
+  _listenForWPLFMessage(message, cb = () => null) {
     window.addEventListener('message', e => {
-      if (typeof e.data === 'string' && e.data.indexOf('[WPLF] Polyfills loaded') === 0) {
+      if (typeof e.data === 'string' && e.data.indexOf(`[WPLF] ${message}`) === 0) {
         cb(this);
       }
     });
+  }
+
+  whenReady(cb = () => null) {
+    this._listenForWPLFMessage('Polyfills loaded', cb);
   }
 
   findFormsById(id) {

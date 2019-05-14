@@ -7,7 +7,7 @@ export class WPLF_Form {
     }
 
     this.form = element;
-    this.submitState = null; // null | 'submitting' | 'success' | 'error'
+    this.submitState = null; // null | 'submitting' | 'success' | new Error('error message')
     this.submitHandler = null;
     this.callbacks = {
       beforeSend: {},
@@ -29,6 +29,34 @@ export class WPLF_Form {
     delete this.callbacks[type][name];
 
     return this;
+  }
+
+  runCallback(type, ...args) {
+    const legacy = window.wplf;
+
+    if (legacy.successCallbacks.length || legacy.errorCallbacks.length || legacy.beforeSendCallbacks.length) {
+      console.warn('WP Libre Form 2.0 introduced breaking changes to window.wplf "API", please migrate to the new API ASAP.');
+
+      (legacy.callbacks.beforeSend).forEach(cb => {
+        cb(...args);
+      });
+
+      (legacy.callbacks.error).forEach(cb => {
+        cb(...args);
+      });
+
+      (legacy.callbacks.success).forEach(cb => {
+        cb(...args);
+      });
+    }
+
+    if (this.callbacks[type]) {
+      Object.keys(this.callbacks[type]).forEach(key => {
+        this.callbacks[type][key](...args);
+      });
+    } else {
+      throw new Error(`Unknown callback ${name} ${type}`);
+    }
   }
 
   addSubmitHandler(handler) {
@@ -68,9 +96,7 @@ export class WPLF_Form {
               this.form.parentNode.removeChild(this.form);
 
               this.submitStatus = 'success';
-              Object.keys(this.callbacks.success).forEach(key => {
-                this.callbacks.success[key](response, this);
-              });
+              this.runCallback('success', response, this);
             }
 
             if( 'error' in response ) {
@@ -81,11 +107,12 @@ export class WPLF_Form {
 
               this.form.appendChild(error);
 
-              this.submitStatus = 'error';
+              this.submitStatus = new Error(response.error);
 
-              Object.keys(this.callbacks.error).forEach(key => {
-                this.callbacks.error[key](response, this);
-              });
+              this.runCallback('error', this.submitStatus, this);
+              // Object.keys(this.callbacks.error).forEach(key => {
+              //   this.callbacks.error[key](response, this);
+              // });
             }
 
             this.form.classList.remove('sending');
@@ -94,13 +121,11 @@ export class WPLF_Form {
           error => {
             this.form.classList.remove("sending");
 
-            if (this.callbacks.error.length > 0) {
-              Object.keys(this.callbacks.error).forEach(key => {
-                this.callbacks.error[key](response, this);
-              });
-            } else {
+            // if (this.callbacks.error.length > 0) {
+              this.runCallback('error', error, this);
+            // } else {
               console.warn("Fetch error: ", error);
-            }
+            // }
         }
       );
     }))
@@ -126,9 +151,7 @@ export class WPLF_Form {
 
     form.submitState = 'submitting';
 
-    Object.keys(this.callbacks.beforeSend).forEach(key => {
-      this.callbacks.beforeSend[key](form, this);
-    });
+    this.runCallback('beforeSend', form, this);
 
     return fetch(globalData.ajax_url, {
       method: "POST",
