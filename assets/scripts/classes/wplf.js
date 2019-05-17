@@ -60,7 +60,7 @@ export class WPLF {
       submitHandler: event => { // Too much work to support properly. I'd be surprised if anyone even used this.
         event.preventDefault();
 
-        alert('Form can\'t be submitted due to configuration error. WP Libre Form 2.0 doesn\'t support the legacy wplf.submitHandler.')
+        alert('Form can\'t be submitted properly due to configuration error. WP Libre Form 2.0 doesn\'t support the legacy wplf.submitHandler.')
       }
     };
 
