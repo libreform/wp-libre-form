@@ -37,6 +37,7 @@ define( 'WPLF_VERSION', '1.5.0.1' );
 class WP_Libre_Form {
   public static $instance;
   public $plugins;
+  public $settings;
 
   public static function init() {
     if ( is_null( self::$instance ) ) {
@@ -46,6 +47,7 @@ class WP_Libre_Form {
   }
 
   private function __construct() {
+    require_once 'classes/class-wplf-settings.php';
     require_once 'classes/class-cpt-wplf-form.php';
     require_once 'classes/class-cpt-wplf-submission.php';
     require_once 'classes/class-wplf-dynamic-values.php';
@@ -57,11 +59,12 @@ class WP_Libre_Form {
     require_once 'inc/wplf-form-validation.php';
 
     // init our plugin classes
-    CPT_WPLF_Form::init();
-    CPT_WPLF_Submission::init();
-    WPLF_Dynamic_Values::init();
+    $this->settings = WPLF_Settings::init( $this );
+    CPT_WPLF_Form::init( $this );
+    CPT_WPLF_Submission::init( $this );
+    WPLF_Dynamic_Values::init( $this );
 
-    $this->plugins = WPLF_Plugins::init();
+    $this->plugins = WPLF_Plugins::init( $this );
 
     add_action( 'after_setup_theme', array( $this, 'init_polylang_support' ) );
 
@@ -118,7 +121,7 @@ class WP_Libre_Form {
   public function init_polylang_support() {
     if ( apply_filters( 'wplf_load_polylang', true ) && class_exists( 'Polylang' ) ) {
       require_once 'classes/class-wplf-polylang.php';
-      WPLF_Polylang::init();
+      WPLF_Polylang::init( $this );
     }
   }
 

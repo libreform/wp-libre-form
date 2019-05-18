@@ -8,9 +8,9 @@ class CPT_WPLF_Form {
    */
   public static $instance;
 
-  public static function init() {
+  public static function init(WP_Libre_Form $wplf) {
     if ( is_null( self::$instance ) ) {
-      self::$instance = new CPT_WPLF_Form();
+      self::$instance = new CPT_WPLF_Form($wplf);
     }
     return self::$instance;
   }
@@ -18,7 +18,7 @@ class CPT_WPLF_Form {
   /**
    * Hook our actions, filters and such
    */
-  public function __construct() {
+  public function __construct(WP_Libre_Form $wplf) {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
 
@@ -40,7 +40,10 @@ class CPT_WPLF_Form {
     add_filter( 'use_block_editor_for_post_type', array( $this, 'disable_gutenberg' ), 10, 2 );
 
     // front end
-    add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
+    if ($wplf->settings->get('parse-wplf-shortcode-rest-api')) {
+      add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
+    }
+
     add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
