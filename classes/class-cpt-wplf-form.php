@@ -22,6 +22,8 @@ class CPT_WPLF_Form {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
 
+    $this->wplf = $wplf;
+
     // post.php / post-new.php view
     add_filter( 'get_sample_permalink_html', array( $this, 'modify_permalink_html' ), 10, 2 );
     add_action( 'save_post', array( $this, 'save_cpt' ) );
@@ -40,10 +42,7 @@ class CPT_WPLF_Form {
     add_filter( 'use_block_editor_for_post_type', array( $this, 'disable_gutenberg' ), 10, 2 );
 
     // front end
-    if ($wplf->settings->get('parse-wplf-shortcode-rest-api')) {
-      add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
-    }
-
+    add_shortcode( 'libre-form', array( $this, 'shortcode' ) );
     add_action( 'wp', array( $this, 'maybe_set_404_for_single_form' ) );
     add_filter( 'the_content', array( $this, 'use_shortcode_for_preview' ), 0 );
     add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_frontend_script' ) );
@@ -992,6 +991,22 @@ class CPT_WPLF_Form {
       'id' => null,
       'xclass' => '',
     ), $shortcode_atts, 'libre-form' );
+
+    // Allow disabling shortcode parsing in API requests.
+    // This can't be done earlier right now, because the constant doesn't exist when add_shortcode is ran.
+    $isREST = defined('REST_REQUEST') ? true : false;
+    $parseShortcodeInREST = $this->wplf->settings->get('parse-wplf-shortcode-rest-api');
+
+    // Because shortcode parsing can't actually be disabled, we output the "same" shortcode instead of the form.
+    if ($isREST && !$parseShortcodeInREST) {
+      $props = [];
+
+      foreach ($attributes as $k => $v) {
+        $props[] = "$k=\"$v\"";
+      }
+
+      return '[libre-form ' . join($props, ' ') . ']';
+    } 
 
     // we don't render id and class as <form> attributes
     $id = $attributes['id'];
