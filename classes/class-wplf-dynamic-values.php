@@ -4,9 +4,9 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
 
     public static $instance;
 
-    public static function init(WP_Libre_Form $wplf) {
+    public static function init( WP_Libre_Form $wplf ) {
       if ( is_null( self::$instance ) ) {
-        self::$instance = new WPLF_Dynamic_Values($wplf);
+        self::$instance = new WPLF_Dynamic_Values( $wplf );
       }
       return self::$instance;
     }
@@ -14,14 +14,14 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
     /**
      * Hook our actions, filters and such
      */
-    public function __construct(WP_Libre_Form $wplf) {
+    public function __construct( WP_Libre_Form $wplf ) {
       add_filter( 'wplf_form', array( $this, 'render_form' ), 10, 4 );
 
       $this->wplf = $wplf;
     }
 
     public function render_form( $content, $id, $xclass, $attributes ) {
-      $settings = $this->wplf->settings->get('dynval-regex');
+      $settings = $this->wplf->settings->get( 'dynval-regex' );
 
       // Get all strings inside  placeholders
       preg_match_all( $settings['regex'], $content, $matches );

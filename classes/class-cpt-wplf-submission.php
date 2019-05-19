@@ -8,9 +8,9 @@ class CPT_WPLF_Submission {
    */
   public static $instance;
 
-  public static function init(WP_Libre_Form $wplf) {
+  public static function init( WP_Libre_Form $wplf ) {
     if ( is_null( self::$instance ) ) {
-      self::$instance = new CPT_WPLF_Submission($wplf);
+      self::$instance = new CPT_WPLF_Submission( $wplf );
     }
     return self::$instance;
   }
@@ -18,7 +18,7 @@ class CPT_WPLF_Submission {
   /**
    * Hook our actions, filters and such
    */
-  public function __construct(WP_Libre_Form $wplf) {
+  public function __construct( WP_Libre_Form $wplf ) {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
 
