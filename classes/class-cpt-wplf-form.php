@@ -32,7 +32,7 @@ class CPT_WPLF_Form {
 
     // edit.php view
     add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
-    add_filter( 'manage_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );;
+    add_filter( 'manage_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );
     add_action( 'manage_wplf-form_posts_custom_column', array( $this, 'custom_columns_display_cpt' ), 10, 2 );
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );

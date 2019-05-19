@@ -80,7 +80,7 @@ class WP_Libre_Form {
    * Include custom JS and CSS in the admin
    */
   public function admin_scripts() {
-    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'wp-libre-form/dist/wplf-admin.js', dirname( __FILE__ ) ), ['jquery', 'underscore'] );
+    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'wp-libre-form/dist/wplf-admin.js', dirname( __FILE__ ) ), [ 'jquery', 'underscore' ] );
     wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'wp-libre-form/assets/styles/wplf-admin.css', dirname( __FILE__ ) ) );
   }
 
