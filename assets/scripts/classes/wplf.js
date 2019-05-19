@@ -70,7 +70,7 @@ export class WPLF {
 
     window.wplf = compatibilityLayer; // Old "API" was in window.wplf
 
-    if (globalData.autoinit === '1') {
+    if (globalData.settings.autoinit) {
       [].forEach.call(
         document.querySelectorAll(".libre-form"),
         form => this.attach(form)

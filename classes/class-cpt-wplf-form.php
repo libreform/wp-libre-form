@@ -28,12 +28,11 @@ class CPT_WPLF_Form {
     add_filter( 'content_save_pre', array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2 );
-    add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
     add_action( 'admin_notices', array( $this, 'print_notices' ), 10 );
 
     // edit.php view
     add_filter( 'post_row_actions', array( $this, 'remove_row_actions' ), 10, 2 );
-    add_filter( 'manage_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );
+    add_filter( 'manage_edit-wplf-form_columns', array( $this, 'custom_columns_cpt' ), 100, 1 );;
     add_action( 'manage_wplf-form_posts_custom_column', array( $this, 'custom_columns_display_cpt' ), 10, 2 );
 
     add_filter( 'default_content', array( $this, 'default_content_cpt' ) );
@@ -166,29 +165,6 @@ class CPT_WPLF_Form {
           }
       }
 
-  }
-
-  /**
-   * Include custom JS and CSS on the edit screen
-   */
-  public function admin_post_scripts_cpt( $hook ) {
-    global $post;
-
-    // make sure we're on the correct view
-    if ( 'post-new.php' !== $hook && 'post.php' !== $hook ) {
-      return;
-    }
-
-    // only for this cpt
-    if ( 'wplf-form' !== $post->post_type ) {
-      return;
-    }
-
-    // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'dist/wplf-admin.js', dirname( __FILE__ ) ) );
-
-    // enqueue the custom CSS for this view
-    wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'assets/styles/wplf-admin-form.css', dirname( __FILE__ ) ) );
   }
 
   public function print_notices() {
@@ -998,7 +974,9 @@ class CPT_WPLF_Form {
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'request_headers' => (object) apply_filters( 'wplf_ajax_request_headers', [] ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
-      'autoinit' => true,
+      'settings' => [ // Plug new settings page here
+        'autoinit' => true,
+      ],
     ) ) );
   }
 

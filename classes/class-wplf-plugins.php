@@ -26,22 +26,6 @@ class WPLF_Plugins {
     }
         );
 
-    add_action(
-         'admin_enqueue_scripts', function( $hook ) {
-      if ( $hook !== 'wplf-form_page_wplf-plugins' ) {
-        return;
-      }
-
-      $assets_url = plugins_url( 'assets', dirname( __FILE__ ) );
-
-      // enqueue the custom JS for this view
-      wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-plugins.js', [], false, true );
-
-      // enqueue the custom CSS for this view
-      wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-plugins.css' );
-    }, 10, 1
-        );
-
     add_action( 'admin_notices', function() {
       $this->notify_about_feature(
         esc_html__(

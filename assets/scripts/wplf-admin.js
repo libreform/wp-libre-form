@@ -1,4 +1,43 @@
-const $ = jQuery; // No need to use a closure.
+const $ = window.jQuery; // No need to use a closure.
+const _ = window._;
+
+function onPluginsPage() {
+  const menu = $('.wplf-plugins-menu');
+  const pages = $('.wplf-plugins-page');
+  const previousItem = localStorage.getItem('wplf-plugins-page-last-active-tab') || 'General';
+
+  if (!menu.length && !pages.length) {
+    return;
+  }
+
+  menu.on('click', '.nav-tab', function(e) {
+    const item = $(e.target);
+    const page = item.attr('data-page');
+    const target = $(`.wplf-plugins-page[data-page="${page}"]`);
+
+    item.siblings().removeClass('nav-tab-active');
+    item.addClass('nav-tab-active');
+
+    pages.hide();
+    target.show();
+
+    try {
+      localStorage.setItem('wplf-plugins-page-last-active-tab', page);
+    } catch (e) {
+      // No one cares. Safari just throws in PB.
+      // The tab remember feature just won't work.
+      console.error(e);
+    }
+    e.preventDefault();
+  });
+
+  if (previousItem) {
+    const target = $(`.wplf-plugins-menu [data-page="${previousItem}"]`);
+
+    target.click();
+  }
+}
+
 
 function parseFields(element = '#content') {
   // get editor content
@@ -92,10 +131,10 @@ function showDynamicValueInfo(e) {
 }
 
 export default (() => {
-  const isProbablyAdmin = document && document.body && document.body.classList.contains('wp-admin');
+  $(document).ready(function() {
+    const isProbablyAdmin = document && document.body && document.body.classList.contains('wp-admin');
 
-  if (isProbablyAdmin) {
-    $(document).ready(function() {
+    if (isProbablyAdmin) {
       $('#content').bind('input propertychange', _.debounce(parseFields, 300));
       parseFields();
 
@@ -104,8 +143,10 @@ export default (() => {
 
       $('input[name="wplf_version_update_toggle"]').change(toggleVersionUpdate);
       $('select[name="wplf-dynamic-values"]').change(showDynamicValueInfo);
-    });
-  }
+
+      onPluginsPage();
+    }
+  });
 
   return {
     parseFields,
