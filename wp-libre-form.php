@@ -81,7 +81,7 @@ class WP_Libre_Form {
    */
   public function admin_scripts() {
     wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'wp-libre-form/dist/wplf-admin.js', dirname( __FILE__ ) ), [ 'jquery', 'underscore' ] );
-    wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'wp-libre-form/assets/styles/wplf-admin.css', dirname( __FILE__ ) ) );
+    wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'wp-libre-form/dist/wplf-admin.css', dirname( __FILE__ ) ) );
   }
 
 

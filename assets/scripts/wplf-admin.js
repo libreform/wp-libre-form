@@ -1,3 +1,5 @@
+import '../styles/wplf-admin.scss';
+
 const $ = window.jQuery; // No need to use a closure.
 const _ = window._;
 
