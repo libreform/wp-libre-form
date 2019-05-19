@@ -136,7 +136,7 @@ class WPLF_Settings {
           default:
             // no op
         }
-} ?>
+      } ?>
 
       <input type="submit">
     </form>
