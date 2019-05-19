@@ -72,12 +72,12 @@ class WPLF_Settings {
 
         switch ($value) {
           case "recommended":
-            return '/## \w+ ##/';
+            return ['regex' => '/## \w+ ##/', 'chars' => '##'];
 
           break;
 
           case "legacy":
-            return '/%[^%%\n]+%/';
+            return ['regex' => '/%[^%%\n]+%/', 'chars' => '%'];
 
           break;
 

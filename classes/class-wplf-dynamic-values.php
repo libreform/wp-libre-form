@@ -3,7 +3,6 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
   class WPLF_Dynamic_Values {
 
     public static $instance;
-    protected $regular_expression = null; // '/## \w+ ##/';
 
     public static function init(WP_Libre_Form $wplf) {
       if ( is_null( self::$instance ) ) {
@@ -18,16 +17,18 @@ if ( ! class_exists( 'WPLF_Dynamic_Values' ) ) {
     public function __construct(WP_Libre_Form $wplf) {
       add_filter( 'wplf_form', array( $this, 'render_form' ), 10, 4 );
 
-      $this->regular_expression = $wplf->settings->get('dynval-regex');
-      error_log($this->regular_expression);
+      $this->wplf = $wplf;
     }
 
     public function render_form( $content, $id, $xclass, $attributes ) {
-      // Get all strings inside ## placeholders
-      preg_match_all( $this->regular_expression, $content, $matches );
+      $settings = $this->wplf->settings->get('dynval-regex');
+
+      // Get all strings inside  placeholders
+      preg_match_all( $settings['regex'], $content, $matches );
+
       foreach ( $matches[0] as $match ) {
         // match contains the ## chars, get rid of them.
-        $string = trim( str_replace( array( '##' ), array( '' ), $match ) );
+        $string = trim( str_replace( array( $settings['chars'] ), array( '' ), $match ) );
         $content = str_replace(
           $match,
           $this->populate_value(
