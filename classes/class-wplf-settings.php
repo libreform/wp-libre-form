@@ -121,10 +121,10 @@ class WPLF_Settings {
           case 'select':
             ?>
             <label>
-              <strong><?php echo $data['label']; ?></strong>
-              <select name="<?php echo $setting; ?>">
+              <strong><?php echo esc_html( $data['label'] ); ?></strong>
+              <select name="<?php echo esc_attr( $setting ); ?>">
                 <?php foreach ( $data['options'] as $k => $v ) { ?>
-                  <option value="<?php echo $k; ?>" <?php echo $k === $this->settings[ $setting ] ? 'selected' : ''; ?>><?php echo $v; ?></option>
+                  <option value="<?php echo esc_attr( $k ); ?>" <?php echo $k === $this->settings[ $setting ] ? 'selected' : ''; ?>><?php echo esc_attr( $v ); ?></option>
                 <?php } ?>
               </select>
             </label>
