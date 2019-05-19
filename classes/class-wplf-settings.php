@@ -3,34 +3,34 @@
 class WPLF_Settings {
   public static $instance;
   private $settings = [
-    "dynval-regex" => null,
-    "parse-wplf-shortcode-rest-api" => true,
+    'dynval-regex' => null,
+    'parse-wplf-shortcode-rest-api' => true,
   ];
 
   private $available_settings = [
-    "dynval-regex" => [
-      "type" => "select",
-      "label" => "Dynamic values regular expression",
-      "options" => [
-        "legacy" => "Legacy (/%[^%%\n]+%/)",
-        "recommended" => "Recommended (/## \w+ ##/)",
+    'dynval-regex' => [
+      'type' => 'select',
+      'label' => 'Dynamic values regular expression',
+      'options' => [
+        'legacy' => "Legacy (/%[^%%\n]+%/)",
+        'recommended' => 'Recommended (/## \w+ ##/)',
       ],
     ],
 
-    "parse-wplf-shortcode-rest-api" => [
-      "type" => "select",
-      "label" => "Parse form shortcode in REST API",
-      "options" => [
-        "false" => "false",
-        "true" => "True"
-      ]
+    'parse-wplf-shortcode-rest-api' => [
+      'type' => 'select',
+      'label' => 'Parse form shortcode in REST API',
+      'options' => [
+        'false' => 'false',
+        'true' => 'True',
+      ],
     ],
   ];
 
   private function __construct() {
-    $settings = get_option('wplf-settings', $this->get_default_settings());
+    $settings = get_option( 'wplf-settings', $this->get_default_settings() );
 
-    $this->settings = array_replace_recursive($this->settings, $settings);
+    $this->settings = array_replace_recursive( $this->settings, $settings );
 
     add_action(
          'admin_menu', function() {
@@ -48,97 +48,95 @@ class WPLF_Settings {
 
   private function get_default_settings() {
     return [
-      "dynval-regex" => "recommended",
-      "parse-wplf-shortcode-rest-api" => "true",
+      'dynval-regex' => 'recommended',
+      'parse-wplf-shortcode-rest-api' => 'true',
     ];
   }
 
-  private function is_valid_setting($setting) {
-    return isset($this->settings[$setting]);
+  private function is_valid_setting( $setting ) {
+    return isset( $this->settings[ $setting ] );
   }
 
-  public function get($setting) {
-    if ($this->is_valid_setting($setting)) {
-      $value = $this->settings[$setting];
+  public function get( $setting ) {
+    if ( $this->is_valid_setting( $setting ) ) {
+      $value = $this->settings[ $setting ];
 
-      if ($value === 'true') {
+      if ( $value === 'true' ) {
         return true;
-      } else if ($value === 'false') {
+      } else if ( $value === 'false' ) {
         return false;
-      } else if ($setting === 'dynval-regex') {
+      } else if ( $setting === 'dynval-regex' ) {
         // WP / PHP doesn't allow me to store regular expressions without fucking them up.
         // So I'm not storing them. Spent way too much time trying to get simple things like selected attribute
         // in the options page right, but nah.
 
-        switch ($value) {
-          case "recommended":
-            return ['regex' => '/## \w+ ##/', 'chars' => '##'];
-
-          break;
-
-          case "legacy":
-            return ['regex' => '/%[^%%\n]+%/', 'chars' => '%'];
-
-          break;
-
-          default: 
-            throw new Exception('Invalid WP Libre Form dynamic value regular expression');
+        if ( $value === 'recommended' ) {
+          return [
+            'regex' => '/## \w+ ##/',
+            'chars' => '##',
+          ];
+        } else if ( $value === 'legacy' ) {
+          return [
+            'regex' => '/%[^%%\n]+%/',
+            'chars' => '%',
+          ];
+        } else {
+          throw new Exception( 'Invalid WP Libre Form dynamic value regular expression' );
         }
-      }
 
-      return $value;
+        return $value;
+      }
     }
 
     return false;
   }
 
-  public function update_setting($setting, $value) {
-    if (!$this->is_valid_setting($setting)) {
-      throw new Exception('Invalid WP Libre Form setting');
+  public function update_setting( $setting, $value ) {
+    if ( ! $this->is_valid_setting( $setting ) ) {
+      throw new Exception( 'Invalid WP Libre Form setting' );
     }
 
-    $settings = get_option("wplf-settings", $this->get_default_settings());
-    $settings[$setting] = $value;
+    $settings = get_option( 'wplf-settings', $this->get_default_settings() );
+    $settings[ $setting ] = $value;
     $this->settings = $settings;
 
-    return update_option("wplf-settings", $settings);
+    return update_option( 'wplf-settings', $settings );
   }
 
   public function render_settings_page() {
-    if (!empty($_POST)) {
+    if ( ! empty( $_POST ) ) {
       // Handle settings form submission
 
-      foreach ($_POST as $k => $v) {
-        if ($this->is_valid_setting($k)) {
-          $this->update_setting($k, $v);
+      foreach ( $_POST as $k => $v ) {
+        if ( $this->is_valid_setting( $k ) ) {
+          $this->update_setting( $k, $v );
         }
       }
     }
     ?>
 
     <form class="wplf-settings" method="post">
-      <?php foreach ($this->available_settings as $setting => $data) {
-        switch ($data["type"]) {
-          case "select": 
+      <?php foreach ( $this->available_settings as $setting => $data ) {
+        switch ( $data['type'] ) {
+          case 'select':
             ?>
             <label>
-              <strong><?=$data["label"]?></strong>
-              <select name="<?=$setting?>">
-                <?php foreach ($data['options'] as $k => $v) { ?>
-                  <option value="<?=$k?>" <?=$k === $this->settings[$setting] ? 'selected' : ''?>><?=$v?></option>
+              <strong><?php echo $data['label']; ?></strong>
+              <select name="<?php echo $setting; ?>">
+                <?php foreach ( $data['options'] as $k => $v ) { ?>
+                  <option value="<?php echo $k; ?>" <?php echo $k === $this->settings[ $setting ] ? 'selected' : ''; ?>><?php echo $v; ?></option>
                 <?php } ?>
               </select>
             </label>
 
             <br>
             <?php
-          break;
+                break;
 
-          default: 
+          default:
             // no op
         }
-
-      } ?>
+} ?>
 
       <input type="submit">
     </form>
