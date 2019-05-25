@@ -1,3 +1,5 @@
+import globalData from './global-data';
+
 import '../styles/wplf-admin.scss';
 
 const $ = window.jQuery; // No need to use a closure.
@@ -120,12 +122,13 @@ function showDynamicValueInfo(e) {
   var help = $('.wplf-dynamic-values-help');
   var desc = help.find('.description');
   var usage = help.find('.usage span');
+  var chars = globalData.dynamic_value_chars;
 
   if (value) {
     var option = target.querySelector('option[value="' + value + '"]');
     var labels = JSON.parse(option.getAttribute('data-labels'));
     desc.html(labels.description);
-    usage.text('## ' + value + ' ##');
+    usage.text(`${chars} ${value} ${chars}`);
     help.show();
   } else {
     help.hide();

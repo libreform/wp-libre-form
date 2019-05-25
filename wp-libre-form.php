@@ -85,6 +85,12 @@ class WP_Libre_Form {
   public function admin_scripts() {
     wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'wp-libre-form/dist/wplf-admin.js', dirname( __FILE__ ) ), [ 'jquery', 'underscore' ] );
     wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'wp-libre-form/dist/wplf-admin.css', dirname( __FILE__ ) ) );
+
+    wp_localize_script( 'wplf-form-edit-js', 'WPLF_DATA', apply_filters( 'wplf_admin_ajax_object', array(
+      'dynamic_value_chars' => $this->settings->get('dynval-regex')['chars'],
+      'autoinit' => $this->settings->get('autoinit'),
+      'parse-wplf-shortcode-rest-api' => $this->settings->get('parse-wplf-shortcode-rest-api'),
+    ) ) );
   }
 
 

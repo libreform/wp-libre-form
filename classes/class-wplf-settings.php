@@ -2,10 +2,7 @@
 
 class WPLF_Settings {
   public static $instance;
-  private $settings = [
-    'dynval-regex' => null,
-    'parse-wplf-shortcode-rest-api' => true,
-  ];
+  private $settings = [];
 
   private $available_settings = [
     'dynval-regex' => [
@@ -25,12 +22,20 @@ class WPLF_Settings {
         'true' => 'True',
       ],
     ],
+
+    // Yeah I know checkbox would be better but handling them in forms is a PITA
+    'autoinit' => [
+      'type' => 'select',
+      'label' => 'Initialize forms automatically',
+      'options' => [
+        'false' => 'false',
+        'true' => 'True',
+      ],
+    ],
   ];
 
   private function __construct() {
-    $settings = get_option( 'wplf-settings', $this->get_default_settings() );
-
-    $this->settings = array_replace_recursive( $this->settings, $settings );
+    $this->settings = get_option( 'wplf-settings', $this->get_default_settings() );
 
     add_action(
          'admin_menu', function() {
@@ -50,11 +55,12 @@ class WPLF_Settings {
     return [
       'dynval-regex' => 'recommended',
       'parse-wplf-shortcode-rest-api' => 'true',
+      'autoinit' => 'true',
     ];
   }
 
   private function is_valid_setting( $setting ) {
-    return isset( $this->settings[ $setting ] );
+    return isset( $this->available_settings[ $setting ] );
   }
 
   public function get( $setting ) {
