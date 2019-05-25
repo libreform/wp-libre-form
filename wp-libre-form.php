@@ -69,10 +69,21 @@ class WP_Libre_Form {
 
     add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 
+    add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 10, 1 );
+
     // flush rewrites on activation since we have slugs for our cpts
     register_activation_hook( __FILE__, array( 'WP_Libre_Form', 'flush_rewrites' ) );
     register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
   }
+
+  /**
+   * Include custom JS and CSS in the admin
+   */
+  public function admin_scripts() {
+    wp_enqueue_script( 'wplf-form-edit-js', plugins_url( 'wp-libre-form/dist/wplf-admin.js', dirname( __FILE__ ) ), [ 'jquery', 'underscore' ] );
+    wp_enqueue_style( 'wplf-form-edit-css', plugins_url( 'wp-libre-form/dist/wplf-admin.css', dirname( __FILE__ ) ) );
+  }
+
 
   /**
    * Plugin activation hook

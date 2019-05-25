@@ -1,0 +1,70 @@
+/**
+ * wp-libre-form admin styles
+ */
+
+.wplf-{
+  &template-override-notice {
+      line-height: 20px;
+      padding: 1ex 0;
+      margin-top: 1em;
+      color: #666;
+      font-style: italic;
+  }
+
+  &dynamic-values-help {
+    display: none;
+    margin-top: 1rem;
+  }
+
+  &dynamic-values-help .description {
+    margin-bottom: 2rem;
+  }
+
+  &plugins {
+    box-sizing: border-box;
+  }
+
+  &plugins *, &plugins *:before, &plugins *:after {
+    box-sizing: border-box;
+  }
+
+  &plugins-page {
+    display: none;
+    overflow: hidden;
+  }
+
+  &plugin-list {
+    overflow: hidden;
+  }
+
+  &plugin-box {
+    padding: 1rem;
+    border: 1px solid #222;
+    width: 48%;
+    margin-right: 2%;
+    float: left;
+    background: #fff;
+  }
+
+  &plugin-box__meta {
+    overflow: hidden;
+    line-height: 30px; /* Poor man centering */
+  }
+
+  &plugin-box__meta--version {
+    color: #ccc;
+  }
+
+  &plugin-box__meta--links {
+    float: right;
+  }
+
+  @media (max-width: 768px) {
+    &plugin-box {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+  }
+}
+

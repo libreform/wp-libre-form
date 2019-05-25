@@ -28,7 +28,6 @@ class CPT_WPLF_Form {
     add_filter( 'content_save_pre', array( $this, 'strip_form_tags' ), 10, 1 );
     add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ) );
     add_action( 'add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2 );
-    add_action( 'admin_enqueue_scripts', array( $this, 'admin_post_scripts_cpt' ), 10, 1 );
     add_action( 'admin_notices', array( $this, 'print_notices' ), 10 );
 
     // edit.php view
@@ -166,31 +165,6 @@ class CPT_WPLF_Form {
           }
       }
 
-  }
-
-  /**
-   * Include custom JS and CSS on the edit screen
-   */
-  public function admin_post_scripts_cpt( $hook ) {
-    global $post;
-
-    // make sure we're on the correct view
-    if ( 'post-new.php' !== $hook && 'post.php' !== $hook ) {
-      return;
-    }
-
-    // only for this cpt
-    if ( 'wplf-form' !== $post->post_type ) {
-      return;
-    }
-
-    $assets_url = plugins_url( 'assets', dirname( __FILE__ ) );
-
-    // enqueue the custom JS for this view
-    wp_enqueue_script( 'wplf-form-edit-js', $assets_url . '/scripts/wplf-admin-form.js' );
-
-    // enqueue the custom CSS for this view
-    wp_enqueue_style( 'wplf-form-edit-css', $assets_url . '/styles/wplf-admin-form.css' );
   }
 
   public function print_notices() {
@@ -986,7 +960,7 @@ class CPT_WPLF_Form {
     // register the script, but only enqueue it if the current post contains a form in it
     wp_register_script(
       'wplf-form-js',
-      plugins_url( 'assets/scripts/wplf-form.js', dirname( __FILE__ ) ),
+      plugins_url( 'dist/wplf-frontend.js', dirname( __FILE__ ) ),
       apply_filters( 'wplf_frontend_script_dependencies', array() ),
       WPLF_VERSION,
       true
@@ -995,11 +969,14 @@ class CPT_WPLF_Form {
     $admin_url = admin_url( 'admin-ajax.php' );
 
     // add dynamic variables to the script's scope
-    wp_localize_script( 'wplf-form-js', 'ajax_object', apply_filters( 'wplf_ajax_object', array(
+    wp_localize_script( 'wplf-form-js', 'WPLF_DATA', apply_filters( 'wplf_ajax_object', array(
       'ajax_url' => apply_filters( 'wplf_ajax_endpoint', "$admin_url?action=wplf_submit" ),
       'ajax_credentials' => apply_filters( 'wplf_ajax_fetch_credentials_mode', 'same-origin' ),
       'request_headers' => (object) apply_filters( 'wplf_ajax_request_headers', [] ),
       'wplf_assets_dir' => plugin_dir_url( realpath( __DIR__ . '/../wp-libre-form.php' ) ) . 'assets',
+      'settings' => [ // Plug new settings page here
+        'autoinit' => true,
+      ],
     ) ) );
   }
 
