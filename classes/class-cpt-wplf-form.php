@@ -8,9 +8,9 @@ class CPT_WPLF_Form {
    */
   public static $instance;
 
-  public static function init() {
+  public static function init( WP_Libre_Form $wplf ) {
     if ( is_null( self::$instance ) ) {
-      self::$instance = new CPT_WPLF_Form();
+      self::$instance = new CPT_WPLF_Form( $wplf );
     }
     return self::$instance;
   }
@@ -18,9 +18,11 @@ class CPT_WPLF_Form {
   /**
    * Hook our actions, filters and such
    */
-  public function __construct() {
+  public function __construct( WP_Libre_Form $wplf ) {
     // init custom post type
     add_action( 'init', array( $this, 'register_cpt' ) );
+
+    $this->wplf = $wplf;
 
     // post.php / post-new.php view
     add_filter( 'get_sample_permalink_html', array( $this, 'modify_permalink_html' ), 10, 2 );
@@ -989,6 +991,22 @@ class CPT_WPLF_Form {
       'id' => null,
       'xclass' => '',
     ), $shortcode_atts, 'libre-form' );
+
+    // Allow disabling shortcode parsing in API requests.
+    // This can't be done earlier right now, because the constant doesn't exist when add_shortcode is ran.
+    $is_rest = defined( 'REST_REQUEST' ) ? true : false;
+    $parse_shortcode_in_rest = $this->wplf->settings->get( 'parse-wplf-shortcode-rest-api' );
+
+    // Because shortcode parsing can't actually be disabled, we output the "same" shortcode instead of the form.
+    if ( $is_rest && ! $parse_shortcode_in_rest ) {
+      $props = [];
+
+      foreach ( $attributes as $k => $v ) {
+        $props[] = "$k=\"$v\"";
+      }
+
+      return '[libre-form ' . join( $props, ' ' ) . ']';
+    }
 
     // we don't render id and class as <form> attributes
     $id = $attributes['id'];

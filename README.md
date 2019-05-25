@@ -214,7 +214,7 @@ add_filter('wplf_dynamic_values', function($values) {
   return $values;
 });
 
-// <input type="text" placeholder="%SOMETHING%" name="something">
+// <input type="text" placeholder="## SOMETHING ##" name="something">
 ```
 
 
