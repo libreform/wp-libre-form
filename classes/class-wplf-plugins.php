@@ -191,7 +191,7 @@ class WPLF_Plugins
           <div class="wplf-plugin-list">
             <?php foreach ($enabled as $plugin) {
               $this->render_plugin($plugin);
-} ?>
+            } ?>
           </div>
         <?php } ?>
 
@@ -201,7 +201,7 @@ class WPLF_Plugins
           <div class="wplf-plugin-list">
             <?php foreach ($recommended as $plugin) {
               $this->render_plugin($plugin);
-} ?>
+            } ?>
           </div>
         <?php } ?>
 

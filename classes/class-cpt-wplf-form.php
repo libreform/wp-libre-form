@@ -255,7 +255,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Remove view action in edit.php for forms
    */
-    function remove_row_actions($actions, $post) {
+    public function remove_row_actions($actions, $post) {
       $publicly_visible = $this->get_publicly_visible_state($post->ID);
 
       if ('wplf-form' === $post->post_type && ! $publicly_visible) {
@@ -421,7 +421,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for fields meta box
    */
-    function metabox_thank_you($post) {
+    public function metabox_thank_you($post) {
       // get post meta
       $meta = get_post_meta($post->ID);
       $message = isset($meta['_wplf_thank_you']) ?
@@ -603,7 +603,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    *
    * @return void
    */
-    function maybe_load_imported_template($post_type, $post) {
+    public function maybe_load_imported_template($post_type, $post) {
       if ($post_type !== 'wplf-form' || $post->post_status === 'auto-draft') {
         return;
       }

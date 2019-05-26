@@ -52,6 +52,10 @@
     <!-- Yeah how about we don't waste lines by putting every fucking curly brace to it's own line -->
     <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
     <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
+
+    <!-- Just STFU about this. Writing HTML between PHP code makes it go nuts,
+    and since it's WordPress we're talking about... -->
+    <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
   </rule>
 
   <!-- Require the brace to be on the same line -->
