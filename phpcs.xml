@@ -21,10 +21,6 @@
     </properties>
   </rule>
 
-
-  <!-- Method arguments with default values MUST go at the end of the argument list. -->
-  <rule ref="PEAR.Functions.ValidDefaultValue"/>
-
   <!-- This means almost always that developer used an ugly hotfix -->
   <rule ref="Squiz.PHP.CommentedOutCode"/>
 
