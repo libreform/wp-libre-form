@@ -35,20 +35,18 @@ class WPLF_Settings {
   ];
 
   private function __construct() {
-    $this->settings = get_option( 'wplf-settings', $this->get_default_settings() );
+    $this->settings = get_option('wplf-settings', $this->get_default_settings());
 
-    add_action(
-         'admin_menu', function() {
+    add_action('admin_menu', function () {
       add_submenu_page(
-        'edit.php?post_type=wplf-form',
-        __( 'WP Libre Form settings', 'wp-libre-form' ),
-        __( 'Settings', 'wp-libre-form' ),
-        'manage_options',
-        'wplf-settings',
-        array( $this, 'render_settings_page' )
+          'edit.php?post_type=wplf-form',
+          __('WP Libre Form settings', 'wp-libre-form'),
+          __('Settings', 'wp-libre-form'),
+          'manage_options',
+          'wplf-settings',
+          array($this, 'render_settings_page')
       );
-    }
-        );
+    });
   }
 
   private function get_default_settings() {
@@ -59,35 +57,35 @@ class WPLF_Settings {
     ];
   }
 
-  private function is_valid_setting( $setting ) {
-    return isset( $this->available_settings[ $setting ] );
+  private function is_valid_setting($setting) {
+    return isset($this->available_settings[$setting]);
   }
 
-  public function get( $setting ) {
-    if ( $this->is_valid_setting( $setting ) ) {
-      $value = $this->settings[ $setting ];
+  public function get($setting) {
+    if ($this->is_valid_setting($setting)) {
+      $value = $this->settings[$setting];
 
-      if ( $value === 'true' ) {
+      if ($value === 'true') {
         return true;
-      } else if ( $value === 'false' ) {
+      } else if ($value === 'false') {
         return false;
-      } else if ( $setting === 'dynval-regex' ) {
+      } else if ($setting === 'dynval-regex') {
         // WP / PHP doesn't allow me to store regular expressions without fucking them up.
         // So I'm not storing them. Spent way too much time trying to get simple things like selected attribute
         // in the options page right, but nah.
 
-        if ( $value === 'recommended' ) {
+        if ($value === 'recommended') {
           return [
             'regex' => '/## \w+ ##/',
             'chars' => '##',
           ];
-        } else if ( $value === 'legacy' ) {
+        } else if ($value === 'legacy') {
           return [
             'regex' => '/%[^%%\n]+%/',
             'chars' => '%',
           ];
         } else {
-          throw new Exception( 'Invalid WP Libre Form dynamic value regular expression' );
+          throw new Exception('Invalid WP Libre Form dynamic value regular expression');
         }
 
         return $value;
@@ -97,40 +95,40 @@ class WPLF_Settings {
     return false;
   }
 
-  public function update_setting( $setting, $value ) {
-    if ( ! $this->is_valid_setting( $setting ) ) {
-      throw new Exception( 'Invalid WP Libre Form setting' );
+  public function update_setting($setting, $value) {
+    if (!$this->is_valid_setting($setting)) {
+      throw new Exception('Invalid WP Libre Form setting');
     }
 
-    $settings = get_option( 'wplf-settings', $this->get_default_settings() );
-    $settings[ $setting ] = $value;
+    $settings = get_option('wplf-settings', $this->get_default_settings());
+    $settings[$setting] = $value;
     $this->settings = $settings;
 
-    return update_option( 'wplf-settings', $settings );
+    return update_option('wplf-settings', $settings);
   }
 
   public function render_settings_page() {
-    if ( ! empty( $_POST ) ) {
+    if (!empty($_POST)) {
       // Handle settings form submission
 
-      foreach ( $_POST as $k => $v ) {
-        if ( $this->is_valid_setting( $k ) ) {
-          $this->update_setting( $k, $v );
+      foreach ($_POST as $k => $v) {
+        if ($this->is_valid_setting($k)) {
+          $this->update_setting($k, $v);
         }
       }
     }
     ?>
 
     <form class="wplf-settings" method="post">
-      <?php foreach ( $this->available_settings as $setting => $data ) {
-        switch ( $data['type'] ) {
+      <?php foreach ($this->available_settings as $setting => $data) {
+        switch ($data['type']) {
           case 'select':
             ?>
             <label>
-              <strong><?php echo esc_html( $data['label'] ); ?></strong>
-              <select name="<?php echo esc_attr( $setting ); ?>">
-                <?php foreach ( $data['options'] as $k => $v ) { ?>
-                  <option value="<?php echo esc_attr( $k ); ?>" <?php echo $k === $this->settings[ $setting ] ? 'selected' : ''; ?>><?php echo esc_attr( $v ); ?></option>
+              <strong><?php echo esc_html($data['label']); ?></strong>
+              <select name="<?php echo esc_attr($setting); ?>">
+                <?php foreach ($data['options'] as $k => $v) { ?>
+                  <option value="<?php echo esc_attr($k); ?>" <?php echo $k === $this->settings[$setting] ? 'selected' : ''; ?>><?php echo esc_attr($v); ?></option>
                 <?php } ?>
               </select>
             </label>
@@ -150,7 +148,7 @@ class WPLF_Settings {
   }
 
   public static function init() {
-    if ( is_null( self::$instance ) ) {
+    if (is_null(self::$instance)) {
       self::$instance = new WPLF_Settings();
     }
 
