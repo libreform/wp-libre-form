@@ -1,8 +1,7 @@
 <?php
 
 add_action('wplf_post_validate_submission', 'wplf_send_email_copy', 20);
-function wplf_send_email_copy($return, $submission_id = null)
-{
+function wplf_send_email_copy($return, $submission_id = null) {
   // Normally $submission_id is null, but when resending copies it isn't, which is why this check exists
   if (! $submission_id) {
     $submission_id = $return->submission_id;
@@ -88,8 +87,7 @@ function wplf_send_email_copy($return, $submission_id = null)
   }
 }
 
-function wplf_email_copy_make_fields_key_value_list($fields, $form_id = 0, $form_name = '')
-{
+function wplf_email_copy_make_fields_key_value_list($fields, $form_id = 0, $form_name = '') {
   $list = '';
 
   foreach ($fields as $key => $value) {
@@ -110,8 +108,7 @@ function wplf_email_copy_make_fields_key_value_list($fields, $form_id = 0, $form
   return $list;
 }
 
-function wplf_email_copy_replace_tags($content, $form = null, $submission_id = null)
-{
+function wplf_email_copy_replace_tags($content, $form = null, $submission_id = null) {
   if (! $form || ! $submission_id) {
     return $content;
   }

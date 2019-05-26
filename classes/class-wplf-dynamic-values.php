@@ -5,8 +5,7 @@ if (! class_exists('WPLF_Dynamic_Values')) {
 
     public static $instance;
 
-    public static function init(WP_Libre_Form $wplf)
-    {
+    public static function init(WP_Libre_Form $wplf) {
       if (is_null(self::$instance)) {
         self::$instance = new WPLF_Dynamic_Values($wplf);
       }
@@ -16,15 +15,13 @@ if (! class_exists('WPLF_Dynamic_Values')) {
     /**
      * Hook our actions, filters and such
      */
-    public function __construct(WP_Libre_Form $wplf)
-    {
+    public function __construct(WP_Libre_Form $wplf) {
       add_filter('wplf_form', array( $this, 'render_form' ), 10, 4);
 
       $this->wplf = $wplf;
     }
 
-    public function render_form($content, $id, $xclass, $attributes)
-    {
+    public function render_form($content, $id, $xclass, $attributes) {
       $settings = $this->wplf->settings->get('dynval-regex');
 
       // Get all strings inside  placeholders
@@ -46,8 +43,7 @@ if (! class_exists('WPLF_Dynamic_Values')) {
       return $content;
     }
 
-    public static function get_available()
-    {
+    public static function get_available() {
       $register = function ($value, $callback, $labels = array()) use (&$available) {
         if (! is_callable($callback)) {
           throw new Exception('$callback is not callable');
@@ -104,8 +100,7 @@ if (! class_exists('WPLF_Dynamic_Values')) {
       ));
     }
 
-    public function populate_value($string, $data = [])
-    {
+    public function populate_value($string, $data = []) {
       $available = self::get_available();
 
       if (! empty($available[ $string ]) && is_callable($available[ $string ]['callback'])) {

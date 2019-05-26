@@ -7,8 +7,7 @@ if (! class_exists('WPLF_Polylang')) {
     protected $regular_expression = "/{{[^{}\n]+}}/";
     protected $strings = array();
 
-    public static function init(WP_Libre_Form $wplf)
-    {
+    public static function init(WP_Libre_Form $wplf) {
       if (is_null(self::$instance)) {
         self::$instance = new WPLF_Polylang($wplf);
       }
@@ -18,8 +17,7 @@ if (! class_exists('WPLF_Polylang')) {
     /**
      * Hook our actions, filters and such
      */
-    public function __construct(WP_Libre_Form $wplf)
-    {
+    public function __construct(WP_Libre_Form $wplf) {
       add_filter('wplf_form', array( $this, 'render_form' ));
       add_filter('save_post_wplf-form', array( $this, 'save_form' ), 10, 3);
       add_action('after_setup_theme', array( $this, 'register_strings' ));
@@ -33,8 +31,7 @@ if (! class_exists('WPLF_Polylang')) {
       $this->register_strings();
     }
 
-    public function render_form($form_content)
-    {
+    public function render_form($form_content) {
       // Get all strings inside double curly braces.
       preg_match_all($this->regular_expression, $form_content, $matches);
       foreach ($matches[0] as $match) {
@@ -46,8 +43,7 @@ if (! class_exists('WPLF_Polylang')) {
       return $form_content;
     }
 
-    public function save_form($post_id, $post, $update)
-    {
+    public function save_form($post_id, $post, $update) {
       unset($post_id, $update); // not used here so shut up linter!
 
       preg_match_all($this->regular_expression, $post->post_content, $matches);
@@ -63,8 +59,7 @@ if (! class_exists('WPLF_Polylang')) {
       update_option('wplf-translation-strings', $this->strings); // Let's be optimistic.
     }
 
-    public function render_success_message($message)
-    {
+    public function render_success_message($message) {
       // Get all strings inside double curly braces.
       preg_match_all($this->regular_expression, $message, $matches);
       foreach ($matches[0] as $match) {
@@ -76,8 +71,7 @@ if (! class_exists('WPLF_Polylang')) {
       return $message;
     }
 
-    public function save_success_message($message)
-    {
+    public function save_success_message($message) {
       preg_match_all($this->regular_expression, $message, $matches);
       if (! empty($matches)) {
         foreach ($matches[0] as $match) {
@@ -93,8 +87,7 @@ if (! class_exists('WPLF_Polylang')) {
       return $message;
     }
 
-    public function ajax_object($array)
-    {
+    public function ajax_object($array) {
       if (function_exists('pll_current_language')) {
         $array['lang'] = pll_current_language();
       } else {
@@ -103,22 +96,19 @@ if (! class_exists('WPLF_Polylang')) {
       return $array;
     }
 
-    public function register_strings()
-    {
+    public function register_strings() {
       foreach ($this->strings as $string => $value) {
         $this->register_string($string);
       }
     }
 
-    public function register_string($string)
-    {
+    public function register_string($string) {
       if (function_exists('pll_register_string')) {
         pll_register_string($string, $string, 'WP Libre Form');
       }
     }
 
-    public function translate_string($string)
-    {
+    public function translate_string($string) {
       if (function_exists('pll__')) {
         return pll__($string);
       } else {

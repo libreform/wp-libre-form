@@ -4,8 +4,7 @@
  * Check that Form exists
  */
 add_filter('wplf_validate_submission', 'wplf_validate_form_exists', 1);
-function wplf_validate_form_exists($return)
-{
+function wplf_validate_form_exists($return) {
   // skip this validation if submission has already failed
   if (! $return->ok) {
     return $return;
@@ -32,8 +31,7 @@ function wplf_validate_form_exists($return)
  * Check for required fields that are empty
  */
 add_filter('wplf_validate_submission', 'wplf_validate_required_empty', 2);
-function wplf_validate_required_empty($return)
-{
+function wplf_validate_required_empty($return) {
   // skip this validation if submission has already failed
   if (! $return->ok) {
     return $return;
@@ -70,8 +68,7 @@ function wplf_validate_required_empty($return)
  * Check that submission has only fields that are set in form
  */
 add_filter('wplf_validate_submission', 'wplf_validate_additional_fields', 3);
-function wplf_validate_additional_fields($return)
-{
+function wplf_validate_additional_fields($return) {
   // skip this validation if submission has already failed
   if (! $return->ok) {
     return $return;

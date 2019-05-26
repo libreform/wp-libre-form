@@ -9,8 +9,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    */
     public static $instance;
 
-    public static function init(WP_Libre_Form $wplf)
-    {
+    public static function init(WP_Libre_Form $wplf) {
       if (is_null(self::$instance)) {
         self::$instance = new CPT_WPLF_Form($wplf);
       }
@@ -20,8 +19,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Hook our actions, filters and such
    */
-    public function __construct(WP_Libre_Form $wplf)
-    {
+    public function __construct(WP_Libre_Form $wplf) {
       // init custom post type
       add_action('init', array( $this, 'register_cpt' ));
 
@@ -67,8 +65,7 @@ if (! class_exists('CPT_WPLF_Form')) :
       add_action('before_delete_post', array( $this, 'clean_up_entry' ));
     }
 
-    public static function register_cpt()
-    {
+    public static function register_cpt() {
       $labels = array(
       'name'               => _x('Forms', 'post type general name', 'wp-libre-form'),
       'singular_name'      => _x('Form', 'post type singular name', 'wp-libre-form'),
@@ -116,8 +113,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Modify post.php permalink html to show notice if form isn't publicly visible.
    */
-    public function modify_permalink_html($html, $post_id)
-    {
+    public function modify_permalink_html($html, $post_id) {
       $publicly_visible = $this->get_publicly_visible_state($post_id);
 
       if (get_post_type($post_id) === 'wplf-form' && ! $publicly_visible) {
@@ -132,8 +128,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Disable TinyMCE editor for forms, which are simple HTML things
    */
-    public function disable_tinymce($default)
-    {
+    public function disable_tinymce($default) {
       global $post;
 
       // only for this cpt
@@ -146,8 +141,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    *  Disable Gutenberg editor
    */
-    public function disable_gutenberg($is_enabled, $post_type)
-    {
+    public function disable_gutenberg($is_enabled, $post_type) {
       if ($post_type === 'wplf-form') {
         return false;
       }
@@ -159,8 +153,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    * Berore permanently deleting form entry, remove attachments
    * in the case they were not added to media library
    */
-    public function clean_up_entry($id)
-    {
+    public function clean_up_entry($id) {
       $type = get_post_type($id);
       if ('wplf-submission' === $type) {
         $postmeta = get_post_meta($id);
@@ -175,8 +168,7 @@ if (! class_exists('CPT_WPLF_Form')) :
       }
     }
 
-    public function print_notices()
-    {
+    public function print_notices() {
       $post_id = ! empty($_GET['post']) ? (int) $_GET['post'] : false;
       $type = get_post_type($post_id);
 
@@ -225,8 +217,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Pre-populate form editor with default content
    */
-    public function default_content_cpt($content)
-    {
+    public function default_content_cpt($content) {
       global $pagenow;
 
       // only on post.php screen
@@ -264,8 +255,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Remove view action in edit.php for forms
    */
-    function remove_row_actions($actions, $post)
-    {
+    function remove_row_actions($actions, $post) {
       $publicly_visible = $this->get_publicly_visible_state($post->ID);
 
       if ('wplf-form' === $post->post_type && ! $publicly_visible) {
@@ -278,8 +268,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Custom columns in edit.php for Forms
    */
-    public function custom_columns_cpt($columns)
-    {
+    public function custom_columns_cpt($columns) {
       $new_columns = array(
       'cb' => $columns['cb'],
       'title' => $columns['title'],
@@ -294,8 +283,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Custom column display for Form CPT in edit.php
    */
-    public function custom_columns_display_cpt($column, $post_id)
-    {
+    public function custom_columns_display_cpt($column, $post_id) {
       if ('shortcode' === $column) {
   ?>
   <input type="text" class="code" value='[libre-form id="<?php echo intval($post_id); ?>"]' readonly>
@@ -322,8 +310,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Add meta box to show fields in form
    */
-    public function add_meta_boxes_cpt()
-    {
+    public function add_meta_boxes_cpt() {
       // Shortcode meta box
       add_meta_box(
           'wplf-shortcode',
@@ -396,8 +383,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for shortcode meta box
    */
-    public function metabox_shortcode($post)
-    {
+    public function metabox_shortcode($post) {
   ?>
   <p><input type="text" class="code" value='[libre-form id="<?php echo esc_attr($post->ID); ?>"]' readonly></p>
 <?php
@@ -406,8 +392,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for dynamic values meta box
    */
-    public function metabox_dynamic_values($post)
-    {
+    public function metabox_dynamic_values($post) {
       unset($post); ?>
       <select name="wplf-dynamic-values">
         <option default value=""><?php esc_html_e('Choose a dynamic value', 'wp-libre-form'); ?></option>
@@ -436,8 +421,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for fields meta box
    */
-    function metabox_thank_you($post)
-    {
+    function metabox_thank_you($post) {
       // get post meta
       $meta = get_post_meta($post->ID);
       $message = isset($meta['_wplf_thank_you']) ?
@@ -460,8 +444,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for should files end up in media library
    */
-    public function metabox_media_library($post)
-    {
+    public function metabox_media_library($post) {
       $meta    = get_post_meta($post->ID);
       $checked = 'checked';
 
@@ -478,8 +461,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for form fields meta box
    */
-    public function metabox_form_fields()
-    {
+    public function metabox_form_fields() {
   ?>
   <p><?php esc_html_e('Fields marked with * are required', 'wp-libre-form'); ?></p>
 <div class="wplf-form-field-container">
@@ -493,8 +475,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for submit email meta box
    */
-    public function metabox_submit_email($post)
-    {
+    public function metabox_submit_email($post) {
       $meta = get_post_meta($post->ID);
       $email_enabled = ! empty($meta['_wplf_email_copy_enabled']) ? (int) $meta['_wplf_email_copy_enabled'][0] : 0;
       $email_copy_to = isset($meta['_wplf_email_copy_to']) ? $meta['_wplf_email_copy_to'][0] : '';
@@ -584,8 +565,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Meta box callback for submission title format
    */
-    public function meta_box_title_format($post)
-    {
+    public function meta_box_title_format($post) {
       // get post meta
       $meta = get_post_meta($post->ID);
       $default = '%name% <%email%>'; // default submission title format
@@ -623,8 +603,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    *
    * @return void
    */
-    function maybe_load_imported_template($post_type, $post)
-    {
+    function maybe_load_imported_template($post_type, $post) {
       if ($post_type !== 'wplf-form' || $post->post_status === 'auto-draft') {
         return;
       }
@@ -660,8 +639,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    *
    * @return void
    */
-    protected function override_form_template($template_content, $form_id)
-    {
+    protected function override_form_template($template_content, $form_id) {
       $this->maybe_persist_override_template($template_content, $form_id);
 
       static $times_content_replaced = 0;
@@ -722,8 +700,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    *
    * @return void
    */
-    protected function maybe_persist_override_template($template, $form_id, $force = false)
-    {
+    protected function maybe_persist_override_template($template, $form_id, $force = false) {
       $hash_transient = 'wplf_form_tmpl_hash_' . $form_id;
       $template_hash = md5($template);
       $stored_hash = get_transient($hash_transient);
@@ -753,8 +730,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Handles saving our post meta
    */
-    public function save_cpt($post_id)
-    {
+    public function save_cpt($post_id) {
       // verify nonce
       if (! isset($_POST['wplf_form_meta_nonce'])) {
         return;
@@ -881,8 +857,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    *
    * We apply <form> via the shortcode, you can't have nested forms anyway
    */
-    public function strip_form_tags($content)
-    {
+    public function strip_form_tags($content) {
       return preg_replace('/<\/?form.*>/i', '', $content);
     }
 
@@ -890,8 +865,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * The function we display the form with
    */
-    public function wplf_form($id, $content = '', $xclass = '', $attributes = [])
-    {
+    public function wplf_form($id, $content = '', $xclass = '', $attributes = []) {
       global $post;
       $preview = ! empty($_GET['preview']) ? $_GET['preview'] : false;
 
@@ -981,8 +955,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Enqueue the front end JS
    */
-    public function maybe_enqueue_frontend_script()
-    {
+    public function maybe_enqueue_frontend_script() {
       global $post;
 
       // register the script, but only enqueue it if the current post contains a form in it
@@ -1012,8 +985,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Shortcode for displaying a Form
    */
-    public function shortcode($shortcode_atts, $content = null)
-    {
+    public function shortcode($shortcode_atts, $content = null) {
       $attributes = shortcode_atts(array(
       'id' => null,
       'xclass' => '',
@@ -1059,8 +1031,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Use the shortcode for previewing forms
    */
-    public function use_shortcode_for_preview($content)
-    {
+    public function use_shortcode_for_preview($content) {
       global $post;
       if (! isset($post->post_type) || $post->post_type !== 'wplf-form') {
         return $content;
@@ -1072,8 +1043,7 @@ if (! class_exists('CPT_WPLF_Form')) :
    * Set and show 404 page for visitors trying to see single form.
    * And yes, it is a global $post. That's right.
    */
-    public function maybe_set_404_for_single_form()
-    {
+    public function maybe_set_404_for_single_form() {
       global $post;
 
       if (! is_singular('wplf-form')) {
@@ -1094,16 +1064,14 @@ if (! class_exists('CPT_WPLF_Form')) :
     /**
    * Wrapper function to check if form is publicly visible.
    */
-    public function get_publicly_visible_state($id)
-    {
+    public function get_publicly_visible_state($id) {
       return apply_filters('wplf-form-publicly-visible', false, $id);
     }
 
     /**
    * A very simple uglify. Just removes line breaks from html
    */
-    public function minify_html($html)
-    {
+    public function minify_html($html) {
       return str_replace(array( "\n", "\r" ), ' ', $html);
     }
   }

@@ -48,5 +48,12 @@
 
     <!-- I don't understand why PSR2 uses this rule as well as defining their own identical rule. -->
     <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps" />
+
+    <!-- Yeah how about we don't waste lines by putting every fucking curly brace to it's own line -->
+    <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+    <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
   </rule>
+
+  <!-- Require the brace to be on the same line -->
+  <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
 </ruleset>

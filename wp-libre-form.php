@@ -39,16 +39,14 @@ if (! class_exists('WP_Libre_Form')) :
     public $plugins;
     public $settings;
 
-    public static function init()
-    {
+    public static function init() {
       if (is_null(self::$instance)) {
         self::$instance = new WP_Libre_Form();
       }
       return self::$instance;
     }
 
-    private function __construct()
-    {
+    private function __construct() {
       require_once 'classes/class-wplf-settings.php';
       require_once 'classes/class-cpt-wplf-form.php';
       require_once 'classes/class-cpt-wplf-submission.php';
@@ -84,8 +82,7 @@ if (! class_exists('WP_Libre_Form')) :
     /**
    * Include custom JS and CSS in the admin
    */
-    public function admin_scripts()
-    {
+    public function admin_scripts() {
       wp_enqueue_script('wplf-form-edit-js', plugins_url('wp-libre-form/dist/wplf-admin.js', dirname(__FILE__)), [ 'jquery', 'underscore' ]);
       wp_enqueue_style('wplf-form-edit-css', plugins_url('wp-libre-form/dist/wplf-admin.css', dirname(__FILE__)));
 
@@ -100,8 +97,7 @@ if (! class_exists('WP_Libre_Form')) :
     /**
    * Plugin activation hook
    */
-    public static function flush_rewrites()
-    {
+    public static function flush_rewrites() {
       CPT_WPLF_Form::register_cpt();
       CPT_WPLF_Submission::register_cpt();
       flush_rewrite_rules();
@@ -110,16 +106,14 @@ if (! class_exists('WP_Libre_Form')) :
     /**
    * Load our plugin textdomain
    */
-    public static function load_our_textdomain()
-    {
+    public static function load_our_textdomain() {
       $loaded = load_plugin_textdomain('wp-libre-form', false, dirname(plugin_basename(__FILE__)) . '/lang/');
       if (! $loaded) {
         $loaded = load_muplugin_textdomain('wp-libre-form', dirname(plugin_basename(__FILE__)) . '/lang/');
       }
     }
 
-    public function register_rest_routes()
-    {
+    public function register_rest_routes() {
       register_rest_route('wplf/v1', 'submit', [
       'methods' => 'POST',
       'callback' => 'wplf_ajax_submit_handler', // admin-ajax handler, works but...
@@ -130,8 +124,7 @@ if (! class_exists('WP_Libre_Form')) :
     /**
    * Enable Polylang support
    */
-    public function init_polylang_support()
-    {
+    public function init_polylang_support() {
       if (apply_filters('wplf_load_polylang', true) && class_exists('Polylang')) {
         require_once 'classes/class-wplf-polylang.php';
         WPLF_Polylang::init($this);
@@ -141,8 +134,7 @@ if (! class_exists('WP_Libre_Form')) :
     /**
    * Public version of wplf_form
    */
-    public function wplf_form($id, $content = '', $xclass = '')
-    {
+    public function wplf_form($id, $content = '', $xclass = '') {
       return CPT_WPLF_Form::wplf_form($id, $content, $xclass);
     }
   }
@@ -152,8 +144,7 @@ endif;
 /**
  * Expose a global function for less awkward usage
  */
-function wplf()
-{
+function wplf() {
   // init the plugin
   return WP_Libre_Form::init();
 }

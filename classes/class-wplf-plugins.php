@@ -5,8 +5,7 @@ class WPLF_Plugins
   public static $instance;
   private $plugins = array();
 
-  public function __get($key)
-  {
+  public function __get($key) {
     if (! empty($this->plugins[ $key ])) {
       return $this->plugins[ $key ]['instance'];
     }
@@ -14,8 +13,7 @@ class WPLF_Plugins
     throw new Exception('No plugin found with that name');
   }
 
-  private function __construct()
-  {
+  private function __construct() {
     add_action(
         'admin_menu',
         function () {
@@ -42,8 +40,7 @@ class WPLF_Plugins
     });
   }
 
-  public static function init()
-  {
+  public static function init() {
     if (is_null(self::$instance)) {
       self::$instance = new WPLF_Plugins();
     }
@@ -51,8 +48,7 @@ class WPLF_Plugins
     return self::$instance;
   }
 
-  public function notify_about_feature($message = '', $link = '', $option_name = null)
-  {
+  public function notify_about_feature($message = '', $link = '', $option_name = null) {
     if (! $option_name) {
       return;
     }
@@ -84,8 +80,7 @@ class WPLF_Plugins
     <?php
   }
 
-  private function render_plugin($plugin = array())
-  {
+  private function render_plugin($plugin = array()) {
     $plugin = $this->fill_plugin_data($plugin);
     $name = $plugin['name'];
     $version = $plugin['version'];
@@ -142,8 +137,7 @@ class WPLF_Plugins
     <?php
   }
 
-  public function render_admin_page()
-  {
+  public function render_admin_page() {
     $recommended = $this->get_recommended_plugins();
     $enabled = $this->get_enabled_plugins();
     $plugins_with_options = array_filter(
@@ -224,13 +218,11 @@ class WPLF_Plugins
     <?php
   }
 
-  private function get_enabled_plugins()
-  {
+  private function get_enabled_plugins() {
     return apply_filters('wplf_enabled_plugins', $this->plugins);
   }
 
-  private function get_recommended_plugins()
-  {
+  private function get_recommended_plugins() {
     $list = [
       'Export' => $this->fill_plugin_data(
           [
@@ -272,8 +264,7 @@ class WPLF_Plugins
    *
    * @param array $data
    */
-  private function fill_plugin_data($data = array())
-  {
+  private function fill_plugin_data($data = array()) {
     return array_merge(
         array(
         'name' => null,
@@ -292,8 +283,7 @@ class WPLF_Plugins
    *
    * @param array $data
    */
-  public function register($data = array())
-  {
+  public function register($data = array()) {
     $data = $this->fill_plugin_data($data);
 
     if (empty($data['name'])) {
