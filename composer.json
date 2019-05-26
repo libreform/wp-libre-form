@@ -17,6 +17,7 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4"
   },
   "scripts": {
-    "lint": "./vendor/bin/phpcs --standard=./phpcs.xml -n -p"
+    "lint": "./vendor/bin/phpcs --standard=./phpcs.xml -n -p",
+    "lintfix": "./vendor/bin/phpcbf --standard=./phpcs.xml"
   }
 }
