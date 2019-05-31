@@ -733,7 +733,11 @@ if (! class_exists('CPT_WPLF_Form')) :
      */
     protected function maybe_persist_override_template($template, $form_id, $force = false) {
       $templateHash = md5($template);
-      $templateTransient = get_transient('wplf-template-override') || [];
+      $templateTransient = get_transient('wplf-template-override');
+
+      if (!$templateTransient) {
+        $templateTransient = [];
+      }
 
       $notForcedAndHashNotChanged = (
         !$force && 
