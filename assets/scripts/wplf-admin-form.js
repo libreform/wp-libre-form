@@ -4,6 +4,16 @@
 (function($) {
 
 $(document).ready(function() {
+  var data = window.wplf_form_edit
+
+  // Prevent users who can't save the post from editing it
+  if (data.has_unfiltered_html !== '1') {
+    $('#title').prop('disabled', true);
+    $('#content').prop('disabled', true);
+    $('#publish').remove();
+    $('#save-post').remove();
+  }
+
   function parseFields() {
     // get editor content
     // we don't allow the wysiwyg editor here, so it's fine to just get the textarea value

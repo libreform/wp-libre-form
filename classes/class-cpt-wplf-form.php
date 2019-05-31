@@ -170,7 +170,7 @@ if (! class_exists('CPT_WPLF_Form')) :
 
     public function print_notices() {
       $post_id = ! empty($_GET['post']) ? (int) $_GET['post'] : false;
-      $type = get_post_type($post_id);
+      $type = get_post_type($post_id)
 
       if ($type !== 'wplf-form' || ! $post_id) {
         return false;
@@ -743,6 +743,15 @@ if (! class_exists('CPT_WPLF_Form')) :
         return;
       }
 
+
+      if ( is_multisite() && ! current_user_can( 'unfiltered_html' ) ) {
+        wp_die(
+          '<h1>' . esc_html__( 'You do not have unfiltered_html capability', 'wp-libre-form' ) . '</h1>' .
+          '<p>' . esc_html__( 'Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form' ) . '</p>',
+          403
+        );
+      }
+      
       // check permissions.
       if (! current_user_can('edit_post', $post_id)) {
         return;
