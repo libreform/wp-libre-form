@@ -906,7 +906,7 @@ if (! class_exists('CPT_WPLF_Form')) :
       }
 
       // save plugin version, update if allowed
-      $updateAllowed = isset($_POST['wplf_version_update_toggle']) && $_POST['wplf_version_update_toggle'] === '1';
+      $updateAllowed = isset($_POST['wplf_update_plugin_version_to_meta']) && $_POST['wplf_update_plugin_version_to_meta'] === '1';
 
       if ($updateAllowed) {
         update_post_meta($post_id, '_wplf_plugin_version', WPLF_VERSION);
