@@ -67,9 +67,9 @@ class WPLF_Settings {
 
       if ($value === 'true') {
         return true;
-      } else if ($value === 'false') {
+      } elseif ($value === 'false') {
         return false;
-      } else if ($setting === 'dynval-regex') {
+      } elseif ($setting === 'dynval-regex') {
         // WP / PHP doesn't allow me to store regular expressions without fucking them up.
         // So I'm not storing them. Spent way too much time trying to get simple things like selected attribute
         // in the options page right, but nah.
@@ -79,7 +79,7 @@ class WPLF_Settings {
             'regex' => '/## \w+ ##/',
             'chars' => '##',
           ];
-        } else if ($value === 'legacy') {
+        } elseif ($value === 'legacy') {
           return [
             'regex' => '/%[^%%\n]+%/',
             'chars' => '%',

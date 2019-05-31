@@ -187,23 +187,23 @@ if (! class_exists('CPT_WPLF_Form')) :
         <p>
         <?php
           echo esc_html(
-            __(
-              'Your site is part of a WordPress Network. 
+              __(
+                  'Your site is part of a WordPress Network. 
               Network installations are different from standard WordPress sites, 
-              and you need unfiltered_html capability to be able to save anything with HTML.', 
-              'wp-libre-form'
-            )
+              and you need unfiltered_html capability to be able to save anything with HTML.',
+                  'wp-libre-form'
+              )
           ); ?>
         </p>
 
         <p>
         <?php
           echo esc_html(
-            __(
-              'You do not have this capability, so to prevent you from accidentally destroying the form, you can\'t save here.
-              Either switch to a user with Super Admin role, or install a plugin like Unfiltered HTML.', 
-              'wp-libre-form'
-            )
+              __(
+                  'You do not have this capability, so to prevent you from accidentally destroying the form, you can\'t save here.
+              Either switch to a user with Super Admin role, or install a plugin like Unfiltered HTML.',
+                  'wp-libre-form'
+              )
           ); ?>
         </p>
       </div>
@@ -740,7 +740,7 @@ if (! class_exists('CPT_WPLF_Form')) :
       }
 
       $notForcedAndHashNotChanged = (
-        !$force && 
+        !$force &&
         (isset($templateTransient[$templateHash]) && $templateTransient[$templateHash] === $templateHash)
       );
 
@@ -796,9 +796,9 @@ if (! class_exists('CPT_WPLF_Form')) :
 
       if (is_multisite() && !current_user_can('unfiltered_html')) {
         wp_die(
-          '<h1>' . esc_html__( 'You do not have unfiltered_html capability', 'wp-libre-form' ) . '</h1>' .
-          '<p>' . esc_html__( 'Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form' ) . '</p>',
-          403
+            '<h1>' . esc_html__('You do not have unfiltered_html capability', 'wp-libre-form') . '</h1>' .
+            '<p>' . esc_html__('Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form') . '</p>',
+            403
         );
       }
       
