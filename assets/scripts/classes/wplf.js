@@ -124,6 +124,9 @@ export class WPLF {
     const wplfForm = new WPLF_Form(element);
     this.forms[wplfForm.key] = wplfForm;
 
+    wplfForm.form.removeAttribute('tabindex');
+    wplfForm.form.removeAttribute('style');
+
     return wplfForm;
   }
 

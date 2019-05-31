@@ -950,6 +950,8 @@ if (! class_exists('CPT_WPLF_Form')) :
   <form
   data-form-id="<?php echo intval($id); ?>"
   class="libre-form libre-form-<?php echo esc_attr($id . ' ' . $xclass); ?>"
+  style="visibility: hidden;"
+  tabindex="-1"
   <?php
     // check if form contains file inputs
   if (false !== strpos($content, "type='file'")
