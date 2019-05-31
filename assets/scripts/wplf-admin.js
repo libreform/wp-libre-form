@@ -5,6 +5,16 @@ import '../styles/wplf-admin.scss';
 const $ = window.jQuery; // No need to use a closure.
 const _ = window._;
 
+function maybePreventEditing() {
+  // Prevent users who can't save the post from editing it
+  if (globalData.has_unfiltered_html !== '1') {
+    $('#title').prop('disabled', true);
+    $('#content').prop('disabled', true);
+    $('#publish').remove();
+    $('#save-post').remove();
+  }
+}
+
 function onPluginsPage() {
   const menu = $('.wplf-plugins-menu');
   const pages = $('.wplf-plugins-page');
@@ -150,6 +160,7 @@ export default (() => {
       $('select[name="wplf-dynamic-values"]').change(showDynamicValueInfo);
 
       onPluginsPage();
+      maybePreventEditing();
     }
   });
 

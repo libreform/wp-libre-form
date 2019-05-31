@@ -170,7 +170,9 @@ if (! class_exists('CPT_WPLF_Form')) :
 
     public function print_notices() {
       $post_id = ! empty($_GET['post']) ? (int) $_GET['post'] : false;
-      $type = get_post_type($post_id)
+      $type = get_post_type($post_id);
+
+      $unableToEdit = is_multisite() && !current_user_can('unfiltered_html');
 
       if ($type !== 'wplf-form' || ! $post_id) {
         return false;
@@ -178,6 +180,34 @@ if (! class_exists('CPT_WPLF_Form')) :
 
       $version_created_at = get_post_meta($post_id, '_wplf_plugin_version', true);
       $version_created_at = $version_created_at ? $version_created_at : '< 1.5';
+
+      if ($unableToEdit) { ?>
+      <div class="notice notice-error">
+        <p>
+        <?php
+          echo esc_html(
+            __(
+              'Your site is part of a WordPress Network. 
+              Network installations are different from standard WordPress sites, 
+              and you need unfiltered_html capability to be able to save anything with HTML.', 
+              'wp-libre-form'
+            )
+          ); ?>
+        </p>
+
+        <p>
+        <?php
+          echo esc_html(
+            __(
+              'You do not have this capability, so to prevent you from accidentally destroying the form, you can\'t save here.
+              Either switch to a user with Super Admin role, or install a plugin like Unfiltered HTML.', 
+              'wp-libre-form'
+            )
+          ); ?>
+        </p>
+      </div>
+      <?php
+      }
 
       // The notice prints outside the form element
       //  a hidden field is created or deleted when this checkbox changes

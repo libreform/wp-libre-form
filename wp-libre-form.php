@@ -86,11 +86,13 @@ if (! class_exists('WP_Libre_Form')) :
       wp_enqueue_script('wplf-form-edit-js', plugins_url('wp-libre-form/dist/wplf-admin.js', dirname(__FILE__)), [ 'jquery', 'underscore' ]);
       wp_enqueue_style('wplf-form-edit-css', plugins_url('wp-libre-form/dist/wplf-admin.css', dirname(__FILE__)));
 
+      $isMS = is_multisite();
+      $hasUnfiltered = current_user_can('unfiltered_html');
       wp_localize_script('wplf-form-edit-js', 'WPLF_DATA', apply_filters('wplf_admin_ajax_object', [
         'dynamic_value_chars' => $this->settings->get('dynval-regex')['chars'],
         'autoinit' => $this->settings->get('autoinit'),
         'parse-wplf-shortcode-rest-api' => $this->settings->get('parse-wplf-shortcode-rest-api'),
-        'has_unfiltered_html' => is_multisite() ? current_user_can( 'unfiltered_html' ) : true, // WP turns it into a number... 
+        'has_unfiltered_html' => $isMS ? $hasUnfiltered ? 1 : 0 : 0, 
       ]));
     }
 
