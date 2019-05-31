@@ -116,7 +116,7 @@ if (! class_exists('CPT_WPLF_Submission')) :
    * Show a form filter in the edit.php view
    */
     public function form_filter_dropdown() {
-      global $pagenow;
+      global $pagenow, $wpdb;
 
       $allowed = array( 'wplf-submission' ); // show filter on these post types (currently only one?)
       $allowed = apply_filters('wplf-dropdown-filter', $allowed);
@@ -131,30 +131,22 @@ if (! class_exists('CPT_WPLF_Submission')) :
       if ($transient) {
         $forms = $transient;
       } else {
-        $query = new WP_Query(array(
-        'post_per_page' => '-1',
-        'post_type' => 'wplf-form',
-        'no_found_rows' => true,
-        'update_post_meta_cache' => false,
-        'update_post_term_cache' => false,
-        ));
-        $forms = $query->get_posts();
+        // Raw SQL is as fast as it gets, we only need the ID and the title anyway.
+        $prefix = $wpdb->prefix;
+        $forms = $wpdb->get_results("SELECT ID, post_title FROM {$prefix}posts WHERE post_type = 'wplf-form' AND post_status = 'publish'");
 
         set_transient('wplf-form-filter', $forms, 15 * MINUTE_IN_SECONDS);
-      }
-
-  ?>
-  <label for="filter-by-form" class="screen-reader-text">Filter by form</label>
-  <select name="form" id="filter-by-form">
-  <option value="0"><?php esc_html_e('All Forms', 'wp-libre-form'); ?></option>
-  <?php foreach ($forms as $form) : ?>
-    <option
-      value="<?php echo intval($form->ID); ?>"
-      <?php echo isset($_REQUEST['form']) && intval($_REQUEST['form']) === $form->ID ? 'selected' : ''; ?>
-    ><?php echo esc_html($form->post_title); ?></option>
-  <?php endforeach; ?>
-</select>
-<?php
+      } ?>
+      <label for="filter-by-form" class="screen-reader-text">Filter by form</label>
+      <select name="form" id="filter-by-form">
+        <option value="0"><?php esc_html_e('All Forms', 'wp-libre-form'); ?></option>
+        <?php foreach ($forms as $form) : ?>
+          <option
+            value="<?php echo intval($form->ID); ?>"
+            <?php echo isset($_REQUEST['form']) && intval($_REQUEST['form']) === $form->ID ? 'selected' : ''; ?>
+          ><?php echo esc_html($form->post_title); ?></option>
+        <?php endforeach; ?>
+      </select><?php
     }
 
     /**

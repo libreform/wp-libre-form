@@ -32,6 +32,7 @@ if (! class_exists('CPT_WPLF_Form')) :
       add_action('add_meta_boxes', array( $this, 'add_meta_boxes_cpt' ));
       add_action('add_meta_boxes', array( $this, 'maybe_load_imported_template' ), 10, 2);
       add_action('admin_notices', array( $this, 'print_notices' ), 10);
+      add_action('delete_post', array( $this, 'delete_form' ));
 
       // edit.php view
       add_filter('post_row_actions', array( $this, 'remove_row_actions' ), 10, 2);
@@ -722,44 +723,59 @@ if (! class_exists('CPT_WPLF_Form')) :
     }
 
     /**
-   * Check if we need to auto-persist the form template override into WP database.
-   *
-   * @param string $template Template to maybe persist.
-   * @param int $form_id Form ID to persist template for.
-   * @param bool $force Force a persist even though not required?
-   *
-   * @return void
-   */
+     * Check if we need to auto-persist the form template override into WP database.
+     *
+     * @param string $template Template to maybe persist.
+     * @param int $form_id Form ID to persist template for.
+     * @param bool $force Force a persist even though not required?
+     *
+     * @return void
+     */
     protected function maybe_persist_override_template($template, $form_id, $force = false) {
-      $hash_transient = 'wplf_form_tmpl_hash_' . $form_id;
-      $template_hash = md5($template);
-      $stored_hash = get_transient($hash_transient);
+      $templateHash = md5($template);
+      $templateTransient = get_transient('wplf-template-override') || [];
 
-      if (! $force && $template_hash === $stored_hash) {
+      $notForcedAndHashNotChanged = (
+        !$force && 
+        (isset($templateTransient[$templateHash]) && $templateTransient[$templateHash] === $templateHash)
+      );
+
+      if ($notForcedAndHashNotChanged) {
         return;
       }
 
       // Safe-guard to prevent accidental infinite loops.
-      remove_action('save_post', array( $this, 'save_cpt' ));
+      remove_action('save_post', [$this, 'save_cpt']);
 
-      $updated = wp_update_post(
-          array(
-          'ID' => (int) $form_id,
-          'post_content' => $template,
-          )
-      );
+      $updated = wp_update_post([
+        'ID' => (int) $form_id,
+        'post_content' => $template,
+      ]);
 
-      add_action('save_post', array( $this, 'save_cpt' ));
+      add_action('save_post', [$this, 'save_cpt']);
 
-      // Maybe we should do something else than just silently fail if persisting failed above.
       if ($updated) {
-        set_transient($hash_transient, $template_hash, HOUR_IN_SECONDS * 8);
+        $transient = array_merge($templateTransient, [$templateHash => date('U')]);
+
+        set_transient('wplf-template-override', $transient, HOUR_IN_SECONDS * 8);
+      }
+    }
+
+    public function delete_form($post_id) {
+      $post = get_post($post_id);
+
+      if ($post->post_type !== 'wplf-form') {
+        do_action("wplf_delete_form", $post);
+        do_action("wplf_{$post->slug}_delete_form", $post);
+        do_action("wplf_{$post->slug}_delete_form", $post);
+
+        $this->deleteTransients();
       }
     }
 
     /**
-   * Handles saving our post meta
-   */
+     * Handles saving our post meta
+     */
     public function save_cpt($post_id) {
       // verify nonce
       if (! isset($_POST['wplf_form_meta_nonce'])) {
@@ -774,7 +790,7 @@ if (! class_exists('CPT_WPLF_Form')) :
       }
 
 
-      if ( is_multisite() && ! current_user_can( 'unfiltered_html' ) ) {
+      if (is_multisite() && !current_user_can('unfiltered_html')) {
         wp_die(
           '<h1>' . esc_html__( 'You do not have unfiltered_html capability', 'wp-libre-form' ) . '</h1>' .
           '<p>' . esc_html__( 'Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wp-libre-form' ) . '</p>',
@@ -786,6 +802,8 @@ if (! class_exists('CPT_WPLF_Form')) :
       if (! current_user_can('edit_post', $post_id)) {
         return;
       }
+
+      $this->deleteTransients();
 
       // save media checkbox
       if (isset($_POST['wplf_media_library'])) {
@@ -1112,6 +1130,14 @@ if (! class_exists('CPT_WPLF_Form')) :
    */
     public function minify_html($html) {
       return str_replace(array( "\n", "\r" ), ' ', $html);
+    }
+
+    /**
+     * Delete all form related transients
+     */
+    public function deleteTransients() {
+      delete_transient('wplf-template-override');
+      delete_transient('wplf-form-filter');
     }
   }
 
