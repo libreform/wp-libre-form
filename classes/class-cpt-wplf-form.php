@@ -599,7 +599,7 @@ if (! class_exists('CPT_WPLF_Form')) :
     public function meta_box_title_format($post) {
       // get post meta
       $meta = get_post_meta($post->ID);
-      $default = '%name% <%email%>'; // default submission title format
+      $default = '%form-title% #%submission-id%'; // default submission title format
       $format = isset($meta['_wplf_title_format']) ? $meta['_wplf_title_format'][0] : $default;
   ?>
   <p><?php esc_html_e('Submissions from this form will use this formatting in their title.', 'wp-libre-form'); ?></p>

@@ -39,13 +39,13 @@ function wplf_ajax_submit_handler() {
       'post_type'      => 'wplf-submission',
     ));
 
-    // exposes $post_id in $_POST to be able to use in the title
-    // hacky, but uses less memory than a copy of $_POST
+    // Expose some extras in $_POST so they can be used in the submission title
     $_POST['submission-id'] = $post_id;
+    $_POST['form-title'] = $form->post_title;
+    $_POST = apply_filters('wplf_submission_post_data', $_POST);
 
     // substitute the %..% tags with field values
     $post_title = $title_format;
-
     preg_match_all('/%(.+?)%/', $post_title, $toks);
     foreach ($toks[1] as $tok) {
       $replace = '';
@@ -61,8 +61,15 @@ function wplf_ajax_submit_handler() {
       'post_title' => $post_title,
     ]);
 
-    // don't save the post id in meta
-    unset($_POST['submission-id']);
+    $discardValues = apply_filters('wplf_submission_discard_values', [
+      'submission-id',
+      'form-title'
+    ]);
+
+    // Discard values like the extras from form submissions
+    foreach ($discardValues as $key) {
+      unset($_POST[$key]);
+    }
 
     // add submission data as meta values
     foreach ($_POST as $key => $value) {
