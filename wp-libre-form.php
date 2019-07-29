@@ -92,7 +92,7 @@ if (! class_exists('WP_Libre_Form')) :
         'dynamic_value_chars' => $this->settings->get('dynval-regex')['chars'],
         'autoinit' => $this->settings->get('autoinit'),
         'parse-wplf-shortcode-rest-api' => $this->settings->get('parse-wplf-shortcode-rest-api'),
-        'has_unfiltered_html' => $isMS ? $hasUnfiltered ? 1 : 0 : 0,
+        'has_unfiltered_html' => $isMS ? $hasUnfiltered ? 1 : 0 : 1,
       ]));
     }
 
