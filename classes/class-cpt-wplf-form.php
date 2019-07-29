@@ -1031,18 +1031,22 @@ if (! class_exists('CPT_WPLF_Form')) :
           true
       );
 
+      // add dynamic variables to the script's scope
+      wp_localize_script('wplf-form-js', 'WPLF_DATA', $this->get_localize_script_data());
+    }
+
+    public function get_localize_script_data() {
       $admin_url = admin_url('admin-ajax.php');
 
-      // add dynamic variables to the script's scope
-      wp_localize_script('wplf-form-js', 'WPLF_DATA', apply_filters('wplf_ajax_object', array(
-      'ajax_url' => apply_filters('wplf_ajax_endpoint', "$admin_url?action=wplf_submit"),
-      'ajax_credentials' => apply_filters('wplf_ajax_fetch_credentials_mode', 'same-origin'),
-      'request_headers' => (object) apply_filters('wplf_ajax_request_headers', []),
-      'wplf_assets_dir' => plugin_dir_url(realpath(__DIR__ . '/../wp-libre-form.php')) . 'assets',
-      'settings' => [ // Plug new settings page here
-        'autoinit' => true,
-      ],
-      )));
+      return apply_filters('wplf_ajax_object', [
+        'ajax_url' => apply_filters('wplf_ajax_endpoint', "$admin_url?action=wplf_submit"),
+        'ajax_credentials' => apply_filters('wplf_ajax_fetch_credentials_mode', 'same-origin'),
+        'request_headers' => (object) apply_filters('wplf_ajax_request_headers', []),
+        'wplf_assets_dir' => plugin_dir_url(realpath(__DIR__ . '/../wp-libre-form.php')) . 'assets',
+        'settings' => [ // Plug new settings page here
+          'autoinit' => true,
+        ],
+      ]);
     }
 
 
@@ -1060,10 +1064,16 @@ if (! class_exists('CPT_WPLF_Form')) :
       $is_rest = defined('REST_REQUEST') ? true : false;
       $parse_shortcode_in_rest = $this->wplf->settings->get('parse-wplf-shortcode-rest-api');
 
-      // Because shortcode parsing can't actually be disabled, we output the "same" shortcode instead of the form.
-      if ($is_rest && ! $parse_shortcode_in_rest) {
+      // Direct requests should contain it though. 
+      $is_wplf_endpoint = strpos($_SERVER['REQUEST_URI'], '/wp-json/wp/v2/wplf-form') !== false;
+
+      // Because shortcode parsing can't actually be disabled, we output the "same" shortcode 
+      // instead of the form. This also normalizes the shortcodes.
+      if ($is_rest && !$is_wplf_endpoint && !$parse_shortcode_in_rest) {
         $props = [];
 
+        // If you change how the shortcode is rebuilt, 
+        // it's a breaking change and must be versioned accordingly.
         foreach ($attributes as $k => $v) {
           $props[] = "$k=\"$v\"";
         }

@@ -18,7 +18,7 @@ class WPLF_Settings {
       'type' => 'select',
       'label' => 'Parse form shortcode in REST API',
       'options' => [
-        'false' => 'false',
+        'false' => 'False',
         'true' => 'True',
       ],
     ],
@@ -28,7 +28,7 @@ class WPLF_Settings {
       'type' => 'select',
       'label' => 'Initialize forms automatically',
       'options' => [
-        'false' => 'false',
+        'false' => 'False',
         'true' => 'True',
       ],
     ],
