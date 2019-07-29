@@ -36,7 +36,7 @@ Required field validation, email notifications, file uploads to WP gallery and l
 
 Please contribute to this project on Github. Pull requests welcome!
 
-[https://github.com/anttiviljami/wp-libre-form](https://github.com/anttiviljami/wp-libre-form)
+[https://github.com/libreform/wp-libre-form](https://github.com/libreform/wp-libre-form)
 
 == Installation ==
 
@@ -57,7 +57,7 @@ None yet.
 
 == Changelog ==
 
-Commit log is available at https://github.com/anttiviljami/wp-libre-form/commits/master
+Commit log is available at https://github.com/libreform/wp-libre-form/commits/master
 
 == Upgrade Notice ==
 

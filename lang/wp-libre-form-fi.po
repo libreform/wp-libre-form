@@ -349,8 +349,8 @@ msgid "WP Libre Form"
 msgstr "WP Libre Form"
 
 #. Plugin URI of the plugin/theme
-msgid "https://github.com/anttiviljami/wp-libre-form"
-msgstr "https://github.com/anttiviljami/wp-libre-form"
+msgid "https://github.com/libreform/wp-libre-form"
+msgstr "https://github.com/libreform/wp-libre-form"
 
 #. Description of the plugin/theme
 msgid "A minimal HTML form builder for WordPress; made for developers"

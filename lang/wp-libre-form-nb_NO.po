@@ -279,7 +279,7 @@ msgid "WP Libre Form"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://github.com/anttiviljami/wp-libre-form"
+msgid "https://github.com/libreform/wp-libre-form"
 msgstr ""
 
 #. Description of the plugin/theme

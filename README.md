@@ -1,5 +1,5 @@
 # WP Libre Form
-[![Build Status](https://travis-ci.org/libreform/wp-libre-form.svg?branch=master)](https://travis-ci.org/libreform/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/stable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Total Downloads](https://poser.pugx.org/anttiviljami/wp-libre-form/downloads)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/unstable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![License](https://poser.pugx.org/anttiviljami/wp-libre-form/license)](https://packagist.org/packages/anttiviljami/wp-libre-form)
+[![Build Status](https://travis-ci.org/libreform/wp-libre-form.svg?branch=master)](https://travis-ci.org/libreform/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/libreform/wp-libre-form/v/stable)](https://packagist.org/packages/libreform/wp-libre-form) [![Total Downloads](https://poser.pugx.org/libreform/wp-libre-form/downloads)](https://packagist.org/packages/libreform/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/libreform/wp-libre-form/v/unstable)](https://packagist.org/packages/libreform/wp-libre-form) [![License](https://poser.pugx.org/libreform/wp-libre-form/license)](https://packagist.org/packages/libreform/wp-libre-form)
 
 Use standard HTML5 markup to create fully functional forms for WordPress
 
@@ -67,7 +67,7 @@ This plugin is available on the [official WordPress.org plugin directory](https:
 
 You can also install the plugin by directly uploading the zip file as instructed below:
 
-1. [Download the plugin](https://github.com/anttiviljami/wp-libre-form/archive/master.zip)
+1. [Download the plugin](https://github.com/libreform/wp-libre-form/archive/master.zip)
 2. Upload to the plugin to /wp-content/plugins/ via the WordPress plugin uploader or your preferred method
 3. Activate the plugin
 
