@@ -37,15 +37,15 @@ export class WPLF_Form {
     if (legacy.successCallbacks.length || legacy.errorCallbacks.length || legacy.beforeSendCallbacks.length) {
       console.warn('WP Libre Form 2.0 introduced breaking changes to window.wplf "API", please migrate to the new API ASAP.');
 
-      (legacy.callbacks.beforeSend).forEach(cb => {
+      (legacy.beforeSendCallbacks).forEach(cb => {
         cb(...args);
       });
 
-      (legacy.callbacks.error).forEach(cb => {
+      (legacy.errorCallbacks).forEach(cb => {
         cb(...args);
       });
 
-      (legacy.callbacks.success).forEach(cb => {
+      (legacy.successCallbacks).forEach(cb => {
         cb(...args);
       });
     }
