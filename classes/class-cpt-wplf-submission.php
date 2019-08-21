@@ -134,9 +134,9 @@ if (! class_exists('CPT_WPLF_Submission')) :
         // Raw SQL is as fast as it gets, we only need the ID and the title anyway.
         $prefix = $wpdb->prefix;
         $forms = $wpdb->get_results("SELECT ID, post_title FROM {$prefix}posts WHERE post_type = 'wplf-form' AND post_status = 'publish'");
-
         set_transient('wplf-form-filter', $forms, 15 * MINUTE_IN_SECONDS);
-      } ?>
+      }
+      $forms = apply_filters( 'wplf-dropdown-filter-forms', $forms ); ?>
       <label for="filter-by-form" class="screen-reader-text">Filter by form</label>
       <select name="form" id="filter-by-form">
         <option value="0"><?php esc_html_e('All Forms', 'wp-libre-form'); ?></option>
