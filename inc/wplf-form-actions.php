@@ -44,7 +44,7 @@ function wplf_send_email_copy( $return, $submission_id = null ) {
     $content .= wplf_email_copy_make_fields_key_value_list( $fields, $form->ID, $form->post_name );
 
     // default pre-filtered values for email headers and attachments
-    $headers = array();
+    $headers     = '';
     $attachments = array();
 
     if ( isset( $form_meta['_wplf_email_copy_from'][0] ) ) {

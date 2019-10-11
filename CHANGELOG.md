@@ -1,3 +1,6 @@
+## 2019-10-11
+- Hotfix for wp_mail() $headers initial value. Fixes array to string conversion.
+
 # 1.5
 - Better client side JavaScript bundle, polyfills are now only loaded when required
 - Much more control for emails, straight on the invidual form level
