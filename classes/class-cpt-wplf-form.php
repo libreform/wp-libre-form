@@ -321,7 +321,7 @@ class CPT_WPLF_Form {
       $submissions = $query->amount;
 ?>
   <a href="<?php echo esc_url_raw( admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ) ); ?>">
-    <?php echo esc_html($submissions); ?>
+    <?php echo esc_html( $submissions ); ?>
   </a>
 <?php
     }
