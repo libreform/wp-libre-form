@@ -317,11 +317,11 @@ class CPT_WPLF_Form {
     if ( 'submissions' === $column ) {
       // count number of submissions
       global $wpdb;
-      $query = $wpdb->get_row( 'select count(*) as amount from ' . $wpdb->postmeta . ' where meta_key = "_form_id" and meta_value = "' . absint($post_id) . '"' );
+      $query = $wpdb->get_row( 'select count(*) as amount from ' . $wpdb->postmeta . ' where meta_key = "_form_id" and meta_value = "' . absint( $post_id ) . '"' );
       $submissions = $query->amount;
 ?>
   <a href="<?php echo esc_url_raw( admin_url( 'edit.php?post_type=wplf-submission&form=' . $post_id ) ); ?>">
-    <?php echo $submissions; ?>
+    <?php echo esc_html($submissions); ?>
   </a>
 <?php
     }
