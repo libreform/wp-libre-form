@@ -15,6 +15,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress
 - Multilingual support with Polylang
 - Predefined static HTML forms via filter hooks
 - Dynamic values, like %USER_EMAIL% for pre-populating form data
+- Simple spam prevention
 
 ## Why?
 
@@ -156,6 +157,39 @@ function my_email_thankyou( $return ) {
   wp_mail( $email, $subject, $body );
 }
 ```
+
+### Filter: wplf_honeypot
+
+By default, forms has honeypot field to detect spambots. Submissions detected as spam are saved as a trash, so false positives can be detected. WordPress core cleans the trash after 30 days from saving. Turn off dy returning false.
+
+```php
+add_filter( 'wplf_honeypot' , '__return_false' );
+```
+
+### Filter: wplf_honeypot_field_name
+
+Change the honeypot default field name (send_hugs_to_developers) to something else. Use obsecure but obiviosuly fake name.
+
+```php
+add_filter( 'wplf_honeypot_field_name' , 'please_send_candy' );
+```
+
+### Filter: wplf_save_spam
+
+Submissions marked as spam are saved as a trash, so false positives can be detected. WordPress core cleans the trash after 30 days from saving. Turn off dy returning false.
+
+```php
+add_filter( 'wplf_save_spam' , '__return_false' );
+```
+
+#### Form specific hooks
+
+This filter supports form specific hooks:
+
+- `wplf_{form_id}_save_spam`
+- `wplf_{form_slug}_save_spam`
+
+These filters are only applied for the target form by ID or slug.
 
 ### Filter: wplf_disable_validate_additional_fields
 
