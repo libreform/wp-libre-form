@@ -278,7 +278,7 @@ class CPT_WPLF_Submission {
         }
         if ( $value_is_url ) {
           $link_text = __( 'Open Link', 'wp-libre-form' );
-          $possible_link = '<a target="_blank" href="' . $value . '" style="float:right">' . $link_text . '</a>';
+          $possible_link = '<a target="_blank" href="' . str_replace( $home_path, '/', $value ) . '" style="float:right">' . $link_text . '</a>';
         }
         ?>
         <tr>
