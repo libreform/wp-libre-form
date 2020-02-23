@@ -72,9 +72,9 @@ export class WPLF {
 
     if (globalData.settings.autoinit) {
       [].forEach.call(
-        document.querySelectorAll(".libre-form"),
+        document.querySelectorAll(".libreform"),
         form => this.attach(form)
-      );
+     );
     }
   }
 
@@ -116,7 +116,7 @@ export class WPLF {
     }
 
     const element = elementOrWplfForm;
-    
+
     if (element instanceof HTMLFormElement !== true) {
       throw new Error('Unable to attach WPLF to element', element);
     }

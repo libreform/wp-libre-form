@@ -1,9 +1,35 @@
 <?php
 
-class WPLF_Plugins
-{
-  public static $instance;
-  private $plugins = array();
+namespace WPLF;
+
+class Addons extends Module {
+  private $plugins = [];
+
+  public function __construct(Plugin $wplf) {
+    $this->injectCore($wplf);
+
+    add_action('admin_menu', function () {
+      add_submenu_page(
+        'edit.php?post_type=' . Form::$postType,
+        __('WP Libre Form plugins', 'libreform'),
+        __('Plugins', 'libreform'),
+        'manage_options',
+        'wplf-plugins',
+        array($this, 'renderAdminPage')
+      );
+    });
+
+    // add_action('admin_notices', function () {
+    //   $this->notify_about_feature(
+    //     esc_html__(
+    //       "Hey! Did you notice that WP Libre Form now lists plugins that extend it's functionality, go check them out!",
+    //       'libreform'
+    //     ),
+    //     get_admin_url() . 'edit.php?post_type=wplf-form&page=wplf-plugins',
+    //     'wplf-plugins-notice-dismissed'
+    //   );
+    // });
+  }
 
   public function __get($key) {
     if (! empty($this->plugins[ $key ])) {
@@ -11,41 +37,6 @@ class WPLF_Plugins
     }
 
     throw new Exception('No plugin found with that name');
-  }
-
-  private function __construct() {
-    add_action(
-        'admin_menu',
-        function () {
-          add_submenu_page(
-              'edit.php?post_type=wplf-form',
-              __('WP Libre Form plugins', 'wp-libre-form'),
-              __('Plugins', 'wp-libre-form'),
-              'manage_options',
-              'wplf-plugins',
-              array( $this, 'render_admin_page' )
-          );
-        }
-    );
-
-    add_action('admin_notices', function () {
-      $this->notify_about_feature(
-          esc_html__(
-              "Hey! Did you notice that WP Libre Form now lists plugins that extend it's functionality, go check them out!",
-              'wp-libre-form'
-          ),
-          get_admin_url() . 'edit.php?post_type=wplf-form&page=wplf-plugins',
-          'wplf-plugins-notice-dismissed'
-      );
-    });
-  }
-
-  public static function init() {
-    if (is_null(self::$instance)) {
-      self::$instance = new WPLF_Plugins();
-    }
-
-    return self::$instance;
   }
 
   public function notify_about_feature($message = '', $link = '', $option_name = null) {
@@ -72,7 +63,7 @@ class WPLF_Plugins
         </p>
         <p>
           <button class="button button-primary">
-            <?php echo esc_html__('View feature and close this notice', 'wp-libre-form'); ?>
+            <?php echo esc_html__('View feature and close this notice', 'libreform'); ?>
           </button>
         </p>
       </form>
@@ -80,8 +71,8 @@ class WPLF_Plugins
     <?php
   }
 
-  private function render_plugin($plugin = array()) {
-    $plugin = $this->fill_plugin_data($plugin);
+  private function renderPlugin($plugin = array()) {
+    $plugin = $this->fillPluginData($plugin);
     $name = $plugin['name'];
     $version = $plugin['version'];
     $link = $plugin['link'];
@@ -113,7 +104,7 @@ class WPLF_Plugins
               target="_blank"
               rel="noreferrer noopener"
             >
-              <?php echo esc_html__('Plugin page', 'wp-libre-form'); ?>
+              <?php echo esc_html__('Plugin page', 'libreform'); ?>
             </a>
           <?php } ?>
 
@@ -126,7 +117,7 @@ class WPLF_Plugins
               target="_blank"
               rel="noreferrer noopener"
             >
-              <?php echo esc_html__('Plugin settings', 'wp-libre-form'); ?>
+              <?php echo esc_html__('Plugin settings', 'libreform'); ?>
             </a>
           <?php } ?>
         </div>
@@ -137,7 +128,7 @@ class WPLF_Plugins
     <?php
   }
 
-  public function render_admin_page() {
+  public function renderAdminPage() {
     $recommended = $this->get_recommended_plugins();
     $enabled = $this->get_enabled_plugins();
     $plugins_with_options = array_filter(
@@ -145,13 +136,13 @@ class WPLF_Plugins
         function ($plugin) {
           return ! empty($plugin['settings_page']) && is_callable($plugin['settings_page']);
         }
-    );
+   );
 
     ?>
     <div class="wplf-plugins">
       <header class="wplf-plugins-menu nav-tab-wrapper">
         <a href="#" class="nav-tab" data-page="General">
-          <?php echo esc_html__('General', 'wp-libre-form'); ?>
+          <?php echo esc_html__('General', 'libreform'); ?>
         </a>
         <?php foreach ($plugins_with_options as $plugin) {
           $name = sanitize_text_field($plugin['name']); ?>
@@ -162,45 +153,45 @@ class WPLF_Plugins
       </header>
 
       <div class="wplf-plugins-page" data-page="General">
-        <h1><?php echo esc_html__('WP Libre Form plugins', 'wp-libre-form'); ?></h1>
+        <h1><?php echo esc_html__('WP Libre Form plugins', 'libreform'); ?></h1>
         <p>
           <?php echo esc_html__(
               'The core of WP Libre Form is kept small and simple, for a reason.',
-              'wp-libre-form'
-          ); ?>
+              'libreform'
+         ); ?>
         </p>
         <p>
           <?php echo esc_html__(
               "If the core doesn't offer enough features for you, you can install a plugin for more functionality.",
-              'wp-libre-form'
-          ); ?>
+              'libreform'
+         ); ?>
           <?php echo esc_html__(
               "Below you'll find your active plugins and some recommendations. ",
-              'wp-libre-form'
-          ); ?>
+              'libreform'
+         ); ?>
           <?php echo esc_html__(
               'Making your own plugin is easy too.',
-              'wp-libre-form'
-          ); ?>
+              'libreform'
+         ); ?>
         </p>
 
 
         <?php if (! empty($enabled)) { ?>
-          <h2><?php echo esc_html__('Enabled plugins', 'wp-libre-form'); ?></h1>
+          <h2><?php echo esc_html__('Enabled plugins', 'libreform'); ?></h1>
 
           <div class="wplf-plugin-list">
             <?php foreach ($enabled as $plugin) {
-              $this->render_plugin($plugin);
+              $this->renderPlugin($plugin);
             } ?>
           </div>
         <?php } ?>
 
         <?php if (! empty($recommended)) { ?>
-          <h2><?php echo esc_html__('Recommended plugins', 'wp-libre-form'); ?></h1>
+          <h2><?php echo esc_html__('Recommended plugins', 'libreform'); ?></h1>
 
           <div class="wplf-plugin-list">
             <?php foreach ($recommended as $plugin) {
-              $this->render_plugin($plugin);
+              $this->renderPlugin($plugin);
             } ?>
           </div>
         <?php } ?>
@@ -224,21 +215,19 @@ class WPLF_Plugins
 
   private function get_recommended_plugins() {
     $list = [
-      'Export' => $this->fill_plugin_data(
-          [
-          'name' => 'Export',
-          'link' => 'https://github.com/libreform/export',
-          'description' => 'Add CSV export functionality.',
-           ]
-      ),
+      'Export' => $this->fillPluginData([
+        'name' => 'Export',
+        'link' => 'https://github.com/libreform/export',
+        'description' => 'Add CSV export functionality.',
+      ]),
 
-      'Formbuilder' => $this->fill_plugin_data(
-          [
-          'name' => 'Formbuilder',
-          'link' => 'https://github.com/k1sul1/wp-libre-formbuilder',
-          'description' => "Writing HTML isn't for everyone. Add a visual builder with this plugin.",
-           ]
-      ),
+    //   'Formbuilder' => $this->fillPluginData(
+    //       [
+    //       'name' => 'Formbuilder',
+    //       'link' => 'https://github.com/k1sul1/wp-libreformbuilder',
+    //       'description' => "Writing HTML isn't for everyone. Add a visual builder with this plugin.",
+    //        ]
+    //  ),
     ];
 
     // Remove already installed plugins
@@ -254,7 +243,7 @@ class WPLF_Plugins
 
           return true;
         }
-    );
+   );
 
     return apply_filters('wplf_recommended_plugins', $list);
   }
@@ -264,7 +253,7 @@ class WPLF_Plugins
    *
    * @param array $data
    */
-  private function fill_plugin_data($data = array()) {
+  private function fillPluginData($data = array()) {
     return array_merge(
         array(
         'name' => null,
@@ -273,9 +262,9 @@ class WPLF_Plugins
         'version' => null,
         'link' => null,
         'settings_page' => null,
-        ),
+       ),
         $data
-    );
+   );
   }
 
   /**
@@ -284,7 +273,7 @@ class WPLF_Plugins
    * @param array $data
    */
   public function register($data = array()) {
-    $data = $this->fill_plugin_data($data);
+    $data = $this->fillPluginData($data);
 
     if (empty($data['name'])) {
       throw new Exception('Must provide a name for the plugin to be registered');

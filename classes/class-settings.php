@@ -1,22 +1,24 @@
 <?php
 
-class WPLF_Settings {
-  public static $instance;
+namespace WPLF;
+
+class Settings extends Module {
   private $settings = [];
+  private $key;
 
-  private $available_settings = [
-    'dynval-regex' => [
-      'type' => 'select',
-      'label' => 'Dynamic values regular expression',
-      'options' => [
-        'legacy' => "Legacy (/%[^%%\n]+%/)",
-        'recommended' => 'Recommended (/## \w+ ##/)',
-      ],
-    ],
-
+  private $availableSettings = [
     'parse-wplf-shortcode-rest-api' => [
       'type' => 'select',
       'label' => 'Parse form shortcode in REST API',
+      'options' => [
+        'false' => 'False',
+        'true' => 'True',
+      ],
+    ],
+
+    'allowDirect' => [
+      'type' => 'select',
+      'label' => 'Allow direct access to forms',
       'options' => [
         'false' => 'False',
         'true' => 'True',
@@ -34,77 +36,61 @@ class WPLF_Settings {
     ],
   ];
 
-  private function __construct() {
-    $this->settings = get_option('wplf-settings', $this->get_default_settings());
+  public function __construct(Plugin $wplf, $key = 'wplfSettings') {
+    $this->injectCore($wplf);
+
+    $this->key = $key;
+    $this->settings = get_option($this->key, $this->getDefaultSettings());
 
     add_action('admin_menu', function () {
       add_submenu_page(
           'edit.php?post_type=wplf-form',
-          __('WP Libre Form settings', 'wp-libre-form'),
-          __('Settings', 'wp-libre-form'),
+          __('WP Libre Form settings', 'libreform'),
+          __('Settings', 'libreform'),
           'manage_options',
-          'wplf-settings',
+          $this->key,
           array($this, 'render_settings_page')
-      );
+     );
     });
   }
 
-  private function get_default_settings() {
+  private function getDefaultSettings() {
     return [
       'dynval-regex' => 'recommended',
+      'allowDirect' => true,
       'parse-wplf-shortcode-rest-api' => 'true',
       'autoinit' => 'true',
     ];
   }
 
-  private function is_valid_setting($setting) {
-    return isset($this->available_settings[$setting]);
+  private function isValidSetting($setting) {
+    return isset($this->availableSettings[$setting]);
   }
 
   public function get($setting) {
-    if ($this->is_valid_setting($setting)) {
+    if ($this->isValidSetting($setting)) {
       $value = $this->settings[$setting];
 
       if ($value === 'true') {
         return true;
       } elseif ($value === 'false') {
         return false;
-      } elseif ($setting === 'dynval-regex') {
-        // WP / PHP doesn't allow me to store regular expressions without fucking them up.
-        // So I'm not storing them. Spent way too much time trying to get simple things like selected attribute
-        // in the options page right, but nah.
-
-        if ($value === 'recommended') {
-          return [
-            'regex' => '/## \w+ ##/',
-            'chars' => '##',
-          ];
-        } elseif ($value === 'legacy') {
-          return [
-            'regex' => '/%[^%%\n]+%/',
-            'chars' => '%',
-          ];
-        } else {
-          throw new Exception('Invalid WP Libre Form dynamic value regular expression');
-        }
-
-        return $value;
       }
     }
 
     return false;
   }
 
-  public function update_setting($setting, $value) {
-    if (!$this->is_valid_setting($setting)) {
+  public function updateSetting($setting, $value) {
+    if (!$this->isValidSetting($setting)) {
       throw new Exception('Invalid WP Libre Form setting');
     }
 
-    $settings = get_option('wplf-settings', $this->get_default_settings());
+    $settings = get_option($this->key, $this->getDefaultSettings());
     $settings[$setting] = $value;
     $this->settings = $settings;
 
-    return update_option('wplf-settings', $settings);
+    return update_option($this->key, $settings);
   }
 
   public function render_settings_page() {
@@ -112,15 +98,15 @@ class WPLF_Settings {
       // Handle settings form submission
 
       foreach ($_POST as $k => $v) {
-        if ($this->is_valid_setting($k)) {
-          $this->update_setting($k, $v);
+        if ($this->isValidSetting($k)) {
+          $this->updateSetting($k, $v);
         }
       }
     }
     ?>
 
     <form class="wplf-settings" method="post">
-      <?php foreach ($this->available_settings as $setting => $data) {
+      <?php foreach ($this->availableSettings as $setting => $data) {
         switch ($data['type']) {
           case 'select':
             ?>
@@ -145,13 +131,5 @@ class WPLF_Settings {
       <input type="submit">
     </form>
     <?php
-  }
-
-  public static function init() {
-    if (is_null(self::$instance)) {
-      self::$instance = new WPLF_Settings();
-    }
-
-    return self::$instance;
   }
 }

@@ -82,7 +82,7 @@ export class WPLF_Form {
           r => {
             const response = JSON.parse(r);
 
-            if( 'success' in response ) {
+            if('success' in response) {
               // show success message if one exists
               const success = document.createElement("p");
               success.className = "wplf-success";
@@ -91,7 +91,7 @@ export class WPLF_Form {
               this.form.parentNode.insertBefore(success, this.form.nextSibling);
             }
 
-            if( 'ok' in response && response.ok ) {
+            if('ok' in response && response.ok) {
               // submit succesful!
               this.form.parentNode.removeChild(this.form);
 
@@ -99,7 +99,7 @@ export class WPLF_Form {
               this.runCallback('success', response, this);
             }
 
-            if( 'error' in response ) {
+            if('error' in response) {
               // show error message in form
               const error = document.createElement("p");
               error.className = "wplf-error error";
@@ -117,7 +117,7 @@ export class WPLF_Form {
 
             this.form.classList.remove('sending');
           }
-        ).catch(
+       ).catch(
           error => {
             this.form.classList.remove("sending");
 
@@ -127,7 +127,7 @@ export class WPLF_Form {
               console.warn("Fetch error: ", error);
             // }
         }
-      );
+     );
     }))
 
     this.form.addEventListener('submit', this.submitHandler);

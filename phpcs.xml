@@ -4,8 +4,8 @@
 
   <!-- Files and directories to parse -->
   <file>./classes/</file>
-  <file>./inc/</file>
-  <file>./wp-libre-form.php</file>
+  <file>./lib/</file>
+  <file>./index.php</file>
 
   <!-- Excluded directories and files -->
   <exclude-pattern>*/vendor/*</exclude-pattern>
@@ -38,23 +38,19 @@
   <!-- Don't allow oneliner ifs without brackets {} -->
   <rule ref="Generic.ControlStructures.InlineControlStructure"/>
 
-  <rule ref="PSR2">
-    <!-- I'm up for using namespaces, but let's discuss on that first -->
-    <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
-
-    <!-- I've never been a fan of using underscores either, especially in "OOP", but 
+  <rule ref="PSR12">
+    <!-- I've never been a fan of using underscores either, especially in "OOP", but
     I'm not changing method names without a further discussion -->
     <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
 
     <!-- I don't understand why PSR2 uses this rule as well as defining their own identical rule. -->
     <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps" />
 
-    <!-- Yeah how about we don't waste lines by putting every fucking curly brace to it's own line -->
+    <!-- Yeah how about no, K&R FTW -->
     <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
     <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
 
-    <!-- Just STFU about this. Writing HTML between PHP code makes it go nuts,
-    and since it's WordPress we're talking about... -->
+    <!-- This isn't MVC. Don't make life hard for trying to use HTML. -->
     <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
   </rule>
 

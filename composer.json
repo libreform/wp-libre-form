@@ -10,14 +10,11 @@
       "homepage": "https://github.com/anttiviljami"
     }
   ],
-  "require": {
-    "php": ">=5.3.0"
-  },
   "require-dev": {
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4"
+    "squizlabs/php_codesniffer": "3.*"
   },
   "scripts": {
-    "lint": "./vendor/bin/phpcs --standard=./phpcs.xml -p",
-    "lintfix": "./vendor/bin/phpcbf --standard=./phpcs.xml"
+    "lint": "./vendor/bin/phpcs -s --standard=./phpcs.xml -p",
+    "fix": "./vendor/bin/phpcbf --standard=./phpcs.xml"
   }
 }
