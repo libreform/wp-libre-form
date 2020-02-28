@@ -75,18 +75,18 @@ You will only need this if you load forms dynamically or you've disabled autoini
 You can also pass WPLF_Form directly.
 
 ```javascript
-WPLF.attach(document.querySelector('.libreform'))
+WPLF.attach(document.querySelector('.wplf'))
 
-WPLF.attach(new WPLF_Form(document.querySelector('.libreform')))
+WPLF.attach(new WPLF_Form(document.querySelector('.wplf')))
 ```
 
 #### WPLF.detach(HTMLElement | WPLF_Form)
 Destroy WPLF_Form instance and remove event listeners from the form.
 
 ```javascript
-WPLF.detach(document.querySelector('.libreform'))
+WPLF.detach(document.querySelector('.wplf'))
 
-WPLF.detach(new WPLF_Form(document.querySelector('.libreform')))
+WPLF.detach(new WPLF_Form(document.querySelector('.wplf')))
 ```
 
 #### WPLF_Form.addCallback(String name, String type, Function callback)

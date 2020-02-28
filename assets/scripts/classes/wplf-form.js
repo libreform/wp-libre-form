@@ -1,8 +1,12 @@
-import globalData from '../global-data';
+import globalData from '../lib/global-data';
+import { WPLF_Tabs } from './wplf-tabs'
+
 
 export class WPLF_Form {
   constructor(element) {
-    if (element instanceof HTMLFormElement !== true) {
+    // if (element instanceof HTMLFormElement !== true) {
+    if (element instanceof HTMLElement !== true) {
+
       throw new Error('Form element invalid or missing');
     }
 
@@ -16,7 +20,18 @@ export class WPLF_Form {
     };
 
     this.key = '_' + Math.random().toString(36).substr(2, 9);
+    this.tabs = Array.from(this.form.querySelectorAll('.wplf-tabs')).map(el => {
+      return new WPLF_Tabs(el, el.getAttribute('data-active'), el.getAttribute('data-rememberas'));
+    });
+
     this.addSubmitHandler();
+
+    // Remove input that triggers the fallback so we get a JSON response
+    const fallbackInput = element.querySelector('[name="_fallbackThankYou"]');
+
+    if (fallbackInput) {
+      fallbackInput.parentNode.removeChild(fallbackInput);
+    }
   }
 
   addCallback(name, type, callback) {
@@ -32,24 +47,6 @@ export class WPLF_Form {
   }
 
   runCallback(type, ...args) {
-    const legacy = window.wplf;
-
-    if (legacy.successCallbacks.length || legacy.errorCallbacks.length || legacy.beforeSendCallbacks.length) {
-      console.warn('WP Libre Form 2.0 introduced breaking changes to window.wplf "API", please migrate to the new API ASAP.');
-
-      (legacy.beforeSendCallbacks).forEach(cb => {
-        cb(...args);
-      });
-
-      (legacy.errorCallbacks).forEach(cb => {
-        cb(...args);
-      });
-
-      (legacy.successCallbacks).forEach(cb => {
-        cb(...args);
-      });
-    }
-
     if (this.callbacks[type]) {
       Object.keys(this.callbacks[type]).forEach(key => {
         this.callbacks[type][key](...args);
@@ -153,11 +150,11 @@ export class WPLF_Form {
 
     this.runCallback('beforeSend', form, this);
 
-    return fetch(globalData.ajax_url, {
+    return fetch(globalData.backendUrl + '/submit', {
       method: "POST",
-      credentials: globalData.ajax_credentials || 'same-origin',
+      credentials: globalData.fetchCredentials || 'same-origin',
       body: data,
-      headers: globalData.request_headers || {},
+      headers: globalData.requestHeaders || {},
     });
   }
 }

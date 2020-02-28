@@ -10,7 +10,7 @@ We use PSR-12 with a few modifications:
 This plugin used to use WordPress CS, but it caused all kind of weird formatting issues over the years. Code is not poetry. Using yoda conditions and adding extra whitespace everywhere is solving a problem that does not even exist. Some tips for readable code:
 
 - Name your conditions by using variables especially if the condition is long: `if ($okToSendEmail) {`
-- Keep lines short, max 120 characters
+- Keep lines short, max 120 characters. You know, line wrapping sucks.
 - Avoid useless comments: `$variable = 'doge'; // assign a variable`
 
 Install plugins dependencies & tooling by running `npm install` & `composer install` first.

@@ -1,5 +1,5 @@
 import { WPLF_Form } from './wplf-form';
-import globalData from '../global-data';
+import globalData from '../lib/global-data';
 
 const dependencies = [];
 let depsLoaded = 0;
@@ -10,7 +10,7 @@ function isReady() {
 
 function loadPolyfill(name) {
   const script = document.createElement('script');
-  script.src = globalData.wplf_assets_dir + '/scripts/polyfills/' + name + '.js';
+  script.src = globalData.assetsDir + '/scripts/polyfills/' + name + '.js';
 
   script.addEventListener('load', () => {
     depsLoaded++;
@@ -51,28 +51,9 @@ export class WPLF {
   Form = WPLF_Form
 
   initialize() {
-    const compatibilityLayer = {
-      beforeSendCallbacks: [],
-      errorCallbacks: [],
-      successCallbacks: [],
-
-      attach: form => this.attach(form),
-      submitHandler: event => { // Too much work to support properly. I'd be surprised if anyone even used this.
-        event.preventDefault();
-
-        alert('Form can\'t be submitted properly due to configuration error. WP Libre Form 2.0 doesn\'t support the legacy wplf.submitHandler.')
-      }
-    };
-
-    // _listenForWPLFMessage('Legacy callback', () => {
-      // This isn't needed, just use runCallback in wplf-form
-    // })
-
-    window.wplf = compatibilityLayer; // Old "API" was in window.wplf
-
     if (globalData.settings.autoinit) {
       [].forEach.call(
-        document.querySelectorAll(".libreform"),
+        document.querySelectorAll("form.wplf"),
         form => this.attach(form)
      );
     }
@@ -117,7 +98,7 @@ export class WPLF {
 
     const element = elementOrWplfForm;
 
-    if (element instanceof HTMLFormElement !== true) {
+    if (element instanceof HTMLElement !== true) {
       throw new Error('Unable to attach WPLF to element', element);
     }
 
@@ -142,7 +123,7 @@ export class WPLF {
 
     const element = elementOrWplfForm;
 
-    if (element instanceof HTMLFormElement !== true) {
+    if (element instanceof HTMLElement !== true) {
       throw new Error('Unable to detach WPLF from element', element);
     }
 

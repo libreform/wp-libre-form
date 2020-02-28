@@ -5,30 +5,17 @@ namespace WPLF;
 class Addons extends Module {
   private $plugins = [];
 
-  public function __construct(Plugin $wplf) {
-    $this->injectCore($wplf);
-
+  public function __construct() {
     add_action('admin_menu', function () {
       add_submenu_page(
-        'edit.php?post_type=' . Form::$postType,
-        __('WP Libre Form plugins', 'libreform'),
-        __('Plugins', 'libreform'),
+        'edit.php?post_type=' . Plugin::$postType,
+        __('WP Libre Form addons', 'wplf'),
+        __('Addons', 'wplf'),
         'manage_options',
-        'wplf-plugins',
+        'wplfAddons',
         array($this, 'renderAdminPage')
       );
     });
-
-    // add_action('admin_notices', function () {
-    //   $this->notify_about_feature(
-    //     esc_html__(
-    //       "Hey! Did you notice that WP Libre Form now lists plugins that extend it's functionality, go check them out!",
-    //       'libreform'
-    //     ),
-    //     get_admin_url() . 'edit.php?post_type=wplf-form&page=wplf-plugins',
-    //     'wplf-plugins-notice-dismissed'
-    //   );
-    // });
   }
 
   public function __get($key) {
@@ -36,39 +23,7 @@ class Addons extends Module {
       return $this->plugins[ $key ]['instance'];
     }
 
-    throw new Exception('No plugin found with that name');
-  }
-
-  public function notify_about_feature($message = '', $link = '', $option_name = null) {
-    if (! $option_name) {
-      return;
-    }
-
-    if (! empty($_POST[ $option_name ])) {
-      update_option($option_name, 'true');
-      $dismissed = true;
-    } else {
-      $dismissed = get_option($option_name, 'false') === 'true';
-    }
-
-    if ($dismissed) {
-      return;
-    }
-    ?>
-    <div class="notice notice-info wplf-notice-feature-plugin">
-      <form method="post" action="<?php echo esc_attr($link); ?>">
-        <input type="hidden" name="<?php echo esc_attr($option_name); ?>" value="true">
-        <p>
-          <?php echo esc_html($message); ?>
-        </p>
-        <p>
-          <button class="button button-primary">
-            <?php echo esc_html__('View feature and close this notice', 'libreform'); ?>
-          </button>
-        </p>
-      </form>
-    </div>
-    <?php
+    throw new Error('No plugin found with that name');
   }
 
   private function renderPlugin($plugin = array()) {
@@ -104,7 +59,7 @@ class Addons extends Module {
               target="_blank"
               rel="noreferrer noopener"
             >
-              <?php echo esc_html__('Plugin page', 'libreform'); ?>
+              <?php echo esc_html__('Plugin page', 'wplf'); ?>
             </a>
           <?php } ?>
 
@@ -117,7 +72,7 @@ class Addons extends Module {
               target="_blank"
               rel="noreferrer noopener"
             >
-              <?php echo esc_html__('Plugin settings', 'libreform'); ?>
+              <?php echo esc_html__('Plugin settings', 'wplf'); ?>
             </a>
           <?php } ?>
         </div>
@@ -142,7 +97,7 @@ class Addons extends Module {
     <div class="wplf-plugins">
       <header class="wplf-plugins-menu nav-tab-wrapper">
         <a href="#" class="nav-tab" data-page="General">
-          <?php echo esc_html__('General', 'libreform'); ?>
+          <?php echo esc_html__('General', 'wplf'); ?>
         </a>
         <?php foreach ($plugins_with_options as $plugin) {
           $name = sanitize_text_field($plugin['name']); ?>
@@ -153,7 +108,7 @@ class Addons extends Module {
       </header>
 
       <div class="wplf-plugins-page" data-page="General">
-        <h1><?php echo esc_html__('WP Libre Form plugins', 'libreform'); ?></h1>
+        <h1><?php echo esc_html__('WP Libre Form plugins', 'wplf'); ?></h1>
         <p>
           <?php echo esc_html__(
               'The core of WP Libre Form is kept small and simple, for a reason.',
@@ -177,7 +132,7 @@ class Addons extends Module {
 
 
         <?php if (! empty($enabled)) { ?>
-          <h2><?php echo esc_html__('Enabled plugins', 'libreform'); ?></h1>
+          <h2><?php echo esc_html__('Enabled plugins', 'wplf'); ?></h1>
 
           <div class="wplf-plugin-list">
             <?php foreach ($enabled as $plugin) {
@@ -187,7 +142,7 @@ class Addons extends Module {
         <?php } ?>
 
         <?php if (! empty($recommended)) { ?>
-          <h2><?php echo esc_html__('Recommended plugins', 'libreform'); ?></h1>
+          <h2><?php echo esc_html__('Recommended plugins', 'wplf'); ?></h1>
 
           <div class="wplf-plugin-list">
             <?php foreach ($recommended as $plugin) {

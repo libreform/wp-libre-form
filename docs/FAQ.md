@@ -48,6 +48,12 @@ Use our npm package @libreform/wp-libreform to send the forms. ~~You can also us
 })
 ```
 
+## Uncaught ReferenceError: WPLF is not defined
+The form script is enqueued when a form is rendered. If there isn't a form on the page, window.WPLF isn't available. Either install the npm package or make your script depend on wplf-frontend;
+
+```php
+wp_enqueue_script('yourscript', $pathToScript, ['wplf-frontend'], $version, true);
+```
 
 ## Multilingual
 
@@ -83,7 +89,7 @@ You can add any custom attributes to the form element easily by adding them to t
 The attribute will render as is on the `<form>` element
 
 ```html
-<form class="libreform libreform-1" data-custom-attr="contactme">
+<form class="wplf libreform-1" data-custom-attr="contactme">
 ```
 
 ## Importing forms from a predefined HTML template

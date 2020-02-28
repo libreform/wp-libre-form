@@ -3,11 +3,13 @@
 namespace WPLF;
 
 class Settings extends Module {
-  private $settings = [];
+  private $options = [];
   private $key;
 
-  private $availableSettings = [
-    'parse-wplf-shortcode-rest-api' => [
+  public $settings = [];
+
+  private $availableOptions = [
+    'parseLibreformShortcodeInRestApi' => [
       'type' => 'select',
       'label' => 'Parse form shortcode in REST API',
       'options' => [
@@ -25,7 +27,7 @@ class Settings extends Module {
       ],
     ],
 
-    // Yeah I know checkbox would be better but handling them in forms is a PITA
+    // Checkboxes are still a pain in the ass to handle
     'autoinit' => [
       'type' => 'select',
       'label' => 'Initialize forms automatically',
@@ -36,40 +38,37 @@ class Settings extends Module {
     ],
   ];
 
-  public function __construct(Plugin $wplf, $key = 'wplfSettings') {
-    $this->injectCore($wplf);
-
+  public function __construct($key = 'wplfSettings') {
     $this->key = $key;
-    $this->settings = get_option($this->key, $this->getDefaultSettings());
+    $this->options = get_option($this->key, $this->getDefaultSettings());
 
     add_action('admin_menu', function () {
       add_submenu_page(
-          'edit.php?post_type=wplf-form',
-          __('WP Libre Form settings', 'libreform'),
-          __('Settings', 'libreform'),
-          'manage_options',
-          $this->key,
-          array($this, 'render_settings_page')
-     );
+        'edit.php?post_type=' . Plugin::$postType,
+        __('WP Libre Form options', 'wplf'),
+        __('Settings', 'wplf'),
+        'manage_options',
+        $this->key,
+        [$this, 'render']
+      );
     });
   }
 
   private function getDefaultSettings() {
     return [
-      'dynval-regex' => 'recommended',
-      'allowDirect' => true,
-      'parse-wplf-shortcode-rest-api' => 'true',
+      'allowDirect' => 'true',
+      'parseLibreformShortcodeInRestApi' => 'true',
       'autoinit' => 'true',
     ];
   }
 
   private function isValidSetting($setting) {
-    return isset($this->availableSettings[$setting]);
+    return isset($this->availableOptions[$setting]);
   }
 
   public function get($setting) {
     if ($this->isValidSetting($setting)) {
-      $value = $this->settings[$setting];
+      $value = $this->options[$setting];
 
       if ($value === 'true') {
         return true;
@@ -86,16 +85,16 @@ class Settings extends Module {
       throw new Exception('Invalid WP Libre Form setting');
     }
 
-    $settings = get_option($this->key, $this->getDefaultSettings());
-    $settings[$setting] = $value;
-    $this->settings = $settings;
+    $options = get_option($this->key, $this->getDefaultSettings());
+    $options[$setting] = $value;
+    $this->options = $options;
 
-    return update_option($this->key, $settings);
+    return update_option($this->key, $options);
   }
 
-  public function render_settings_page() {
+  public function render() {
     if (!empty($_POST)) {
-      // Handle settings form submission
+      // Handle options form submission
 
       foreach ($_POST as $k => $v) {
         if ($this->isValidSetting($k)) {
@@ -105,23 +104,25 @@ class Settings extends Module {
     }
     ?>
 
-    <form class="wplf-settings" method="post">
-      <?php foreach ($this->availableSettings as $setting => $data) {
+    <form class="wplf-options" method="post">
+      <?php foreach ($this->availableOptions as $setting => $data) {
         switch ($data['type']) {
-          case 'select':
-            ?>
+          case 'select': ?>
             <label>
               <strong><?php echo esc_html($data['label']); ?></strong>
               <select name="<?php echo esc_attr($setting); ?>">
-                <?php foreach ($data['options'] as $k => $v) { ?>
-                  <option value="<?php echo esc_attr($k); ?>" <?php echo $k === $this->settings[$setting] ? 'selected' : ''; ?>><?php echo esc_attr($v); ?></option>
+                <?php foreach ($data['options'] as $k => $v) {
+                  $selected = $this->options[$setting] === $k ? 'selected' : '';
+                  $value = esc_attr($k);?>
+                  <option value="<?=$value?>" <?=$selected?>>
+                    <?php echo esc_attr($v); ?>
+                  </option>
                 <?php } ?>
               </select>
             </label>
 
-            <br>
-            <?php
-                break;
+            <br><?php
+          break;
 
           default:
             // no op

@@ -8,7 +8,7 @@
  * Author URI: https://github.com/libreform/
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl.html
- * Text Domain: libreform
+ * Text Domain: wplf
  *
   */
 
@@ -29,10 +29,6 @@ function libreform(...$params) {
   return $instance;
 }
 
-function uninstallLibreform() {
-  libreform()->onUninstall();
-}
-
 [$version] = get_file_data(__FILE__, ['Version']);
 
 // die('/' . dirname(plugin_basename(__FILE__)));
@@ -45,5 +41,4 @@ $wplf = libreform([
 
 register_activation_hook(__FILE__, [$wplf, 'onActivation']);
 register_deactivation_hook(__FILE__, [$wplf, 'onDeactivation']);
-register_uninstall_hook(__FILE__, 'uninstallLibreform');
 
