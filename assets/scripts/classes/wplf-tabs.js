@@ -2,7 +2,7 @@
 import Storage from './storage'
 import log from '../lib/log'
 
-export class WPLF_Tabs {
+export default class WPLF_Tabs {
   remember = false
   activeTab = null
   element = null
@@ -27,8 +27,6 @@ export class WPLF_Tabs {
       // Get saved value or keep using the old one
       this.activeTab = Storage.get(this.name, this.activeTab)
     }
-
-    console.log('Created tabs', this.name, this.getTabs())
 
     this.refresh()
   }
@@ -62,9 +60,6 @@ export class WPLF_Tabs {
       log.notice('activeTab was null, setting first tab as active', first)
       this.activeTab = first
     }
-
-    console.log('refreshed tabs', this.name, this.getTabs())
-
 
     this.switchTab(this.activeTab)
   }

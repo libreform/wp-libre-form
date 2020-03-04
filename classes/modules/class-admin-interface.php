@@ -5,7 +5,7 @@ namespace WPLF;
 class AdminInterface extends Module {
   public function __construct() {
     // Nag if necessary
-    add_action('admin_init', [$this, 'registerNotices']);
+    add_action('admin_init', [$this, 'onAdminInit']);
 
     // Show sample content so even a HTML impaired user can use the plugin
     add_filter('default_content', [$this, 'defaultContent']);
@@ -15,12 +15,34 @@ class AdminInterface extends Module {
     add_filter('use_block_editor_for_post_type', [$this, 'disableGutenberg'], 10, 2);
 
     add_action('edit_form_after_editor', [$this, 'addCustomEditor']);
+  }
+
+  public function defaultContent($content) {
+    global $pagenow;
+
+    // only on post.php screen
+    if ('post-new.php' !== $pagenow && 'post.php' !== $pagenow) {
+      return $content;
+    }
+
+    // only for this cpt
+    if (isset($_GET['post_type']) && Plugin::$postType === $_GET['post_type']) {
+      ob_start();
+      Form::printDefaultForm();
+      $content = esc_textarea(ob_get_clean());
+    }
+
+    return $content;
+  }
+
+  public function onAdminInit() {
+    $this->registerNotices();
 
     /**
      * Do not add more metaboxes unless you have a good reason. Bad UX.
      */
-    add_meta_box(
-      'wplfFields',
+    \add_meta_box(
+      'wplfFieldsMetabox',
       __('Form Fields Detected', 'wplf'),
       [$this, 'renderFieldsMetabox'],
       Plugin::$postType,
@@ -29,63 +51,52 @@ class AdminInterface extends Module {
   }
 
   public function registerNotices() {
-    $formId = !empty($_GET['post']) ? (int) $_GET['post'] : false;
-    $form = get_post($formId);
+    $form = get_post();
 
-    if ($form->post_type !== Plugin::$postType) {
-      return;
+    if ($form->post_type ?? null === Plugin::$postType) {
+      $form = new Form($form);
+      $createdWithVersion = $form->getVersionCreatedAt();
+      $unableToEdit = is_multisite() && !current_user_can('unfiltered_html');
+
+      $multisiteInfo1 = esc_html(__(
+        'Your site is part of a WordPress Network. Network installations are different from standard WordPress sites, and you need unfiltered_html capability to be able to save anything with HTML.',
+        'wplf'
+      ));
+      $multisiteInfo2 = esc_html(__(
+        'You do not have this capability, so to prevent you from accidentally destroying the form, you can\'t save here. Either switch to a user with Super Admin role, or install a plugin like Unfiltered HTML.',
+        'wplf'
+      ));
+
+      $formVersionUpgradeInfo1 = sprintf(
+        esc_html(
+          // translators: Placeholders indicate version numbers
+          __('This form was created with WPLF version %1$s, and your installed WPLF version is %2$s', 'wplf')
+        ),
+        esc_html($createdWithVersion),
+        esc_html($this->version)
+      );
+
+      $formVersionUpgradeInfo2 = esc_html__('The form is on a feature freeze to ensure it works the same way even after you update WPLF. Go to Settings -> Miscellaneous to upgrade the form if you want to use the latest features.', 'wplf');
+
+      $unfilteredHtmlNotice = $this->notices->add(
+        'unfilteredHtmlWarning',
+        "
+        <p>$multisiteInfo1</p>
+        <p>$multisiteInfo2</p>
+
+        ",
+        ['type' => 'error', 'show' => $unableToEdit]
+      );
+
+      $formVersionUpgradeNotice = $this->notices->add(
+        'formVersionUpgrade',
+        "
+        <p>$formVersionUpgradeInfo1</p>
+        <p>$formVersionUpgradeInfo2</p>
+        ",
+        ['type' => 'info', 'show' => version_compare($createdWithVersion, $this->version, '<')]
+      );
     }
-
-    $form = new Form($form);
-    $createdWithVersion = $form->getVersionCreatedAt();
-    $unableToEdit = is_multisite() && !current_user_can('unfiltered_html');
-
-    $multisiteInfo1 = esc_html(__(
-      'Your site is part of a WordPress Network. Network installations are different from standard WordPress sites, and you need unfiltered_html capability to be able to save anything with HTML.',
-      'wplf'
-    ));
-    $multisiteInfo2 = esc_html(__(
-      'You do not have this capability, so to prevent you from accidentally destroying the form, you can\'t save here. Either switch to a user with Super Admin role, or install a plugin like Unfiltered HTML.',
-      'wplf'
-    ));
-
-    $formVersionUpgradeInfo1 = sprintf(
-      esc_html(
-        // translators: Placeholders indicate version numbers
-        __('This form was created with WPLF version %1$s, and your installed WPLF version is %2$s', 'wplf')
-      ),
-      esc_html($createdWithVersion),
-      esc_html($this->version)
-    );
-
-    $formVersionUpgradeInfo2 = esc_html__('There might be new features available, would you like to update the form version?', 'wplf');
-    $formVersionUpgradeInfo3 = esc_html__('TYes, update when I save the form', 'wplf');
-
-    $unfilteredHtmlNotice = $this->notices->add(
-      'unfilteredHtmlWarning',
-      "
-      <p>$multisiteInfo1</p>
-      <p>$multisiteInfo2</p>
-
-      ",
-      ['type' => 'error', 'show' => $unableToEdit]
-    );
-
-    $formVersionUpgradeNotice = $this->notices->add(
-      'formVersionUpgrade',
-      "
-      <p>$formVersionUpgradeInfo1</p>
-      <p>$formVersionUpgradeInfo2</p>
-
-      <p>
-        <label>
-          <input type='checkbox' name='wplfFormVersionUpdate' value='1'>
-          $formVersionUpgradeInfo3
-        </label>
-      </p>
-      ",
-      ['type' => 'info', 'show' => version_compare($createdWithVersion, $this->version, '<')]
-    );
   }
 
   public function disableTinymce($value) {
@@ -105,6 +116,7 @@ class AdminInterface extends Module {
   }
 
   public function renderFieldsMetabox() : void {
+    $form = new Form(get_post());
     ?>
     <p><?php esc_html_e('Fields marked with * are required', 'wplf'); ?>.</p>
 
@@ -125,11 +137,18 @@ class AdminInterface extends Module {
     </div>
 
 
+    <!-- List of fields that the form MAY NOT have as they are added dynamically -->
+    <input type="text" name="wplfAdditionalFields" id="wplfAdditionalFields" value='<?=json_encode($form->getAdditionalFields()); ?>'>
 
-    <div class="wplf-form-field-container">
-    </div>
-    <input type="hidden" name="wplfFields" id="wplf_fields">
-    <input type="hidden" name="wplf_required" id="wplf_required"><?php
+    <!-- List of fields is used to save the current field config, and to compare changes -->
+    <input type="text" name="wplfFields" id="wplfFields" value='<?=json_encode($form->getFields()); ?>'>
+
+    <!-- New fields are used to add columns to the database. They are not saved.  -->
+    <input type="text" name="wplfNewFields" id="wplfNewFields">
+
+    <!-- See above comment about new fields.  -->
+    <input type="text" name="wplfDeletedFields" id="wplfDeletedFields">
+    <?php
   }
 
   /**
@@ -159,7 +178,7 @@ class AdminInterface extends Module {
         'text' => 'Submissions',
         'fn' => [$this, 'renderSubmissions']
       ],
-      'email' => [
+      'settings' => [
         'text' => 'Settings',
         'fn' => [$this, 'renderSettings']
       ],
@@ -169,7 +188,7 @@ class AdminInterface extends Module {
     ?>
 
     <div class="wplf">
-      <div class="wplf__editor">
+      <div class="wplf-editor">
         <textarea name="content" class="wplf-cmEditor"><?=($form->post_content)?></textarea>
 
         <div class="wplf-editor__meta wplf-tabs" data-name="FormEditActiveTab" data-default="<?=array_keys($metaSections)[0]?>" data-remember>
@@ -185,7 +204,7 @@ class AdminInterface extends Module {
 
           <?php
           foreach ($metaSections as $key => $data) {
-            echo "<section class='wplf-tabs__tab' data-name='FormEditActiveTab' data-tab='$key'>";
+            echo "<section class='wplf-tabs__tab wplf-$key' data-name='FormEditActiveTab' data-tab='$key'>";
             $data['fn']();
             echo "</section>";
           }
@@ -198,8 +217,8 @@ class AdminInterface extends Module {
   private function renderPreview() : void {
     $form = get_post(); ?>
     <div class="wplf-editor__preview">
-      <!-- Updated with JS -->
-      <?=$form->post_content?>
+      <!-- Rendered with JS -->
+      <!-- <?=$form->post_content?> -->
     </div><?php
   }
 
@@ -211,7 +230,7 @@ class AdminInterface extends Module {
     </p>
 
     <div class="wplf-formRow">
-      <input type="text" class="code" value='[wplf id="<?php echo esc_attr($post->ID); ?>"]' readonly>
+      <input type="text" class="code" value='[libreform id="<?php echo esc_attr($post->ID); ?>"]' readonly>
     </div>
 
     <p>
@@ -227,50 +246,54 @@ libreform()->render($form); ?&gt;</code>
 
   private function renderSelectors() : void {
     $all = $this->selectors->getAll();
-    $tag = $this->selectors->getTemplateTag();
+
+    ksort($all);
     ?>
 
 
     <div class="wplf-selectors">
-      <p>
-        <?=__('Selectors are special strings that will be replaced with their corresponding values at runtime.', 'wplf')?>
-        <?=__('Most selectors work everywhere, while some depend on a spesific context, such as the form submission.', 'wplf')?>
-      </p>
+      <div class="wplf-selectors__info">
+        <p>
+          <?=__('Selectors are special strings that will be replaced with their corresponding values at runtime.', 'wplf')?>
+          <?=__('Most selectors work everywhere, while some depend on a spesific context, such as the form submission.', 'wplf')?>
+        </p>
 
-      <h3>Usage</h3>
+        <h3>Syntax</h3>
 
-      <p>
-        <?=__('Write a selector in the form, thank you message, or even the email copy. ', 'wplf')?>
-      </p>
+        <code>## SELECTOR_NAME OptionalArgument1, OptionalArgument2 ##</code>
 
-      <h3>Syntax</h3>
+        <p>
+          <?=__('Selector names are always uppercase alphanumeric strings, and can receive any number of arguments, separated by commas.', 'wplf')?>
+          <?=__('The arguments are treated as strings, and are passed into the corresponding selector function.', 'wplf')?>
+        </p>
+      </div>
 
-      <code>## SELECTOR_NAME OptionalArgument1, OptionalArgument2 ##</code>
+      <div class="wplf-selectors__list">
+        <?php foreach ($all as $selectorKey => $selector) {
+          // Trusted input with HTML data, no escaping.
+          $description = $selector['labels']['description'];
+          $usage = $selector['labels']['usage'];
+          $name = $selector['labels']['name'];
+          $example = $selector['labels']['example'];
 
-      <p>
-        <?=__('Selector names are always uppercase alphanumeric strings, and can receive any number of arguments, separated by commas.', 'wplf')?>
-        <?=__('The arguments are treated as strings, and are passed into the corresponding selector function.', 'wplf')?>
-      </p>
+          // Input is trusted and has to be unescaped for formatting to work.
+          ?>
+          <div class="wplf-selectors__selector">
+            <strong class="wplf-selectors__selector__name"><?=$name?></strong>
 
-      <?php foreach ($all as $selectorName => $selector) {
-        $description = $selector['labels']['description'];
-        $usage = $selector['labels']['usage'];
+            <p class="wplf-selectors__selector__description">
+              <?=$description?>
+            </p>
 
-        // Input is trusted and has to be unescaped for formatting to work.
-        ?>
-        <div class="wplf-selectors__selector">
-          <strong><?=esc_html("$tag $selectorName $tag")?></strong>
+            <p class="wplf-selectors__selector__usage">
+              <?=$usage?>
+            </p>
 
-          <p>
-            <?=$description?>
-          </p>
-
-          <p>
-            <?=$usage?>
-          </p>
-        </div>
-        <?php
-      } ?>
+            <code class="wplf-selectors__selector__example"><?=$example?></code>
+          </div>
+          <?php
+        } ?>
+      </div>
     </div>
   <?php
   }
@@ -278,14 +301,25 @@ libreform()->render($form); ?&gt;</code>
   private function renderSubmissions() : void {
     $form = get_post();
     $form = new Form($form);
-    $submissions = $this->submissions->getFormSubmissions($form);
 
-    var_dump($submissions);
-     ?>
+    if ($form->post_status === 'publish') {
+      [$submissions, $pages, $count] = $this->database->getFormSubmissions($form);
 
-    <?php
+      ?>
+      <div class="wplf-submissions">
 
-  //  <?php
+        <div class="wplf-submissions__list">
+          <?php foreach ($submissions as $submission) {
+            var_dump($submission->getFields());
+          } ?>
+        </div>
+      </div>
+      <?php
+
+      // var_dump($submissions);
+    } else {
+      echo __('Publish the form first.', 'wplf');
+    }
   }
 
   private function renderSettings() {
@@ -294,144 +328,223 @@ libreform()->render($form); ?&gt;</code>
     // $meta = get_post_meta($post->ID);
     $siteurl = get_site_url();
 
-    $thankYou = $form->getThankYouMessage();
+    $thankYou = $form->getSuccessMessage();
     $submissionTitleFormat = $form->getSubmissionTitleFormat();
 
-    $emailCopy = $form->getEmailCopyData();
-    $enabled = $emailCopy['enabled'] === 1;
-    $to = $emailCopy['to'];
-    $from = $emailCopy['from'] ?? "wordpress@$siteurl";
-    $subject = $emailCopy['subject'];
-    $content = $emailCopy['content'];
-
-    $toPlaceholder = esc_attr(get_option('admin_email'));;
+    $toPlaceholder = esc_attr(get_option('admin_email'));
     $fromPlaceholder = 'WordPress <wordpress@example.com>';
-    $subjectPlaceholder = esc_attr__('[%submission-id%] Submission from %referrer%', 'wplf');
-    $contentPlaceholder = esc_attr__('Form %form-title% (ID %form-id%) was submitted with values below', 'wplf') . ': %all-form-data%';
+    $subjectPlaceholder = esc_attr__('## SUBMISSION id ##[%submission-id%] Submission from ## FORM title ##', 'wplf');
+    $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM id ##) was submitted with the following values:', 'wplf') . ': ## SUBMISSION ##';
+
+    $emailCopy = $form->getEmailCopyData();
+    $emailCopyEnabled = $emailCopy['enabled'] ?? null === 1;
+    $to = $emailCopy['to'] ?? $toPlaceholder;
+    $from = $emailCopy['from'] ?? $fromPlaceholder;
+    $subject = $emailCopy['subject'] ?? $subjectPlaceholder;
+    $content = $emailCopy['content'] ?? $contentPlaceholder;
+
+    $wplfDestroyUnusedDatabaseColumnsEnabled = $form->getDestroyUnusedDatabaseColumns();
+    $addToMediaLibraryEnabled = $form->getAddToMediaLibrary();
     ?>
 
-    <div class="wplf-addToMediaLibrary">
-      <div class="wplf-formRow">
-        <label for="wplfAddToMediaLibrary">
-          <input
-            id="wplfAddToMediaLibrary"
-            name="wplfAddToMediaLibrary"
-            type="checkbox"
-            value="1"
-            <?=checked($enabled, true, false)?>
-          >
-          <?php esc_html_e('Add files to media library', 'wplf'); ?>
-        </label>
-      </div>
-    </div>
+    <div class="wplf-tabs wplf-formSettings" data-name="FormEditSettingsActiveTab" data-default="afterSubmission" data-remember>
+      <header>
+        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='afterSubmission'>
+          <?=__('After submission', 'wplf')?>
+        </button>
 
-    <div class="wplf-emailCopy">
-      <div class="wplf-formRow">
-        <label for="wplfEmailCopyEnabled">
-          <input
-            id="wplfEmailCopyEnabled"
-            name="wplfEmailCopyEnabled"
-            type="checkbox"
-            value="1"
-            <?=checked($enabled, true, false)?>
-          >
-          <?php esc_html_e('Send an email copy when a form is submitted?', 'wplf'); ?>
+        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='email'>
+          <?=__('Email confirmation', 'wplf')?>
+        </button>
 
-        </label>
-      </div>
+        <button type='button' class='wplf-tabs__tabSwitcher' data-name='FormEditSettingsActiveTab' data-target='misc'>
+          <?=__('Miscellaneous', 'wplf')?>
+        </button>
+      </header>
 
-      <div class="wplf-formRow">
+
+
+      <section class="wplf-tabs__tab wplf-afterSubmission" data-name="FormEditSettingsActiveTab" data-tab="afterSubmission">
+
+        <h3>
+          <?=__('After submission', 'wplf')?>
+        </h3>
+
+        <div class="wplf-formRow">
+          <label for="wplfSuccessMessage">
+            <strong>
+              <?php esc_attr_e('Success message', 'wplf'); ?>
+            </strong>
+
+            <textarea name="wplfSuccessMessage" class="wplf-cmEditor"><?=$thankYou?></textarea>
+
+            <p><?=__('HTML and selectors allowed.')?>
+          </label>
+        </div>
+
+
+      </section>
+
+
+
+      <section class="wplf-tabs__tab wplf-email" data-name="FormEditSettingsActiveTab" data-tab="email">
+        <h3>
+          <?=__('Email confirmation', 'wplf')?>
+        </h3>
+
+        <div class="wplf-formRow">
+          <label for="wplfEmailCopyEnabled">
+            <input
+              id="wplfEmailCopyEnabled"
+              name="wplfEmailCopyEnabled"
+              type="checkbox"
+              value="1"
+              <?=checked($emailCopyEnabled, true, false)?>
+            >
+
+            <?php esc_html_e('Send email when form is submitted?', 'wplf'); ?>
+          </label>
+        </div>
+
         <p>
-          <?php esc_attr_e('You may use any form field values and following global tags: submission-id, referrer, form-title, form-id, user-id, timestamp, datetime, language, all-form-data. All field values and tags should be enclosed in "%" markers.', 'wplf'); ?>
+          <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically.', 'wplf'); ?>
         </p>
-      </div>
 
-      <div class="wplf-formRow">
-        <label for="wplfEmailCopyTo">
-          <strong>
-            <?php esc_attr_e('Send copy to', 'wplf'); ?>
-          </strong>
+        <p>
+          <?=__('Selectors are allowed. No HTML.')?>
+        </p>
 
-          <input
-            type="text"
-            name="wplfEmailCopyTo"
-            value="<?php echo esc_attr($to); ?>"
-            placeholder="<?=$toPlaceholder?>"
-          >
-        </label>
-      </div>
+        <div class="wplf-formRow">
+          <label for="wplfEmailCopyContent">
+            <strong>
+              <?php esc_attr_e('Content', 'wplf'); ?>
+            </strong>
 
-      <div class="wplf-formRow">
-        <label for="wplfEmailCopyFrom">
-          <strong>
-            <?php esc_attr_e('Sender email', 'wplf'); ?>
-          </strong>
+            <textarea
+              name="wplfEmailCopyContent"
+              placeholder="<?=$contentPlaceholder?>"
+              rows="10"
+            ><?php echo esc_attr($content); ?></textarea>
+          </label>
+        </div>
 
-          <input
-            type="text"
-            name="wplfEmailCopyFrom"
-            value="<?php echo esc_attr($from); ?>"
-            placeholder="<?=$fromPlaceholder?>"
-          >
-        </label>
-      </div>
+        <div class="wplf-formRow">
+          <label for="wplfEmailCopyTo">
+            <strong>
+              <?php esc_attr_e('Send to', 'wplf'); ?>
+            </strong>
 
-      <div class="wplf-formRow">
-        <label for="wplfEmailCopySubject">
-          <strong>
-            <?php esc_attr_e('Subject', 'wplf'); ?>
-          </strong>
+            <input
+              type="text"
+              name="wplfEmailCopyTo"
+              value="<?php echo esc_attr($to); ?>"
+              placeholder="<?=$toPlaceholder?>"
+            >
+          </label>
+        </div>
 
-          <input
-            type="text"
-            name="wplfEmailCopySubject"
-            value="<?php echo esc_attr($submissionTitleFormat); ?>"
-            placeholder="<?=$subjectPlaceholder?>"
-          >
-        </label>
-      </div>
+        <div class="wplf-formRow">
+          <label for="wplfEmailCopyFrom">
+            <strong>
+              <?php esc_attr_e('Sender email', 'wplf'); ?>
+            </strong>
 
-      <div class="wplf-formRow">
-        <label for="wplfEmailCopyContent">
-          <strong>
-            <?php esc_attr_e('Content', 'wplf'); ?>
-          </strong>
+            <input
+              type="text"
+              name="wplfEmailCopyFrom"
+              value="<?php echo esc_attr($from); ?>"
+              placeholder="<?=$fromPlaceholder?>"
+            >
+          </label>
+        </div>
 
-          <textarea
-            name="wplfEmailCopyContent"
-            placeholder="<?=$contentPlaceholder?>"
-            rows="10"
-          ><?php echo esc_attr($content); ?></textarea>
-        </label>
-      </div>
+        <div class="wplf-formRow">
+          <label for="wplfEmailCopySubject">
+            <strong>
+              <?php esc_attr_e('Subject', 'wplf'); ?>
+            </strong>
+
+            <input
+              type="text"
+              name="wplfEmailCopySubject"
+              value="<?php echo esc_attr($subject); ?>"
+              placeholder="<?=$subjectPlaceholder?>"
+            >
+          </label>
+        </div>
+      </section>
+
+      <section class="wplf-tabs__tab wplf-misc" data-name="FormEditSettingsActiveTab" data-tab="misc">
+        <h3>
+          <?=__('Submission settings', 'wplf')?>
+        </h3>
+
+        <div class="wplf-formRow">
+          <label for="wplfSuccessMessage">
+            <strong>
+              <?php esc_attr_e('Title format', 'wplf'); ?>
+            </strong>
+
+            <input name="wplfSubmissionTitleFormat" value="<?=esc_attr($submissionTitleFormat)?>">
+
+            <p><?php esc_html_e('Submissions will generate a title based on this format.', 'wplf'); ?></p>
+            <p><?=__('Selectors are allowed. No HTML.')?></p>
+          </label>
+        </div>
+
+        <div class="wplf-formRow">
+          <label for="wplfAddToMediaLibrary">
+            <input
+              id="wplfAddToMediaLibrary"
+              name="wplfAddToMediaLibrary"
+              type="checkbox"
+              value="1"
+              <?=checked($addToMediaLibraryEnabled, 1, false)?>
+            >
+            <?php esc_html_e('Add files to media library', 'wplf'); ?>
+          </label>
+        </div>
+
+        <h3>
+          <?=__('Feature freeze', 'wplf')?>
+        </h3>
+
+        <div class="wplf-formRow">
+          <label for="wplfUpdateVersionCreatedAt">
+            <input
+              id="wplfUpdateVersionCreatedAt"
+              name="wplfUpdateVersionCreatedAt"
+              type="checkbox"
+              value="1"
+              <?=checked(apply_filters('wplfUpgradeFormByFefault', false, $form), true, false)?>
+            >
+            <?php esc_html_e('Upgrade form to enable latest features', 'wplf'); ?>
+          </label>
+        </div>
+
+        <h3>
+          <?=__('Dangerous settings', 'wplf')?>
+        </h3>
+
+        <div class="wplf-formRow">
+          <label for="wplfDestroyUnusedDatabaseColumns">
+            <input
+              id="wplfDestroyUnusedDatabaseColumns"
+              name="wplfDestroyUnusedDatabaseColumns"
+              type="checkbox"
+              value="1"
+              <?=checked($wplfDestroyUnusedDatabaseColumnsEnabled, 1, false)?>
+            >
+            <?php esc_html_e('Delete removed fields from database', 'wplf'); ?>
+          </label>
+        </div>
+
+        <p>
+          <?=__("This setting WILL cause loss of data if used on a form with submissions. It's useful for reusing the same form after an event or freeing field names in the database. ", 'wplf')?>
+          <?=__("All field data that doesn't have a field in the current version of the form will be deleted, and form history data will be destroyed.", 'wplf')?>
+        </p>
+      </section>
     </div>
-
-    <div class="wplf-thankYou">
-      <div class="wplf-formRow">
-        <label for="wplfThankYou">
-          <strong>
-            <?php esc_attr_e('Content to display after succesful form submission', 'wplf'); ?>
-          </strong>
-
-          <textarea name="wplfThankYou" class="wplf-cmEditor"><?=$thankYou?></textarea>
-        </label>
-      </div>
-    </div>
-
-    <div class="wplf-submissionTitleFormat">
-      <div class="wplf-formRow">
-        <label for="wplfThankYou">
-          <strong>
-            <?php esc_attr_e('Submission title format', 'wplf'); ?>
-          </strong>
-
-          <input name="wplfSubmissionTitleFormat" value="<?=esc_attr($submissionTitleFormat)?>">
-
-          <p><?php esc_html_e('Submissions from this form will use this formatting in their title.', 'wplf'); ?></p>
-          <p><?php esc_html_e('You may use any field values enclosed in "%" markers.', 'wplf'); ?></p>
-          <p><?php esc_html_e('In addition, you may use %submission-id%.', 'wplf'); ?></p>
-        </label>
-      </div>
-    </div><?php
+    <?php
   }
 }

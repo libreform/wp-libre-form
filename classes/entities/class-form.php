@@ -6,6 +6,7 @@ namespace WPLF;
  */
 class Form {
   public int $ID;
+  public string $title;
 
   private $raw;
 
@@ -22,6 +23,8 @@ class Form {
 
   public function __construct(\WP_Post $form) {
     $this->ID = $form->ID;
+    $this->title = $form->post_title;
+
     $this->raw = $form;
 
     if ($form->post_type !== Plugin::$postType) {
@@ -35,19 +38,33 @@ class Form {
     return $this->raw;
   }
 
-  // without prefix
-  public function getDbTable() {
-    return "wplf_{$this->ID}_submissions";
-  }
-
-  public function getMeta(string $name) {
+  public function getMeta(string $name, $default = null) {
     // Prefix keys with _ to make them "hidden" and
 
-    return get_post_meta($this->ID, "_wplf" . $name, true);
+
+    return get_post_meta($this->ID, "_wplf" . $name, true) ?? $default;
   }
 
   public function setMeta(string $name, $data = []) : void {
+    // log("setting meta $name");
+
     update_post_meta($this->ID, "_wplf" . $name, $data);
+  }
+
+  public function isSubmissionsTableCreated() : bool {
+    return $this->getMeta('DBTableCreated');
+  }
+
+  public function setTableCreated(bool $value) : void {
+    $this->setMeta('DBTableCreated', $value);
+  }
+
+  public function getHistoryId() : int {
+    return (int) $this->getMeta('HistoryId');
+  }
+
+  public function setHistoryId(int $value) : void {
+    $this->setMeta('HistoryId', $value);
   }
 
   public function getFields() : array {
@@ -57,25 +74,28 @@ class Form {
   }
 
   public function setFields(string $json) : void {
-    $fields = json_decode(stripslashes($json));
-
-    foreach ($fields as $name => $data) {
-      if ($fields->type === 'file' && $fields->multiple) {
-        // Remove brackets from the name
-        $fields->name = str_replace('[]', '', $field->name);
-      }
-    }
-
+    $fields = json_decode(stripslashes($json), true);
     $this->setMeta('Fields', $fields);
   }
 
-  // can't store booleans in postmeta
   public function setAddToMediaLibrary(int $status) : void {
     $this->setMeta('AddToMediaLibrary', $status);
   }
 
+  public function getAddToMediaLibrary() {
+    return $this->getMeta('AddToMediaLibrary') ?? 0;
+  }
+
+  public function getDestroyUnusedDatabaseColumns() : int {
+    return (int) $this->getMeta('DestroyUnusedDatabaseColumns') ?? 0;
+  }
+
+  public function setDestroyUnusedDatabaseColumns(int $status) : void {
+    $this->setMeta('DestroyUnusedDatabaseColumns', $status);
+  }
+
   public function getEmailCopyData() {
-    return $this->getMeta('EmailCopy');
+    return $this->getMeta('EmailCopy') ?? [];
   }
 
   public function setEmailCopyData($data = []) : void {
@@ -83,10 +103,10 @@ class Form {
   }
 
   public function getSubmissionTitleFormat() {
-    return $this->getMeta('SubmissionTitleFormat');
+    return $this->getMeta('SubmissionTitleFormat') ?: '## FORM title ## ### SUBMISSION id ##'; // );
   }
 
-  public function setSubmissionTitleFormat(?string $formattedString = '%form-title% #%submission-id%') : void {
+  public function setSubmissionTitleFormat(string $formattedString = '') : void {
     $this->setMeta('SubmissionTitleFormat', $formattedString);
   }
 
@@ -98,21 +118,22 @@ class Form {
     $this->setMeta('VersionCreatedAt', $version);
   }
 
-  public function getThankYouMessage() {
-    return $this->getMeta('ThankYou');
+  public function getSuccessMessage() {
+    return $this->getMeta('ThankYou') ?: '<p>' . __('Form submitted succesfully.', 'wplf') . '</p>';
   }
 
-  public function setThankYouMessage(string $message) : void {
+  public function setSuccessMessage(string $message) : void {
     $this->setMeta('ThankYou', $message);
   }
 
   public function render($options = []) {
     // $content = $this->post_content;
     $content = $options['content'] ?? null;
+    $printAdditionalFields = (bool) ($options['printAdditionalFields'] ?? true);
     $attributes = $options['attributes'] ?? [];
     $className = $attributes['class'] ?? null;
 
-    $useFallbackThankYou = (int) ($_GET['wplfFallbackThankYou'] ?? false) === $this->ID;
+    $useFallbackThankYou = (int) ($_GET['wplfNoJs'] ?? false) === $this->ID;
 
     if (!$content) {
       $content = $this->post_content;
@@ -152,13 +173,14 @@ class Form {
       if ($useFallbackThankYou) { ?>
         <div class="form-notice form-notice__thankyou">
           Fallback
-          <?=$this->getThankYouMessage($this->post)?>
+          <?=$this->getSuccessMessage($this->post)?>
         </div><?php
       }
 
       // This is where we output the user-input form html. We allow all HTML here. Yes, even scripts.
       echo $content;
 
+      if ($printAdditionalFields) {
       // Prove yourself human by NOT filling this field
       ?>
       <div class="wplf-formRow wplf-fcaptcha" aria-hidden="true">
@@ -169,30 +191,38 @@ class Form {
         </label>
       </div>
       <?php
+      $isArchive = is_archive();
+      $referrerData = $isArchive ? [
+        'type' => 'archive',
+        'title' => get_the_archive_title(),
+        'url' => currentUrl(),
+      ] : [
+        'type' => 'singular',
+        'id' => get_the_ID(),
+        'url' => currentUrl(),
+      ]; ?>
 
-      if (is_archive()) {
-        global $wp;
-        $current_url = home_url($wp->request);
-
-        if (empty(get_option('permalink_structure'))) {
-          $current_url = add_query_arg($wp->query_string, '', home_url($wp->request));
-        }
-        ?>
-        <input type="hidden" name="referrer" value="<?php echo esc_attr($current_url); ?>">
-        <input type="hidden" name="_referrerId" value="Archive">
-        <input type="hidden" name="_referrerArchiveTitle" value="<?php echo esc_attr(get_the_archive_title()); ?>">
-        <?php
-      } else { ?>
-        <input type="hidden" name="referrer" value="<?php the_permalink(); ?>">
-        <input type="hidden" name="_referrerId" value="<?php echo esc_attr(get_the_id()); ?>"><?php
-      } ?>
-
-      <input type="hidden" name="_fallbackThankYou" value="1">
+      <input type="hidden" name="_referrerData" value='<?=json_encode($referrerData)?>'>
+      <input type="hidden" name="_nojs" value="1">
       <input type="hidden" name="_formId" value="<?=$id?>">
+      <?php
+      }
+      ?>
     </form><?php
   }
 
-  public function printDefaultForm() {
+  /**
+   * Get list of fields which names are already used. These fields
+   * are handled differently than the rest of the submission, and are not added to the database
+   * by default. Feel free to add your own if you must but I suggest using hidden fields instead.
+   */
+  public function getAdditionalFields() {
+    $defaults = ['_fcaptcha', '_referrerData', '_nojs', '_formId', 'lang'];
+
+    return apply_filters('wplfAdditionalFields', $defaults, $this);
+  }
+
+  public static function printDefaultForm() {
     $required = esc_html_x('(required)', 'wplf');
     $defaultName = esc_html_x('John Doe', 'Default placeholder name', 'wplf');
     $nameLabel = esc_html_x('Please enter your name', 'wplf');

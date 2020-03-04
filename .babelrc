@@ -5,7 +5,8 @@
       {
         "targets": {
           "esmodules": false,
-        }
+        },
+        "exclude": ["transform-regenerator"]
       }
     ]
   ],

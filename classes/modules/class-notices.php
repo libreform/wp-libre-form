@@ -3,7 +3,7 @@
 namespace WPLF;
 
 class Notices extends Module {
-  private $notices = [];
+  private $items = [];
   private $optionName = 'wplfDismissedNotices';
 
   public function __construct() {
@@ -16,17 +16,17 @@ class Notices extends Module {
     $dismissable = $options['dismissable'] ?? false;
     $show = $options['show'] ?? false;
 
-    $this->notices[$name] = compact('content', 'type', 'dismissable', 'show');
+    $this->items[$name] = compact('content', 'type', 'dismissable', 'show');
 
     return $name;
   }
 
   public function show(string $name) {
-    $this->notices[$name]['show'] = true;
+    $this->items[$name]['show'] = true;
   }
 
   public function hide(string $name) {
-    $this->notices[$name]['show'] = false;
+    $this->items[$name]['show'] = false;
   }
 
   public function handleDismissal() {
@@ -43,21 +43,19 @@ class Notices extends Module {
   public function render() {
     $dismissedNotices = get_option($this->optionName, []);
 
-    foreach ($this->notices as $name => $data) {
+    foreach ($this->items as $name => $data) {
       $type = esc_attr($data['type']);
       $dismissable = $data['dismissable'];
       $content = $data['content'];
       $show = $data['show'];
       $name = esc_attr($name);
 
-      if (!$data['show'] || $dismissed) {
+      if (!$data['show'] || isset($dismissedNotices[$name])) {
         continue;
       }
 
       ?>
       <div class="notice notice-<?=$type?> wplf-notice" data-name="<?=$name?>">
-        <?=$content?>
-
         <?php
         echo $content;
 

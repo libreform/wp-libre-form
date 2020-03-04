@@ -70,7 +70,7 @@ class RestApi extends Module {
 
     try {
       $form = new Form(get_post($formId));
-      $html = $this->core->render($form, ['content' => $html], true);
+      $html = $this->core->render($form, ['content' => $html, 'printAdditionalFields' => false], true);
 
       $response = new \WP_REST_Response(['html' => trim($html), 'form' => $form]);
 
@@ -85,24 +85,26 @@ class RestApi extends Module {
   public function handleSubmission($request) {
     $params = $request->get_params();
     $useFallback = isset($params['_fallbackThankYou']); // field is removed with JS
-
-    $formId = 6;
+    $formId = $params['_formId'];
 
     try {
       $form = new Form(get_post($formId));
       $submission = new Submission($form);
-      $submission->create(array_merge($params, getUploadedFiles()));
+      $submission->create(array_merge($params, getUploadedFiles() ?? []));
 
       if ($useFallback) {
         $referrer = $params['referrer'];
         $referrerContainsParams = strpos($referrer, '?');
-        $url = $referrer . ($referrerContainsParams ? '&' : '?') . "wplfFallbackThankYou=$formId";
+        $url = $referrer . ($referrerContainsParams ? '&' : '?') . "wplfNoJs=$formId";
 
         header("Location: $url");
         return;
       }
 
-      $response = new \WP_REST_Response($submission);
+      $response = new \WP_REST_Response([
+        'submission' => $submission,
+        'message' => $this->selectors->parse($form->getSuccessMessage(), $form, $submission),
+      ]);
 
       return $response;
     } catch (Error $e) {
@@ -118,7 +120,7 @@ class RestApi extends Module {
         exit;
       }
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], ['status' => 500]);
+      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
     }
   }
 }

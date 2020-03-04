@@ -14,7 +14,7 @@ abstract class Module {
       'settings',
       'notices',
       'form',
-      'submissions',
+      'database',
       'selectors',
       'addons',
       'restApi',

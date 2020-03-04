@@ -35,12 +35,15 @@ class Plugin {
 
     $this->loadModule('settings', 'wplfSettings');
     $this->loadModule('notices');
-    $this->loadModule('submissions');
+    $this->loadModule('database');
     $this->loadModule('selectors');
     $this->loadModule('addons');
 
+    if (is_admin()) {
+      $this->loadModule('admin-interface');
+    }
+
     add_action('init', [$this, 'afterInit']);
-    add_action('admin_init', [$this, 'afterAdminInit']);
     add_action('rest_api_init', [$this, 'afterRestApiInit']);
     add_action('after_setup_theme', [$this, 'afterSetupTheme']);
 
@@ -73,29 +76,28 @@ class Plugin {
     // Change the contents of the columns we just changed
     add_action('manage_' . self::$postType . '_posts_custom_column', function($column, $postId) {
       // Change column contents
+      $form = new Form(get_post($postId));
+
 
       if ($column === 'shortcode') { ?>
         <input type="text" class="code" value='[libreform id="<?php echo intval($post_id); ?>"]' readonly><?php
       }
 
       if ($column === 'submissions') {
-        // count number of submissions
-        $submissions = get_posts([
-          'post_type' => 'wplf-submission',
-          'posts_per_page' => -1,
-          'meta_key' => '_form_id',
-          'meta_value' => $post_id,
-          'suppress_filters' => false,
-        ]); ?>
+        [$submissions, $pages, $count] = $this->database->getFormSubmissions($form, 0, 1); ?>
 
-        <a href="<?php echo esc_url_raw(admin_url('edit.php?post_type=wplf-submission&form=' . $post_id)); ?>">
-          <?php echo count($submissions); ?>
+        <a href="<?=esc_url_raw(admin_url("post.php?post={$form->ID}&action=edit"))?>">
+          <?=$count?>
         </a><?php
       }
     }, 10, 2);
 
     // If direct access to form is allowed, replace the HTML content with a form
     add_filter('the_content', [$this, 'replaceContentWithFormOnSingleForm'], 0);
+
+    if (!$this->settings->get('historyTableCreated')) {
+      $this->database->createHistoryTable();
+    }
   }
 
   public function afterInit() {
@@ -123,10 +125,6 @@ class Plugin {
     $this->loadModule('rest-api');
   }
 
-  public function afterAdminInit() {
-    $this->loadModule('admin-interface');
-  }
-
   public function getLocalizeScriptData(array $additional = []) {
     $isMS = is_multisite();
     $hasUnfiltered = current_user_can('unfiltered_html');
@@ -137,9 +135,8 @@ class Plugin {
       'requestHeaders' => (object) apply_filters('wplfSubmissionHeaders', [
         'X-WP-Nonce' =>  wp_create_nonce('wp_rest'),
       ]),
-      // 'lang' => $this->polylang ? \pll_current_language() : null,
+      'lang' => $this->polylang ? \pll_current_language() : null,
       'assetsDir' => $this->url . '/assets',
-      // 'nonce' =>,
       'settings' => [
         'autoinit' => $this->settings->get('autoinit'),
         'parseLibreformShortcodeInRestApi' => $this->settings->get('parseLibreformShortcodeInRestApi'),
@@ -192,6 +189,7 @@ class Plugin {
    */
   public static function onActivation() {
     isDebug() && log('Activated');
+
     flush_rewrite_rules();
   }
 
@@ -215,7 +213,7 @@ class Plugin {
    * Modules must be named as class-kebab-case.php, and they must contain a class with the
    * same name in PascalCase: class KebabCase extends X {}
    */
-  public function loadModule(string $moduleName, ...$params) {
+  private function loadModule(string $moduleName, ...$params) {
     $path = "modules/class-$moduleName.php";
 
     require_once $path;
@@ -230,13 +228,43 @@ class Plugin {
     $this->{$instanceVariable} = $module;
   }
 
-  public function deleteForm($post_id) {
-    $post = get_post($post_id);
+  /**
+   * Delete all submissions, as the foreign keys prevent the form from being deleted.
+   * Alternatively bails out of the deletion if
+   */
+  public function beforeDeleteForm(int $postId) {
+    $post = get_post($postId);
 
-    if ($post->post_type !== self::$postType) {
-      do_action("wplf_deleteForm", $post);
-      do_action("wplf_{$post->slug}_deleteForm", $post);
-      do_action("wplf_{$post->slug}_deleteForm", $post);
+    if ($post->post_type === self::$postType) {
+      $form = new Form($post);
+      $submissionCount = $this->database->getFormSubmissionCount($form);
+      $allowDeletionWithSubmissions = $this->settings->get('allowDangerousDelete');
+
+      do_action("wplf_beforeDeleteForm", $form, $submissionCount);
+
+      if ($submissionCount > 0 && !$allowDeletionWithSubmissions) {
+        $errorMessage = __('Form has submissions, and allowDangerousDelete is turned off. Delete the submissions before deleting the form.', 'wplf');
+
+        if (isRest()) { // Can't show wp_die in rest api
+          throw new Error($errorMessage);
+        }
+
+        wp_die(
+          $errorMessage,
+          409
+        );
+      }
+
+      // Just drop the table. Might throw due to DB error.
+      $this->database->dropFormSubmissionsTable($form);
+    }
+  }
+
+  public function deleteForm(int $postId) {
+    $post = get_post($postId);
+
+    if ($post->post_type === self::$postType) {
+      do_action("wplf_deleteForm", new Form($post));
 
       $this->deleteTransients();
     }
@@ -250,15 +278,13 @@ class Plugin {
     }
 
     $form = new Form($form);
-
-    // $form->render();
-
-    $nonceExistsAndIsValid = $_POST['wplfSavePostNonce'] ??  wp_verify_nonce($_POST['wplfSavePostNonce']. 'wplfSavePostNonce');
+    $nonce = $_POST['wplfSavePostNonce'] ?? null;
+    $nonceIsValid = wp_verify_nonce($nonce, 'wplfSavePostNonce');
     $currentUserCanEdit = current_user_can('edit_post', $form->ID);
     $isTheRightPostType = $_POST['post_type'] ?? false === self::$postType;
     $hasUnfilteredHtml = !is_multisite() || current_user_can('unfiltered_html');
 
-    if (!$isTheRightPostType || !$nonceExistsAndIsValid || !$currentUserCanEdit) {
+    if (!$isTheRightPostType || !$nonceIsValid || !$currentUserCanEdit) {
       return;
     } else if (!$hasUnfilteredHtml) {
       wp_die(
@@ -268,23 +294,21 @@ class Plugin {
       );
     }
 
-
     $this->deleteTransients();
-    $this->render($form, [], true); // Render in admin context for reasons like Polylang
+    $this->render($form, [], true); // Render in admin context so selectors can do stuff
 
-    // log($_POST['wplfFields'] );
-
-    $form->setAddToMediaLibrary($_POST['wplfAddToMediaLibrary'] ?? 0);
-    $form->setThankYouMessage($_POST['wplfThankYou'] ?? __('Success!', 'wplf'));
+    $oldFields = $form->getFields(); // Save old fields for reference
+    $form->setAddToMediaLibrary((int) ($_POST['wplfAddToMediaLibrary'] ?? 0));
+    $form->setSuccessMessage($_POST['wplfSuccessMessage'] ?? __('Success!', 'wplf'));
     $form->setFields($_POST['wplfFields'] ?? '[]');
     $form->setEmailCopyData([
-      'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'] ?? false),
+      'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'] ?? false), // booleans are ok in postmeta if inside array
       'to' => parseEmailToField($_POST['wplfEmailCopyTo'] ?? ''),
       'from' => sanitize_email($_POST['wplfEmailCopyFrom'] ?? ''),
       'subject' => sanitize_text_field($_POST['wplfEmailCopySubject'] ?? ''),
       'content' => wp_kses_post($_POST['wplfEmailCopyContent'] ?? ''),
     ]);
-
+    $form->setDestroyUnusedDatabaseColumns((int) ($_POST['wplfDestroyUnusedDatabaseColumns'] ?? 0));
     /**
      * Typically the format will include characters like <, >, %. Sanitize functions mess up the value.
      * The value is only displayed in the same input that it came from, where it is escaped at runtime.
@@ -292,7 +316,7 @@ class Plugin {
     $form->setSubmissionTitleFormat($_POST['wplfSubmissionTitleFormat'] ?? null);
 
     /**
-     * We may add a feature that changes how the form behaves. That might forms
+     * We may add a feature that changes how the form behaves. That might break forms
      * so this acts as a "feature freeze", giving control of the feature to the user.
      */
     $updateAllowed = $_POST['wplfUpdateVersionCreatedAt'] ?? false === '1';
@@ -300,27 +324,61 @@ class Plugin {
     if ($updateAllowed) {
       $form->setVersionCreatedAt($this->version);
     }
+
+    try {
+      if (!$form->isSubmissionsTableCreated()) {
+        $this->database->createFormSubmissionsTable($form);
+      }
+
+      // wplfNewFields and wplfDeletedFields are not saved, just used for db mutations
+      $newFields = json_decode(stripslashes(($_POST['wplfNewFields'] ?? '[]')), true);
+      $deletedFields = json_decode(stripslashes(($_POST['wplfDeletedFields'] ?? '[]')), true);
+      $destroyUnusedDbColumns = $form->getDestroyUnusedDatabaseColumns();
+
+      // $newFields = !empty($newFields) ? $newFields : null;
+      // $deletedFields = !empty($deletedFields) ? $deletedFields : null;
+
+      log([$newFields, $deletedFields, "fuck"]);
+
+
+      if ($newFields || $deletedFields) {
+        //  var_dump($destroyUnusedDbColumns); die("FUCK OFF CUNT");
+
+        // log('yes');
+
+        if ($destroyUnusedDbColumns) {
+          // Nuke the history, it's useless when only current field values remain
+          // $this->database->destroyHistoryFields($form);
+        } else {
+          log('preventing deletion');
+          $deletedFields = null; // Prevent deletion of fields
+        }
+
+        log('updating submissions next');
+        $this->database->updateFormSubmissionsTable($form, $newFields, $deletedFields);
+      }
+    } catch (Error $e) {
+      $msg = $e->getMessage();
+
+      log("Database error: {$msg}");
+    }
   }
 
-   /**
-   * Pre-populate form editor with default content
+  public function arrays_are_equal($array1, $array2)
+  {
+      array_multisort($array1);
+      array_multisort($array2);
+      return ( serialize($array1) === serialize($array2) );
+  }
+  /**
+   * Objects are more memory efficient as they are passed by reference,
+   * but they are a major PITA to compare. Converting them to arrays momentarily solves the problem.
    */
-  public function defaultContent($content) {
-    global $pagenow;
+  private function compareOldAndNewFields($old, $new) {
+    $old = (array) $old;
+    $new = (array) $new;
 
-    // only on post.php screen
-    if ('post-new.php' !== $pagenow && 'post.php' !== $pagenow) {
-      return $content;
-    }
-
-    // only for this cpt
-    if (isset($_GET['post_type']) && self::$postType === $_GET['post_type']) {
-      ob_start();
-      $this->printDefaultForm();
-      $content = esc_textarea(ob_get_clean());
-    }
-
-    return $content;
+    return $old === $new ? 1 : 0;
   }
 
   public function replaceContentWithFormOnSingleForm($content) {
@@ -384,7 +442,6 @@ class Plugin {
         'title',
         'editor',
         'revisions',
-        'custom-fields',
      ),
       'show_in_rest' => true,
     ];
@@ -475,7 +532,7 @@ class Plugin {
       $form->render($options);
 
       $output = ob_get_clean();
-      $output = $this->selectors->parse($output, $form, $options);
+      $output = $this->selectors->parse($output, $form, null);
       $output = apply_filters('wplfAfterRender', $output, $form, $options);
       $output = minifyHtml($output); // Minify after filter, I doubt that anyone want the minified HTML
 

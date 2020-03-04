@@ -4,8 +4,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 export default ({ NODE_ENV: env }) => ({
   mode: env,
   entry: {
-    'wplf-admin': [path.join(__dirname, 'assets/scripts/wplf-admin.js')],
-    'wplf-frontend': [path.join(__dirname, 'assets/scripts/wplf-frontend.js')],
+    'wplf-admin': [path.join(__dirname, 'assets/scripts/wplf-admin-bundle.js')],
+    'wplf-frontend': [path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.js')],
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -33,7 +33,7 @@ export default ({ NODE_ENV: env }) => ({
       // both options are optional
       filename: '[name].css',
       chunkFilename: '[id].css',
-    }), 
+    }),
   ],
   module: {
     rules: [

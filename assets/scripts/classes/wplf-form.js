@@ -1,6 +1,10 @@
-import globalData from '../lib/global-data';
-import { WPLF_Tabs } from './wplf-tabs'
+import globalData from '../lib/global-data'
+import createApiClient from '../lib/api-client'
+import log from '../lib/log'
 
+import WPLF_Tabs from './wplf-tabs'
+
+const { request } = createApiClient()
 
 export class WPLF_Form {
   constructor(element) {
@@ -27,7 +31,7 @@ export class WPLF_Form {
     this.addSubmitHandler();
 
     // Remove input that triggers the fallback so we get a JSON response
-    const fallbackInput = element.querySelector('[name="_fallbackThankYou"]');
+    const fallbackInput = element.querySelector('[name="_nojs"]');
 
     if (fallbackInput) {
       fallbackInput.parentNode.removeChild(fallbackInput);
@@ -57,74 +61,52 @@ export class WPLF_Form {
   }
 
   addSubmitHandler(handler) {
-    this.submitHandler = (handler || (e => {
-      e.preventDefault();
+    this.submitHandler = (handler || (async e => {
+      e.preventDefault();    console.log('handle', this.submitState)
 
-      // Prevent double submissions by blocking send if it's already in progress
-      if (this.form.submitState === 'sending') {
+      // Prevent double submissions
+      if (this.submitState === 'submitting') {
+        log.notice('Preventing double doubmission')
         return;
       }
 
-      // add class to enable css changes to indicate ajax loading
-      this.form.classList.add('sending');
-      [].forEach.call(this.form.querySelectorAll(".wplf-error"), error => {
-        // reset errors
-        error.parentNode.removeChild(error);
+      // Reset messages if there were any
+      [].forEach.call(this.form.parentNode.querySelectorAll(".wplf-errorMessage, .wplf-successMessage"), el => {
+        el.parentNode.removeChild(el);
       });
 
+      try {
+        const { data, ok } = await this.send()
 
-      this.send()
-        .then(r => r.text())
-        .then(
-          r => {
-            const response = JSON.parse(r);
+        if (ok) {
+          const { message } = data
+          const div = document.createElement('div')
+          div.classList.add('wplf-successMessage')
+          div.insertAdjacentHTML('afterbegin', message)
 
-            if('success' in response) {
-              // show success message if one exists
-              const success = document.createElement("p");
-              success.className = "wplf-success";
-              success.innerHTML = response.success;
+          this.form.insertAdjacentElement('beforebegin', div)
+          this.form.classList.add('submitted')
+          this.form.reset()
+          this.submitState = 'success'
 
-              this.form.parentNode.insertBefore(success, this.form.nextSibling);
-            }
+          this.runCallback('success', data, this);
+        } else {
+          const { error } = data
 
-            if('ok' in response && response.ok) {
-              // submit succesful!
-              this.form.parentNode.removeChild(this.form);
-
-              this.submitStatus = 'success';
-              this.runCallback('success', response, this);
-            }
-
-            if('error' in response) {
-              // show error message in form
-              const error = document.createElement("p");
-              error.className = "wplf-error error";
-              error.textContent = response.error;
-
-              this.form.appendChild(error);
-
-              this.submitStatus = new Error(response.error);
-
-              this.runCallback('error', this.submitStatus, this);
-              // Object.keys(this.callbacks.error).forEach(key => {
-              //   this.callbacks.error[key](response, this);
-              // });
-            }
-
-            this.form.classList.remove('sending');
-          }
-       ).catch(
-          error => {
-            this.form.classList.remove("sending");
-
-            // if (this.callbacks.error.length > 0) {
-              this.runCallback('error', error, this);
-            // } else {
-              console.warn("Fetch error: ", error);
-            // }
+          throw new Error(error)
         }
-     );
+      } catch (e) {
+        const div = document.createElement('div')
+        div.classList.add('wplf-errorMessage')
+        div.insertAdjacentHTML('afterbegin', e.message)
+
+        this.submitState = e
+        log.error(this.submitState);
+
+        this.form.classList.remove('sending')
+        this.form.insertAdjacentElement('beforebegin', div)
+        this.runCallback('error', this.submitState, this);
+      }
     }))
 
     this.form.addEventListener('submit', this.submitHandler);
@@ -139,22 +121,23 @@ export class WPLF_Form {
     return this;
   }
 
-  send() {
+  async send() {
     const form = this.form;
     const data = new FormData(form);
 
     // Pass language if it exists.
-    globalData.lang && data.append('lang', globalData.lang);
+    globalData.lang && data.append('lang', globalData.lang)
 
-    form.submitState = 'submitting';
+    this.submitState = 'submitting';
+    form.classList.add('sending')
+    this.runCallback('beforeSend', form, this)
 
-    this.runCallback('beforeSend', form, this);
-
-    return fetch(globalData.backendUrl + '/submit', {
-      method: "POST",
-      credentials: globalData.fetchCredentials || 'same-origin',
+    const req = request('/submit', {
+      method: 'POST',
       body: data,
-      headers: globalData.requestHeaders || {},
-    });
+    })
+
+    form.classList.remove('sending')
+    return req
   }
 }

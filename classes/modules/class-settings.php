@@ -13,8 +13,17 @@ class Settings extends Module {
       'type' => 'select',
       'label' => 'Parse form shortcode in REST API',
       'options' => [
-        'false' => 'False',
-        'true' => 'True',
+        'false' => 'No',
+        'true' => 'Yes',
+      ],
+    ],
+
+    'allowDangerousDelete' => [
+      'type' => 'select',
+      'label' => 'Allow deleting forms which have submissions',
+      'options' => [
+        'false' => 'No',
+        'true' => 'Yes',
       ],
     ],
 
@@ -22,8 +31,8 @@ class Settings extends Module {
       'type' => 'select',
       'label' => 'Allow direct access to forms',
       'options' => [
-        'false' => 'False',
-        'true' => 'True',
+        'false' => 'No',
+        'true' => 'Yes',
       ],
     ],
 
@@ -32,10 +41,14 @@ class Settings extends Module {
       'type' => 'select',
       'label' => 'Initialize forms automatically',
       'options' => [
-        'false' => 'False',
-        'true' => 'True',
+        'false' => 'No',
+        'true' => 'Yes',
       ],
     ],
+
+    'historyTableCreated' => [
+      'type' => 'hidden',
+    ]
   ];
 
   public function __construct($key = 'wplfSettings') {
@@ -57,8 +70,10 @@ class Settings extends Module {
   private function getDefaultSettings() {
     return [
       'allowDirect' => 'true',
+      'allowDangerousDelete' => 'false',
       'parseLibreformShortcodeInRestApi' => 'true',
       'autoinit' => 'true',
+      'historyTableCreated' => 'false',
     ];
   }
 
@@ -68,7 +83,7 @@ class Settings extends Module {
 
   public function get($setting) {
     if ($this->isValidSetting($setting)) {
-      $value = $this->options[$setting];
+      $value = $this->options[$setting] ?? null;
 
       if ($value === 'true') {
         return true;
@@ -80,9 +95,9 @@ class Settings extends Module {
     return false;
   }
 
-  public function updateSetting($setting, $value) {
+  public function set($setting, $value) {
     if (!$this->isValidSetting($setting)) {
-      throw new Exception('Invalid WP Libre Form setting');
+      throw new Error('Invalid setting');
     }
 
     $options = get_option($this->key, $this->getDefaultSettings());
@@ -98,14 +113,24 @@ class Settings extends Module {
 
       foreach ($_POST as $k => $v) {
         if ($this->isValidSetting($k)) {
-          $this->updateSetting($k, $v);
+          $this->set($k, $v);
         }
       }
     }
     ?>
 
     <form class="wplf-options" method="post">
+      <h1>
+        <?=__('WP Libre Form settings')?>
+      </h1>
+
+      <p>
+        <?=__('Leave these options alone unless you know what they do. Consult the documentation if necessary.', 'wplf')?>
+      </p>
+
       <?php foreach ($this->availableOptions as $setting => $data) {
+
+        echo '<div class="wplf-formRow">';
         switch ($data['type']) {
           case 'select': ?>
             <label>
@@ -127,9 +152,12 @@ class Settings extends Module {
           default:
             // no op
         }
+
+        echo '</div>';
       } ?>
 
-      <input type="submit">
+      <input type="submit" class="button">
+
     </form>
     <?php
   }

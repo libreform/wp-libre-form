@@ -32,7 +32,7 @@ if (!window.Promise) {
   dependencies.push('promise');
 }
 
-export class WPLF {
+export default class WPLF {
   forms = {
     // '_g67a8z2kw': WPLF_Form
   }

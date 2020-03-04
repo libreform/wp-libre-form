@@ -3,12 +3,37 @@
 namespace WPLF;
 
 class Submission {
+  public int $ID;
   private $form;
-  private $id;
+  private $fields = [];
 
-  public function __construct(Form $form, ?int $id = null) {
+  public function __construct(Form $form, ?array $data = null) {
     $this->form = $form;
-    $this->id = $id;
+    // $this->id = $id;
+
+    if ($data) {
+      $this->fields = $data;
+    }
+  }
+
+  public function getField(string $fieldName) {
+    return $this->fields[$fieldName] ?? null;
+  }
+
+  public function getFields() {
+    $additionalFields = $this->form->getAdditionalFields();
+    $fields = [];
+
+    /**
+     * Filter additional fields out
+     */
+    foreach ($this->fields as $name => $v) {
+      if (!in_array($name, $additionalFields)) {
+        $fields[$name] = $v;
+      }
+    }
+
+    return $fields;
   }
 
   public function delete($submission, $removeUploads = true) {
@@ -37,35 +62,26 @@ class Submission {
     return unlink($path);
   }
 
-  public function create($data) {
-    $update = isset($this->id);
+  public function create($fields) {
+    $update = isset($this->ID);
     $form = $this->form;
 
 
-    print_r(getUploadedFiles());
+    // print_r(getUploadedFiles());
 
-    print_r($data);
+    // print_r($data);
 
-    $data = apply_filters('wplfBeforeCreateSubmission', $data);
-    [$valid, $error] = $this->validate($data);
+    $fields = apply_filters('wplfBeforeCreateSubmission', $fields);
+    [$valid, $error] = $this->validate($fields);
 
     if ($error instanceof Error) {
       throw new Error($error->getMessage(), $error->getData());
     }
 
+    $this->fields = $fields;
+    $this->ID = libreform()->database->insertSubmission($form, $fields);
 
-    // [$db, $prefix] = db();
-    // $query = $db->query($db->prepare($sql, [
-    //   'form' => $form->ID
-
-    //   // Consider saving
-    //   // 'formFieldsAtTheTime' => ???
-    // ]));
-
-    return [
-      'id' => 123,
-      'data' => $data,
-    ];
+    return $this->ID;
   }
 
   public function validate($data) {
@@ -74,8 +90,8 @@ class Submission {
     $error = null;
 
     $honeypotEnabled = apply_filters('wplfEnableHoneypot', true, $form);
-    $requiredEnabled = apply_filters('wplfEnableHoneypot', true, $form);
-    $additionalFieldsEnabled = apply_filters('wplfEnableHoneypot', true, $form);
+    $requiredEnabled = apply_filters('wplfEnablRequiredValidation', true, $form);
+    $additionalFieldsEnabled = apply_filters('wplfEnableAdditionalFieldsValidation', true, $form);
 
     try {
       $honeypotEnabled && $this->validateHoneypot($data);
@@ -103,8 +119,8 @@ class Submission {
 
     $missing = [];
     foreach ($fields as $field) {
-      $required = $field->required;
-      $name = $field->name;
+      $required = $field['required'];
+      $name = $field['name'];
       $value = $data[$name] ?? false;
 
       if ($required && empty($value)) {
@@ -126,21 +142,20 @@ class Submission {
   public function validateAdditionalFields($data) : void {
     $form = $this->form;
     $fields = $form->getFields();
+
     $formFieldNames = array_map(function($field) {
-      return $field->name;
+      // log($field);
+      return $field['name'];
     }, $fields);
     $notAllowed = [];
 
-    $whitelist = apply_filters('wplfAllowedFormFields', array_merge($formFieldNames, [
-      // Core fields
-      'referrer',
-      '_referrerId',
-      '_referrerArchiveTitle',
-      '_formId',
-      '_fcaptcha',
-      '_fallbackThankYou',
-      'lang',
-    ]), $form);
+    // log('formfield names');
+    // log($formFieldNames);
+
+    // log('data');
+    // log($data);
+
+    $whitelist = apply_filters('wplfAllowedFormFields', array_merge($formFieldNames, $form->getAdditionalFields()), $form);
 
     foreach ($data as $key => $value) {
       $fieldIsWhiteListed = in_array($key, $whitelist);

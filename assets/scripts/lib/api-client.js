@@ -35,7 +35,7 @@ function createApiClient() {
           headers: globalData.requestHeaders || {},
           ...options,
         })
-        const { headers, status, statusText, url } = res
+        const { headers, status, statusText, url, ok } = res
         const data = await res.json()
 
         controller = null
@@ -45,6 +45,7 @@ function createApiClient() {
           status,
           statusText,
           url,
+          ok,
           data,
         }
       } catch (e) {

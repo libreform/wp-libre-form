@@ -94,43 +94,34 @@ class Addons extends Module {
    );
 
     ?>
-    <div class="wplf-plugins">
-      <header class="wplf-plugins-menu nav-tab-wrapper">
-        <a href="#" class="nav-tab" data-page="General">
+    <div class="wplf-plugins wplf-tabs" data-name="WPLFAddons" data-default="general" data-remember>
+      <header class="wplf-plugins-menu">
+        <a href="#" class="wplf-tabs__tabSwitcher" data-name="WPLFAddons" data-target="general">
           <?php echo esc_html__('General', 'wplf'); ?>
         </a>
+
         <?php foreach ($plugins_with_options as $plugin) {
           $name = sanitize_text_field($plugin['name']); ?>
-          <a href="#" class="nav-tab" data-page="<?php echo esc_attr($name); ?>">
+
+          <a href="#" class="wplf-tabs__tabSwitcher" data-name="WPLFAddons" data-target="<?php echo esc_attr($name); ?>">
             <?php echo esc_html($name); ?>
           </a>
         <?php } ?>
       </header>
 
-      <div class="wplf-plugins-page" data-page="General">
+      <section class="wplf-tabs__tab" data-name="WPLFAddons" data-tab="general">
         <h1><?php echo esc_html__('WP Libre Form plugins', 'wplf'); ?></h1>
         <p>
-          <?php echo esc_html__(
-              'The core of WP Libre Form is kept small and simple, for a reason.',
-              'libreform'
-         ); ?>
+          <?=__('The core feature set of WP Libre Form is kept small for multiple reasons, but we understand that sometimes more is more. ', 'wplf')?>
         </p>
         <p>
-          <?php echo esc_html__(
-              "If the core doesn't offer enough features for you, you can install a plugin for more functionality.",
-              'libreform'
-         ); ?>
-          <?php echo esc_html__(
-              "Below you'll find your active plugins and some recommendations. ",
-              'libreform'
-         ); ?>
-          <?php echo esc_html__(
-              'Making your own plugin is easy too.',
-              'libreform'
-         ); ?>
+          <?=__("If the core doesn't offer enough features for you, you can install an addon for more functionality. You could also hire a developer to build you an addon if the one you need doesn't exist yet.", 'wplf')?>
+          <?=__("You'll find your active addons below.", 'wplf')?>
         </p>
 
-
+        <p>
+          <?=__("Consult our documentation if you want to build an addon.", 'wplf')?>
+        </p>
         <?php if (! empty($enabled)) { ?>
           <h2><?php echo esc_html__('Enabled plugins', 'wplf'); ?></h1>
 
@@ -151,14 +142,14 @@ class Addons extends Module {
           </div>
         <?php } ?>
 
-      </div>
+      </section>
 
       <?php foreach ($plugins_with_options as $plugin) {
         $name = sanitize_text_field($plugin['name']);
       ?>
-      <div class="wplf-plugins-page" data-page="<?php echo esc_attr($name); ?>">
+      <section class="wplf-tabs__tab" data-name="WPLFAddons" data-tab="<?php echo esc_attr($name); ?>">
         <?php $plugin['settings_page'](); ?>
-      </div>
+      </section>
       <?php } ?>
     </div>
     <?php
@@ -170,11 +161,11 @@ class Addons extends Module {
 
   private function get_recommended_plugins() {
     $list = [
-      'Export' => $this->fillPluginData([
-        'name' => 'Export',
-        'link' => 'https://github.com/libreform/export',
-        'description' => 'Add CSV export functionality.',
-      ]),
+      // 'Export' => $this->fillPluginData([
+        // 'name' => 'Export',
+        // 'link' => 'https://github.com/libreform/export',
+        // 'description' => 'Add CSV export functionality.',
+      // ]),
 
     //   'Formbuilder' => $this->fillPluginData(
     //       [

@@ -3,6 +3,7 @@ namespace WPLF;
 
 class Polylang extends Module {
   protected $strings = [];
+  protected $changed = false;
   private $optionName = 'wplfPolylangStrings';
 
   public function __construct() {
@@ -35,7 +36,8 @@ class Polylang extends Module {
       [
         'name' => __('Polylang', 'wplf'),
         'description' => __('Translate a string with Polylang.', 'wplf'),
-        'usage' => __('Works everywhere. Prefer using keywords in the selector over full sentences. Example; <code>## PLL__ NameLabel ##</code>', 'wplf'),
+        'usage' => __('Works everywhere. Prefer keywords over sentences in the selector.', 'wplf'),
+        'example' => '## PLL__ NameLabel ##',
       ]
     );
   }
@@ -46,21 +48,9 @@ class Polylang extends Module {
   }
 
   public function addLangToScripts($localizeScriptData = []) {
-    $localizeScriptData['lang'] = \pll_get_current_language();
+    $localizeScriptData['lang'] = \pll_get_current_language(); // Necessary to ensure correct language thank you response
 
     return $localizeScriptData;
-  }
-
-  public function render_form($form_content) {
-    // Get all strings inside double curly braces.
-    preg_match_all($this->regular_expression, $form_content, $matches);
-    foreach ($matches[0] as $match) {
-      // match contains the braces, get rid of them.
-      $string = trim(str_replace(array('{', '}'), array('', ''), $match));
-      $form_content = str_replace($match, $this->translate($string), $form_content);
-    }
-
-    return $form_content;
   }
 
   public function registerStrings() {
@@ -78,18 +68,25 @@ class Polylang extends Module {
   }
 
   public function registerString(string $string) : void {
-    $this->strings[$string] = null; // Reusing my "no need for array unique" trick
+    if (!isset($this->strings[$string])) {
+      // Saving the string as the key makes it cheaper to check if the string already exists
+      $this->strings[$string] = null;
+      $this->changed = true;
+    }
   }
 
   public function saveStrings() : void {
-    update_option($this->optionName, $this->strings);
+    // Say no to unnecessary DB writes.
+    if ($this->changed) {
+      update_option($this->optionName, $this->strings);
+    }
   }
 
   public function translate($string) {
     if (function_exists('pll__')) {
       return pll__($string);
     } else {
-      return $string; // Don't kill anything.
+      return $string;
     }
   }
 }
