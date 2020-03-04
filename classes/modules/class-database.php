@@ -74,7 +74,7 @@ class Database extends Module {
     }
 
     log("Updated form $form->ID submissions table");
-    // $this->insertHistoryFields($form);
+    $this->insertHistoryFields($form);
 
     return true;
   }
@@ -225,6 +225,29 @@ class Database extends Module {
     }
   }
 
+  public function getHistoryFields(Form $form) {
+    [$db, $prefix] = db();
+    $tableName = $this->getHistoryTableName($form);
+    $id = (int) $form->ID;
+
+    $res = $db->get_results("SELECT fields FROM $tableName WHERE formId = $id", $this->outputType);
+
+    if ($res) {
+      $combined = [];
+
+      // var_dump($res); die();
+
+      foreach ($res as $row) {
+        $combined[] = json_decode($row['fields'], true);
+      }
+
+      return array_merge_recursive(...$combined);
+      // return $combined;
+    } else {
+      throw new Error('Unable to select history fields!', [$form]);
+    }
+  }
+
   public function destroyHistoryFields(Form $form) {
     [$db, $prefix] = db();
     $tableName = $this->getHistoryTableName($form);
@@ -270,9 +293,13 @@ class Database extends Module {
       break;
     }
 
-    if ($required) {
-      $definition = $definition . 'NOT NULL';
-    }
+
+    // This could be enforced on the database level, but it's problematic if the user
+    // starts adding the requires AFTER saving once, as the columns can't be changed,
+    // only created and dropped.
+    // if ($required) {
+      // $definition = $definition . 'NOT NULL';
+    // }
 
     return $definition;
   }

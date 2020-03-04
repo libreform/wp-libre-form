@@ -12,10 +12,12 @@ class Polylang extends Module {
     add_action('shutdown', [$this, 'saveStrings']);
 
     $this->strings = get_option($this->optionName, []);
+  }
 
-    \libreform()->selectors->createSelector(
+  public function afterInjectCore(Plugin $wplf) {
+    $wplf->selectors->createSelector(
       'PLL__',
-      function ($params = []) {
+      function ($params = []) use ($wplf) {
         $text = $params[0] ?? null;
 
         if (!$text) {
@@ -25,13 +27,13 @@ class Polylang extends Module {
         }
 
         if (is_admin()) {
-          // It's not possible to access this class from the selector directly.
+          // It's not possible to access this class from the selector directly because PHP scope
           // I declare this as A-OK; thisisfine.jpg
-          libreform()->polylang->registerString($text);
+          $wplf()->polylang->registerString($text);
         }
 
 
-        return pll__($text);
+        return $this->translate($text);
       },
       [
         'name' => __('Polylang', 'wplf'),
@@ -62,7 +64,6 @@ class Polylang extends Module {
     }
 
     foreach ($this->strings as $string => $null) {
-      //
       pll_register_string('WP Libre Form string', $string, 'WP Libre Form');
     }
   }

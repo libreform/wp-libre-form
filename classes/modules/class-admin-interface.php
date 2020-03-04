@@ -148,6 +148,11 @@ class AdminInterface extends Module {
 
     <!-- See above comment about new fields.  -->
     <input type="text" name="wplfDeletedFields" id="wplfDeletedFields">
+
+
+    käytä näitä siihen et vertaat onko kentän nimi jo käytetty vai tuleeko kannalta sanomnista
+    <input type="text" name="wplfDeletedFields" id="wplfHistoryFields" value='<?=json_encode($this->database->getHistoryFields($form)); ?>'>
+
     <?php
   }
 

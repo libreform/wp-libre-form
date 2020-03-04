@@ -45,7 +45,7 @@ class Plugin {
 
     add_action('init', [$this, 'afterInit']);
     add_action('rest_api_init', [$this, 'afterRestApiInit']);
-    add_action('after_setup_theme', [$this, 'afterSetupTheme']);
+    add_action('pll_language_defined', [$this, 'loadPolylang']);
 
     add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
     add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
@@ -80,7 +80,7 @@ class Plugin {
 
 
       if ($column === 'shortcode') { ?>
-        <input type="text" class="code" value='[libreform id="<?php echo intval($post_id); ?>"]' readonly><?php
+        <input type="text" class="code" value='[libreform id="<?php echo intval($postId); ?>"]' readonly><?php
       }
 
       if ($column === 'submissions') {
@@ -113,13 +113,14 @@ class Plugin {
     }
   }
 
-  public function afterSetupTheme() {
-    $enablePolylangSupport = apply_filters('wplfEnablePolylangSupport', true);
+public function loadPolylang() {
+  $enablePolylangSupport = apply_filters('wplfEnablePolylangSupport', true);
 
-    if ($enablePolylangSupport && class_exists('Polylang')) {
-      $this->loadModule('polylang');
-    }
+  if ($enablePolylangSupport && class_exists('Polylang')) {
+    log('enabling polylang support');
+    $this->loadModule('polylang');
   }
+}
 
   public function afterRestApiInit() {
     $this->loadModule('rest-api');
@@ -338,14 +339,8 @@ class Plugin {
       // $newFields = !empty($newFields) ? $newFields : null;
       // $deletedFields = !empty($deletedFields) ? $deletedFields : null;
 
-      log([$newFields, $deletedFields, "fuck"]);
-
 
       if ($newFields || $deletedFields) {
-        //  var_dump($destroyUnusedDbColumns); die("FUCK OFF CUNT");
-
-        // log('yes');
-
         if ($destroyUnusedDbColumns) {
           // Nuke the history, it's useless when only current field values remain
           // $this->database->destroyHistoryFields($form);
@@ -362,23 +357,6 @@ class Plugin {
 
       log("Database error: {$msg}");
     }
-  }
-
-  public function arrays_are_equal($array1, $array2)
-  {
-      array_multisort($array1);
-      array_multisort($array2);
-      return ( serialize($array1) === serialize($array2) );
-  }
-  /**
-   * Objects are more memory efficient as they are passed by reference,
-   * but they are a major PITA to compare. Converting them to arrays momentarily solves the problem.
-   */
-  private function compareOldAndNewFields($old, $new) {
-    $old = (array) $old;
-    $new = (array) $new;
-
-    return $old === $new ? 1 : 0;
   }
 
   public function replaceContentWithFormOnSingleForm($content) {

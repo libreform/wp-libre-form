@@ -6,6 +6,15 @@ class RestApi extends Module {
   public $namespace = 'wplf/v2';
 
   public function __construct() {
+
+  }
+
+  public function afterInjectCore(Plugin $wplf) {
+    $this->core->loadPolylang();
+    $this->registerEndpoints();
+  }
+
+  public function registerEndpoints() {
     $this->registerSubmitEndpoint();
     $this->registerSubmissionsEndpoint();
     $this->registerRenderEndpoint();
@@ -85,7 +94,7 @@ class RestApi extends Module {
   public function handleSubmission($request) {
     $params = $request->get_params();
     $useFallback = isset($params['_fallbackThankYou']); // field is removed with JS
-    $formId = $params['_formId'];
+    $formId = $params['_formId'] ?? null;
 
     try {
       $form = new Form(get_post($formId));

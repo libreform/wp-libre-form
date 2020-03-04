@@ -32,5 +32,11 @@ abstract class Module {
 
   public function injectCore(Plugin $wplf) {
     $this->core = $wplf;
+
+    $this->afterInjectCore($this->core);
+  }
+
+  public function afterInjectCore(Plugin $wplf) {
+    // override this function
   }
 }

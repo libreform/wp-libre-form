@@ -172,6 +172,12 @@ class Selectors extends Module {
       $selector = $hits[1][$i];
       $params = array_filter(array_map('trim', explode(',', trim($hits[2][$i]))));
 
+      if (!isset($selectors[$selector])) {
+        isDebug() && log("Unknown selector $selector");
+
+        continue;
+      }
+
       $content = str_replace(
         $hit,
         $selectors[$selector]['callback'](!empty($params) ? $params : null, $form, $submission),

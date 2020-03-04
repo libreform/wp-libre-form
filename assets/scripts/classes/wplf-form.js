@@ -61,6 +61,7 @@ export class WPLF_Form {
   }
 
   addSubmitHandler(handler) {
+    console.log('test', handler)
     this.submitHandler = (handler || (async e => {
       e.preventDefault();    console.log('handle', this.submitState)
 

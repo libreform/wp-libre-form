@@ -21,15 +21,18 @@ class Form {
     return  $existsHere ?: $existsInPost ?: null;
   }
 
-  public function __construct(\WP_Post $form) {
+  public function __construct(?\WP_Post $form) {
+    if (!$form) {
+      throw new Error('No post provided');
+    } else if ($form->post_type !== Plugin::$postType) {
+      throw new Error("Post ID {$this->ID} is not a form");
+    }
     $this->ID = $form->ID;
     $this->title = $form->post_title;
 
     $this->raw = $form;
 
-    if ($form->post_type !== Plugin::$postType) {
-      throw new Error("Post ID {$this->ID} is not a form");
-    }
+
 
     // $this->content = $form->post_content;
   }

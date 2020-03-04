@@ -148,6 +148,9 @@ export default class WPLF_Editor {
         wplf.detach(formInstance)
       }
 
+      // Disable submit button when the fields change
+      this.setState(() => ({ allowSave: false }))
+
       await this.updatePreview(content)
       await this.updateFormFieldsFromPreview()
       await this.removeProblematicAttributesFromPreview()
@@ -164,6 +167,7 @@ export default class WPLF_Editor {
     const body = new FormData()
     body.append('content', content)
     body.append('formId', formId)
+    body.append('lang', 'fi')
 
     const { data } = await request('/render', {
       method: 'POST',
