@@ -1,13 +1,14 @@
 # WP Libre Form API
 
+TODO
 
 ## PHP
-WPLF instance is saved in a static variable and available with the `wplf()` function available in the global namespace.
+WPLF instance is saved in a static variable and available with the `libreform()` function available in the global namespace.
 
 ### Example: Register a plugin to WPLF
 
 ```php
-$wplf = wplf();
+$wplf = libreform();
 $plugin = new YourPlugin();
 
 $wplf->plugins->register([
@@ -22,7 +23,7 @@ $wplf->plugins->register([
 
 If you use spaces in the name, you can access the plugin instance like this:
 
-`wplf()->plugins->{"Your plugin"}->somePublicMethod()`
+`libreform()->plugins->{"Your plugin"}->somePublicMethod()`
 
 ## Javascript
 

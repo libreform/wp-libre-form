@@ -1,32 +1,12 @@
-### Action: wplf_post_validate_submission
+# WP Libre Form Actions
 
-Triggers after the form validation is done.
+TODO
 
-#### Form specific hooks
+classes/class-plugin.php
+255:      do_action("wplf_beforeDeleteForm", $form, $submissionCount);
+307:      do_action("wplf_deleteForm", new Form($post));
 
-This action supports form specific hooks:
-
-- `wplf_{form_id}_post_validate_submission`
-- `wplf_{form_slug}_post_validate_submission`
-
-These actions are only run for the target form by ID or slug.
-
-#### Example: Send a thank you email to the email in the submission
-
-```php
-add_action('wplf_post_validate_submission', 'my_email_thankyou');
-function my_email_thankyou($return) {
-  // recipient details from submission
-  $name = sanitize_text_field($_POST['name']);
-  $email = sanitize_email($_POST['email']);
-
-  // email subject
-  $subject = __('Thank You For Submitting A Form');
-
-  // text body of email
-  $body = wp_sprintf(__('Thanks, %s for clicking Submit on this glorious HTML5 Form!'), $name);
-
-  // send the email
-  wp_mail($email, $subject, $body);
-}
-```
+classes/entities/class-submission.php
+71:    do_action('wplfAfterSubmission', $this);
+125:      do_action('wplfValidateSubmission', $data, $this);
+208:      do_action('wplfHoneypotTriggered', $data, $this);

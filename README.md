@@ -6,7 +6,7 @@ Use standard HTML5 markup to create fully functional forms for WordPress. [Versi
 ## Features
 
 - Uses only HTML5 syntax to build forms. No GUIs, shortcodes, **no bullshit**.
-- Works with any[*](/docs/limitations.md) valid HTML form. Just copy any form from any website and it will work. **It's magic!**
+- Works with any[*](docs/limitations.md) valid HTML form. Just copy any form from any website and it will work. **It's magic!**
 - ~~Submissions are saved as custom post type posts. Form values are saved as custom fields.~~
 - Validates required fields tagged with the native HTML5 `required` attribute.
 - **It's hackable.** Add your own functionality with hooks and APIs.
@@ -90,11 +90,11 @@ Some key changes;
 
 ## Actions, filters & API
 
-- [Actions](/docs/actions.md)
-- [Filters](/docs/filters.md)
+- [Actions](docs/actions.md)
+- [Filters](docs/filters.md)
 - [API](docs/API.md)
-- [FAQ](/docs/FAQ.md)
-- [Limitations](/docs/limitations.md)
+- [FAQ](docs/FAQ.md)
+- [Limitations](docs/limitations.md)
 
 ## Server requirements
  - PHP 7.3 or newer
