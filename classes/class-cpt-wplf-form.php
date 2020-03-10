@@ -67,7 +67,7 @@ class CPT_WPLF_Form {
     $labels = array(
       'name'               => _x( 'Forms', 'post type general name', 'wp-libre-form' ),
       'singular_name'      => _x( 'Form', 'post type singular name', 'wp-libre-form' ),
-      'menu_name'          => _x( 'Forms', 'admin menu', 'wp-libre-form' ),
+      'menu_name'          => 'Legacy ' . _x( 'Forms', 'admin menu', 'wp-libre-form' ),
       'name_admin_bar'     => _x( 'Form', 'add new on admin bar', 'wp-libre-form' ),
       'add_new'            => _x( 'New Form', 'form', 'wp-libre-form' ),
       'add_new_item'       => __( 'Add New Form', 'wp-libre-form' ),

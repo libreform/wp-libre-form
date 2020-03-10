@@ -1,6 +1,12 @@
-# WP Libre Form
+# WP Libre Form Legacy
 [![Build Status](https://travis-ci.org/libreform/wp-libre-form.svg?branch=master)](https://travis-ci.org/libreform/wp-libre-form) [![Latest Stable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/stable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Total Downloads](https://poser.pugx.org/anttiviljami/wp-libre-form/downloads)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![Latest Unstable Version](https://poser.pugx.org/anttiviljami/wp-libre-form/v/unstable)](https://packagist.org/packages/anttiviljami/wp-libre-form) [![License](https://poser.pugx.org/anttiviljami/wp-libre-form/license)](https://packagist.org/packages/anttiviljami/wp-libre-form)
 
+-------------------------------
+# Deprecated in favour of WP Libre Form 2
+
+WPLF 2 has been rewritten from scratch, and is not backwards compatible with the new version. Migrating data to the new version is not possible,
+but you can run the plugins side-by-side if necessary. 
+-------------------------------
 Use standard HTML5 markup to create fully functional forms for WordPress
 
 ## Features
