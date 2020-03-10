@@ -1,19 +1,17 @@
 <?xml version="1.0"?>
-<ruleset name="anttiviljami-wordpress">
+<ruleset name="wp-libre-form">
   <description>For nicer WordPress and PHP development</description>
 
   <!-- Files and directories to parse -->
   <file>./classes/</file>
-  <file>./inc/</file>
-  <file>./wp-libre-form.php</file>
+  <file>./lib/</file>
+  <file>./index.php</file>
 
   <!-- Excluded directories and files -->
   <exclude-pattern>*/vendor/*</exclude-pattern>
   <exclude-pattern>*/lang/*</exclude-pattern>
   <exclude-pattern>*/assets/*</exclude-pattern>
-
-  <!-- Disallow tabs altogether -->
-  <rule ref="Generic.WhiteSpace.DisallowTabIndent.TabsUsed"/>
+  <exclude-pattern>*.js</exclude-pattern>
 
   <!-- Use 2 spaces for indentation -->
   <arg name="tab-width" value="2"/>
@@ -22,27 +20,6 @@
       <property name="indent" value="2"/>
     </properties>
   </rule>
-
-  <!--
-    The soft limit on line length MUST be 120 characters
-    automated style checkers MUST warn but MUST NOT error at the soft limit.
-  -->
-  <rule ref="Generic.Files.LineLength">
-    <properties>
-      <property name="lineLimit" value="120"/>
-      <property name="absoluteLineLimit" value="0"/>
-    </properties>
-  </rule>
-
-  <!-- All PHP files MUST use the Unix LF (linefeed) line ending. -->
-  <rule ref="Generic.Files.LineEndings">
-    <properties>
-      <property name="eolChar" value="\n"/>
-    </properties>
-  </rule>
-
-  <!-- Method arguments with default values MUST go at the end of the argument list. -->
-  <rule ref="PEAR.Functions.ValidDefaultValue"/>
 
   <!-- This means almost always that developer used an ugly hotfix -->
   <rule ref="Squiz.PHP.CommentedOutCode"/>
@@ -61,76 +38,22 @@
   <!-- Don't allow oneliner ifs without brackets {} -->
   <rule ref="Generic.ControlStructures.InlineControlStructure"/>
 
-  <!-- No spaces before comma in function calls -->
-  <!-- This might be problematic when using wp actions/filters -->
-  <rule ref="Generic.Functions.FunctionCallArgumentSpacing.SpaceBeforeComma"/>
+  <rule ref="PSR12">
+    <!-- I've never been a fan of using underscores either, especially in "OOP", but
+    I'm not changing method names without a further discussion -->
+    <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
 
-  <!--
-    Ending tags '?>' can be really painful to debug.
-    Just disallow them in the end of the file
-  -->
-  <rule ref="PSR2.Files.ClosingTag.NotAllowed"/>
+    <!-- I don't understand why PSR2 uses this rule as well as defining their own identical rule. -->
+    <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps" />
 
-  <!-- <?php tags and constants (true,false,null) need to be lowercase  -->
-  <rule ref="Generic.PHP.LowerCaseKeyword"/>
-  <rule ref="Generic.PHP.LowerCaseConstant"/>
+    <!-- Yeah how about no, K&R FTW -->
+    <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine" />
+    <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
 
-  <!-- Include WordPress Coding Standards with few exclusions -->
-  <rule ref="WordPress">
-    <!--
-    We may want a middle ground though. The best way to do this is add the
-    entire ruleset, then rule by rule, remove ones that don't suit a project. We
-    can do this by running `phpcs` with the '-s' flag, to see the names of the
-    different Sniffs, as their rules are broken. From here, we can opt to
-    exclude problematic sniffs like so.
-    -->
-
-    <!-- Not for WordPress VIP -->
-    <exclude name="WordPress.VIP" />
-
-    <!-- Exclude indentation rules and use PEAR.WhiteSpace.ScopeIndent instead -->
-    <exclude name="Generic.WhiteSpace.ScopeIndent" />
-
-    <!-- Use spaces instead of tabs -->
-    <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
-
-    <!-- Free-form commenting rules -->
-    <exclude name="Squiz.Commenting" />
-
-    <!--
-      This forces you to put '.' in oneline comments.
-      Maybe full sentences are better than comments with 1-2 words
-      But we don't want to discourage people from usen even a small comments
-    -->
-    <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
-
-    <!-- <?php doesn't have to be on its own line -->
-    <exclude name="Squiz.PHP.EmbeddedPhp.ContentBeforeEnd" />
-    <exclude name="Squiz.PHP.EmbeddedPhp.ContentAfterOpen" />
-
-    <!-- Squiz.PHP.EmbeddedPhp.ContentBeforeEnd -->
-    <exclude name="Generic.ControlStructures.InlineControlStructure.NotAllowed" />
-
-    <!-- These indentation rules are just wrong :) -->
-    <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
-
-    <!-- Welcome to the dark side -->
-    <exclude name="WordPress.PHP.YodaConditions" />
-
-    <!-- We don't use nonce verification in this plugin -->
-    <exclude name="WordPress.CSRF.NonceVerification.NoNonceVerification" />
-
-    <!-- We like assignments in if -->
-    <exclude name="Squiz.PHP.DisallowMultipleAssignments.Found" />
-
-    <!-- Our hooks use dashes, not underscores -->
-    <exclude name="WordPress.NamingConventions.ValidHookName.UseUnderscores" />
-
-    <!-- This would be nice to enforce, but plugin main file shouldn't be called class-something -->
-    <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
-
-    <!-- This one is just weird. -->
-    <exclude name="WordPress.Arrays.ArrayIndentation" />
-
+    <!-- This isn't MVC. Don't make life hard for trying to use HTML. -->
+    <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
   </rule>
+
+  <!-- Require the brace to be on the same line -->
+  <rule ref="Generic.Functions.OpeningFunctionBraceKernighanRitchie" />
 </ruleset>

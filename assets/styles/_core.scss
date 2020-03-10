@@ -1,0 +1,14 @@
+.wplf {
+  box-sizing: border-box;
+
+  &form:focus {
+    outline: 0;
+  }
+
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+}
+
+@import 'forms';
+@import 'tabs';

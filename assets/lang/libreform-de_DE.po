@@ -1,0 +1,310 @@
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Project-Id-Version: WP Libre Form\n"
+"POT-Creation-Date: 2018-06-12 11:05+0200\n"
+"PO-Revision-Date: 2018-06-12 11:51+0200\n"
+"Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.9\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: wp-libreform.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"Last-Translator: \n"
+"Language: de\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: classes/class-cpt-wplf-form.php:62
+msgctxt "post type general name"
+msgid "Forms"
+msgstr "Formulare"
+
+#: classes/class-cpt-wplf-form.php:63
+msgctxt "post type singular name"
+msgid "Form"
+msgstr "Formular"
+
+#: classes/class-cpt-wplf-form.php:64
+msgctxt "admin menu"
+msgid "Forms"
+msgstr "Formulare"
+
+#: classes/class-cpt-wplf-form.php:65
+msgctxt "add new on admin bar"
+msgid "Form"
+msgstr "Formular"
+
+#: classes/class-cpt-wplf-form.php:66
+msgctxt "form"
+msgid "New Form"
+msgstr "Neues Formular hinzufügen"
+
+#: classes/class-cpt-wplf-form.php:67
+msgid "Add New Form"
+msgstr "Neues Formular hinzufügen"
+
+#: classes/class-cpt-wplf-form.php:68
+msgid "New Form"
+msgstr "Neues Formular"
+
+#: classes/class-cpt-wplf-form.php:69
+msgid "Edit Form"
+msgstr "Formular bearbeiten"
+
+#: classes/class-cpt-wplf-form.php:70
+msgid "View Form"
+msgstr "Formular ansehen"
+
+#: classes/class-cpt-wplf-form.php:71 classes/class-cpt-wplf-submission.php:141
+msgid "All Forms"
+msgstr "Formulare"
+
+#: classes/class-cpt-wplf-form.php:72
+msgid "Search Forms"
+msgstr "Formulare suchen"
+
+#: classes/class-cpt-wplf-form.php:73
+msgid "No forms found."
+msgstr "Keine Formulare gefunden"
+
+#: classes/class-cpt-wplf-form.php:74
+msgid "No forms found in Trash."
+msgstr "Keine Formulare im Papierkorb gefunden"
+
+#: classes/class-cpt-wplf-form.php:112
+msgid "Permalink is for preview purposes only."
+msgstr "Link dient nur zur Vorschau."
+
+#: classes/class-cpt-wplf-form.php:172
+msgid "Please enter your name"
+msgstr "Bitte geben Sie ihren Namen ein"
+
+#: classes/class-cpt-wplf-form.php:173
+msgctxt "Default placeholder name"
+msgid "John Doe"
+msgstr "Max Müller"
+
+#: classes/class-cpt-wplf-form.php:175
+msgctxt "wp-libreform"
+msgid "Please enter your email address"
+msgstr "Bitte geben Sie ihre E-Mail Adresse ein"
+
+#: classes/class-cpt-wplf-form.php:175 classes/class-cpt-wplf-form.php:178
+msgid "(required)"
+msgstr "(benötigt)"
+
+#: classes/class-cpt-wplf-form.php:176
+msgctxt "Default placeholder email"
+msgid "example@email.com"
+msgstr "example@email.com"
+
+#: classes/class-cpt-wplf-form.php:178
+msgid "Write your message below"
+msgstr "Schreiben Sie nachfolgend ihre Nachricht"
+
+#: classes/class-cpt-wplf-form.php:179
+msgctxt "Default placeholder message"
+msgid "I wanted to ask about..."
+msgstr "Ich habe eine Frage zu..."
+
+#: classes/class-cpt-wplf-form.php:181
+msgid "Submit"
+msgstr "Absenden"
+
+#: classes/class-cpt-wplf-form.php:183
+msgctxt "The HTML comment at the end of the example form"
+msgid "Any valid HTML form can be used here!"
+msgstr "Jedes valide HTML Formular kann genutzt werden!"
+
+#: classes/class-cpt-wplf-form.php:212 classes/class-cpt-wplf-form.php:254
+msgid "Shortcode"
+msgstr "Shortcode"
+
+#: classes/class-cpt-wplf-form.php:213 classes/class-cpt-wplf-submission.php:52
+msgid "Submissions"
+msgstr "Anfragen"
+
+#: classes/class-cpt-wplf-form.php:264
+msgid "Success Message"
+msgstr "Erfolgsnachricht"
+
+#: classes/class-cpt-wplf-form.php:274
+msgid "Form Fields Detected"
+msgstr "Formularfelder entdeckt"
+
+#: classes/class-cpt-wplf-form.php:283
+msgid "Emails"
+msgstr "E-Mails"
+
+#: classes/class-cpt-wplf-form.php:292
+msgid "Submission Title Format"
+msgstr "Titelformat der Anfrage"
+
+#: classes/class-cpt-wplf-form.php:316
+msgctxt "Default success message"
+msgid "Success!"
+msgstr "Erfolg!"
+
+#: classes/class-cpt-wplf-form.php:337
+msgid "Fields marked with * are required"
+msgstr "Felder mit * sind Pflichtfelder"
+
+#: classes/class-cpt-wplf-form.php:363
+msgid "Send an email copy when a form is submitted?"
+msgstr "Sende eine Nachrichtenkopie wenn ein Formular abgeschickt wurde?"
+
+#: classes/class-cpt-wplf-form.php:387
+msgid "Submissions from this form will use this formatting in their title."
+msgstr "Anfragen über dieses Formular werden diese Formatierung im Titel haben."
+
+#: classes/class-cpt-wplf-form.php:388
+msgid "You may use any field values enclosed in \"%\" markers."
+msgstr "Sie können jegliche Feldwerte nutzen die mit \"%\" umschlossen werden."
+
+#: classes/class-cpt-wplf-form.php:543
+msgid "This form preview URL is not public and cannot be shared."
+msgstr "Diese Formularvorschau ist nicht öffentlich und kann nicht geteilt werden."
+
+#: classes/class-cpt-wplf-form.php:546
+msgid "Non-logged in visitors will see a 404 error page instead."
+msgstr "Nicht eingeloggte Besucher werden stattdessen eine Fehlerseite sehen."
+
+#: classes/class-cpt-wplf-submission.php:43
+msgctxt "post type general name"
+msgid "Submissions"
+msgstr "Anfragen"
+
+#: classes/class-cpt-wplf-submission.php:44
+msgctxt "post type singular name"
+msgid "Submission"
+msgstr "Anfrage"
+
+#: classes/class-cpt-wplf-submission.php:45
+msgctxt "admin menu"
+msgid "Submissions"
+msgstr "Anfragen"
+
+#: classes/class-cpt-wplf-submission.php:46
+msgctxt "add new on admin bar"
+msgid "Submission"
+msgstr "Anfrage"
+
+#: classes/class-cpt-wplf-submission.php:47
+msgctxt "submission"
+msgid "Add New"
+msgstr "Neue hinzufügen"
+
+#: classes/class-cpt-wplf-submission.php:48
+msgid "Add New Submission"
+msgstr "Neue Anfrage hinzufügen"
+
+#: classes/class-cpt-wplf-submission.php:49
+msgid "New Submission"
+msgstr "Neue Anfrage"
+
+#: classes/class-cpt-wplf-submission.php:50
+msgid "Edit Submission"
+msgstr "Anfrage bearbeiten"
+
+#: classes/class-cpt-wplf-submission.php:51
+msgid "View Submission"
+msgstr "Anfrage ansehen"
+
+#: classes/class-cpt-wplf-submission.php:53
+msgid "Search Submissions"
+msgstr "Anfragen suchen"
+
+#: classes/class-cpt-wplf-submission.php:54
+msgid "No submissions found."
+msgstr "Keine Anfragen gefunden"
+
+#: classes/class-cpt-wplf-submission.php:55
+msgid "No submissions found in Trash."
+msgstr "Keine Anfragen im Papierkorb gefunden."
+
+#: classes/class-cpt-wplf-submission.php:104
+msgid "Referrer"
+msgstr "Referrer"
+
+#: classes/class-cpt-wplf-submission.php:105
+msgid "Form"
+msgstr "Formular"
+
+#: classes/class-cpt-wplf-submission.php:175
+msgid "Resend email copy"
+msgstr "E-Mail Kopie erneut senden"
+
+#: classes/class-cpt-wplf-submission.php:202
+#, php-format
+msgid "Resent email copy of %s submission."
+msgid_plural "Resent email copy of %s submissions."
+msgstr[0] "E-Mail Kopie von %s Anfrage erneut senden."
+msgstr[1] "E-Mail Kopie von %s Anfragen erneut senden."
+
+#: classes/class-cpt-wplf-submission.php:220
+msgid "Submission"
+msgstr "Anfrage"
+
+#: classes/class-cpt-wplf-submission.php:241
+msgid "Field"
+msgstr "Feld"
+
+#: classes/class-cpt-wplf-submission.php:242
+msgid "Value"
+msgstr "﻿Wert"
+
+#: classes/class-cpt-wplf-submission.php:258
+msgid "View Attachment"
+msgstr "Anhang ansehen"
+
+#: classes/class-cpt-wplf-submission.php:268
+msgid "Open Link"
+msgstr "Link öffnen"
+
+#: inc/wplf-form-actions.php:28
+#, php-format
+msgid "[%1$s] New submission to %2$s"
+msgstr "[%1$s] Neue Anfrage an %2$s"
+
+#: inc/wplf-form-actions.php:33
+#, php-format
+msgid "[%1$s] Submission from %2$s"
+msgstr "[%1$s] Anfrage von %2$s"
+
+#: inc/wplf-form-actions.php:39
+#, php-format
+msgid "Form \"%1$s\" (ID %2$d) was submitted with values below: "
+msgstr "Formular \"%1$s\" (ID %2$d) wurde mit folgenden Werten abgesendet: "
+
+#: inc/wplf-form-validation.php:20
+#, php-format
+msgid "Form id %d doesn't exist!"
+msgstr "Formular mit ID %d existiert nicht!"
+
+#: inc/wplf-form-validation.php:57
+msgid "Required fields are missing."
+msgstr "Pflichtfelder fehlen."
+
+#. Plugin Name of the plugin/theme
+msgid "WP Libre Form"
+msgstr "WP Libre Form"
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/libreform/wp-libreform"
+msgstr "https://github.com/libreform/wp-libreform"
+
+#. Description of the plugin/theme
+msgid "A minimal HTML form builder for WordPress; made for developers"
+msgstr "A minimal HTML form builder for WordPress; made for developers"
+
+#. Author of the plugin/theme
+msgid "@anttiviljami"
+msgstr "@anttiviljami"
+
+#. Author URI of the plugin/theme
+msgid "https://github.com/anttiviljami/"
+msgstr "https://github.com/anttiviljami/"

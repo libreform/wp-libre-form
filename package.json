@@ -1,0 +1,39 @@
+{
+  "name": "wp-libre-form",
+  "version": "1.5.0",
+  "description": "WP Libre Form clientside bindings",
+  "main": "dist/wp-libre-form.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --env.NODE_ENV=production",
+    "dev": "webpack --env.NODE_ENV=development --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libreform/wp-libre-form.git"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/libreform/wp-libre-form/issues"
+  },
+  "homepage": "https://github.com/libreform/wp-libre-form#readme",
+  "devDependencies": {
+    "@babel/core": "^7.8.6",
+    "@babel/preset-env": "^7.8.6",
+    "@babel/register": "^7.8.6",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-add-module-exports": "^1.0.2",
+    "css-loader": "^2.1.1",
+    "mini-css-extract-plugin": "^0.6.0",
+    "node-sass": "^4.13.1",
+    "sass-loader": "^7.3.1",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "abort-controller": "^3.0.0",
+    "regenerator-runtime": "^0.13.3"
+  }
+}

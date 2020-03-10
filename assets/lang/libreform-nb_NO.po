@@ -1,0 +1,295 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Libre Form\n"
+"POT-Creation-Date: 2016-10-26 12:53+0100\n"
+"PO-Revision-Date: 2016-10-26 12:53+0100\n"
+"Last-Translator: Antti Kuosmanen <antti@seravo.fi>\n"
+"Language-Team: Antti Kuosmanen <antti@seravo.fi>\n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.8\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: wp-libreform.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: classes/class-cpt-wplf-form.php:56
+msgctxt "post type general name"
+msgid "Forms"
+msgstr "Skjemaer"
+
+#: classes/class-cpt-wplf-form.php:57
+msgctxt "post type singular name"
+msgid "Form"
+msgstr "Skjema"
+
+#: classes/class-cpt-wplf-form.php:58
+msgctxt "admin menu"
+msgid "Forms"
+msgstr "Skjemaer"
+
+#: classes/class-cpt-wplf-form.php:59
+msgctxt "add new on admin bar"
+msgid "Form"
+msgstr "Skjema"
+
+#: classes/class-cpt-wplf-form.php:60
+msgctxt "form"
+msgid "New Form"
+msgstr "nytt skjema"
+
+#: classes/class-cpt-wplf-form.php:61
+msgid "Add New Form"
+msgstr "Lag nytt skjema"
+
+#: classes/class-cpt-wplf-form.php:62
+msgid "New Form"
+msgstr "nytt skjema"
+
+#: classes/class-cpt-wplf-form.php:63
+msgid "Edit Form"
+msgstr "Rediger skjema"
+
+#: classes/class-cpt-wplf-form.php:64
+msgid "View Form"
+msgstr "Vis skjema"
+
+#: classes/class-cpt-wplf-form.php:65 classes/class-cpt-wplf-submission.php:135
+msgid "All Forms"
+msgstr "Alle skjemaer"
+
+#: classes/class-cpt-wplf-form.php:66
+msgid "Search Forms"
+msgstr "Søk etter skjema"
+
+#: classes/class-cpt-wplf-form.php:67
+msgid "No forms found."
+msgstr "Ingen skjemaer funnet."
+
+#: classes/class-cpt-wplf-form.php:68
+msgid "No forms found in Trash."
+msgstr "Ingen skjema ble funnet i papirkurven"
+
+#: classes/class-cpt-wplf-form.php:105
+msgid "Permalink is for preview purposes only."
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:163
+msgid "Please enter your name"
+msgstr "Vennligst skriv inn ditt navn"
+
+#: classes/class-cpt-wplf-form.php:164
+msgctxt "Default placeholder name"
+msgid "John Doe"
+msgstr "Ola Nordmann"
+
+#: classes/class-cpt-wplf-form.php:166
+msgid "Please enter your email address"
+msgstr "Vennligst skriv inn din e-postadresse"
+
+#: classes/class-cpt-wplf-form.php:166 classes/class-cpt-wplf-form.php:169
+msgid "(required)"
+msgstr "(påkrevd)"
+
+#: classes/class-cpt-wplf-form.php:167
+msgctxt "Default placeholder email"
+msgid "example@email.com"
+msgstr "eksempel@e-mail.no"
+
+#: classes/class-cpt-wplf-form.php:169
+msgid "Write your message below"
+msgstr "Skriv din melding nedenfor"
+
+#: classes/class-cpt-wplf-form.php:170
+msgctxt "Default placeholder message"
+msgid "I wanted to ask about..."
+msgstr "Jeg ønsket å spørre om ..."
+
+#: classes/class-cpt-wplf-form.php:172
+msgid "Submit"
+msgstr "Send"
+
+#: classes/class-cpt-wplf-form.php:174
+msgctxt "The HTML comment at the end of the example form"
+msgid "Any valid HTML form can be used here!"
+msgstr "Alle gyldig skjema med HTML kan brukes her!"
+
+#: classes/class-cpt-wplf-form.php:201 classes/class-cpt-wplf-form.php:240
+msgid "Shortcode"
+msgstr "Shortcode"
+
+#: classes/class-cpt-wplf-form.php:202 classes/class-cpt-wplf-submission.php:46
+msgid "Submissions"
+msgstr "Svar"
+
+#: classes/class-cpt-wplf-form.php:250
+msgid "Success Message"
+msgstr "Suksessmelding"
+
+#: classes/class-cpt-wplf-form.php:260
+msgid "Form Fields Detected"
+msgstr "Skjemafelt oppdaget"
+
+#: classes/class-cpt-wplf-form.php:269
+msgid "Emails"
+msgstr "E-post"
+
+#: classes/class-cpt-wplf-form.php:278
+msgid "Submission Title Format"
+msgstr "Tittel på svar"
+
+#: classes/class-cpt-wplf-form.php:301
+msgctxt "Default success message"
+msgid "Thank you! :)"
+msgstr "Tusen takk! :)"
+
+#: classes/class-cpt-wplf-form.php:322
+msgid "Fields marked with * are required"
+msgstr "Feltene merket med * er obligatoriske"
+
+#: classes/class-cpt-wplf-form.php:343
+msgid "Send an email copy when a form is submitted?"
+msgstr "Send en e-post når et skjema er sendt?"
+
+#: classes/class-cpt-wplf-form.php:359
+msgid "Submissions from this form will use this formatting in their title."
+msgstr "Svar fra dette skjemaet vil bruke denne formateringen i tittelen."
+
+#: classes/class-cpt-wplf-form.php:360
+msgid "You may use any field values enclosed in \"%\" markers."
+msgstr "Du kan bruke feltverdier i \"%\" markører."
+
+#: classes/class-cpt-wplf-form.php:487
+msgid "This form preview URL is not public and cannot be shared."
+msgstr ""
+
+#: classes/class-cpt-wplf-form.php:488
+msgid "Non-logged in visitors will see a 404 error page instead."
+msgstr ""
+
+#: classes/class-cpt-wplf-submission.php:37
+msgctxt "post type general name"
+msgid "Submissions"
+msgstr "Svar"
+
+#: classes/class-cpt-wplf-submission.php:38
+msgctxt "post type singular name"
+msgid "Submission"
+msgstr "Svar"
+
+#: classes/class-cpt-wplf-submission.php:39
+msgctxt "admin menu"
+msgid "Submissions"
+msgstr "Svar"
+
+#: classes/class-cpt-wplf-submission.php:40
+msgctxt "add new on admin bar"
+msgid "Submission"
+msgstr "Svar"
+
+#: classes/class-cpt-wplf-submission.php:41
+msgctxt "submission"
+msgid "Add New"
+msgstr "Legg til ny"
+
+#: classes/class-cpt-wplf-submission.php:42
+msgid "Add New Submission"
+msgstr "Legg til nytt svar"
+
+#: classes/class-cpt-wplf-submission.php:43
+msgid "New Submission"
+msgstr "Nytt svar"
+
+#: classes/class-cpt-wplf-submission.php:44
+msgid "Edit Submission"
+msgstr "Rediger svar"
+
+#: classes/class-cpt-wplf-submission.php:45
+msgid "View Submission"
+msgstr "Se svar"
+
+#: classes/class-cpt-wplf-submission.php:47
+msgid "Search Submissions"
+msgstr "Søk i Svarene"
+
+#: classes/class-cpt-wplf-submission.php:48
+msgid "No submissions found."
+msgstr "Ingen svar er funnet"
+
+#: classes/class-cpt-wplf-submission.php:49
+msgid "No submissions found in Trash."
+msgstr "Ingen svar er funnet i søppelbøtten"
+
+#: classes/class-cpt-wplf-submission.php:96
+msgid "Referrer"
+msgstr "Henvisning"
+
+#: classes/class-cpt-wplf-submission.php:97
+msgid "Form"
+msgstr "Skjema"
+
+#: classes/class-cpt-wplf-submission.php:172
+msgid "Submission"
+msgstr "Svar"
+
+#: classes/class-cpt-wplf-submission.php:193
+msgid "Field"
+msgstr "Felt"
+
+#: classes/class-cpt-wplf-submission.php:194
+msgid "Value"
+msgstr "Verdi"
+
+#: classes/class-cpt-wplf-submission.php:209
+msgid "View Attachment"
+msgstr ""
+
+#: classes/class-cpt-wplf-submission.php:217
+msgid "Open Link"
+msgstr ""
+
+#: inc/wplf-form-actions.php:20
+#, php-format
+msgid "New submission from %s"
+msgstr "Nytt svarskjema fra %s"
+
+#: inc/wplf-form-actions.php:21
+#, php-format
+msgid "Form \"%s\" (ID %d) was submitted with values below: "
+msgstr "Skjemaet \"%s\" (ID %d) ble sendt med verdiene nedenfor:"
+
+#: inc/wplf-form-validation.php:15
+#, php-format
+msgid "Form id %d doesn't exist!"
+msgstr "Skjema-IDen %d finnes ikke!"
+
+#: inc/wplf-form-validation.php:43
+msgid "Required fields are missing."
+msgstr "Obligatoriske felt mangler."
+
+#. Plugin Name of the plugin/theme
+msgid "WP Libre Form"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/libreform/wp-libreform"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "A minimal HTML form builder for WordPress; made for developers"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "@anttiviljami"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://github.com/anttiviljami/"
+msgstr ""
