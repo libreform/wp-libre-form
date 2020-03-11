@@ -3,7 +3,9 @@
 namespace WPLF;
 
 class AdminInterface extends Module {
-  public function __construct() {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
+
     // Nag if necessary
     add_action('admin_init', [$this, 'onAdminInit']);
 

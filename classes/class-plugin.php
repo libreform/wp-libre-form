@@ -98,7 +98,11 @@ class Plugin {
     add_filter('the_content', [$this, 'replaceContentWithFormOnSingleForm'], 0);
 
     if (!$this->settings->get('historyTableCreated')) {
-      $this->io->createHistoryTable();
+      try {
+        $this->io->createHistoryTable();
+      } catch (Error $e) {
+        log("Unable to create history table: " . $e->getMessage());
+      }
     }
   }
 
@@ -234,9 +238,7 @@ class Plugin {
     $instanceVariable = lcfirst($className);
     $namespacedClassName = "\\WPLF\\$className";
 
-    $module = new $namespacedClassName(...$params);
-    $module->injectCore($this);
-
+    $module = new $namespacedClassName($this, ...$params);
     $this->{$instanceVariable} = $module;
   }
 
@@ -290,11 +292,11 @@ class Plugin {
         }
 
         $errorMessage = __("Something went wrong while deleting submissions. If this happens again, please file an issue in our GitHub repository. $message");
-        ;
+
 
         wp_die(
-            $errorMessage,
-            409
+          $errorMessage,
+          409
         );
       }
     }
@@ -304,7 +306,7 @@ class Plugin {
     $post = get_post($postId);
 
     if ($post->post_type === self::$postType) {
-      do_action("wplf_deleteForm", new Form($post));
+      do_action("wplfDeleteForm", new Form($post));
 
       $this->deleteTransients();
     }
@@ -329,16 +331,15 @@ class Plugin {
       return;
     } elseif (!$hasUnfilteredHtml) {
       wp_die(
-          '<h1>' . esc_html__('You do not have unfiltered_html capability', 'wplf') . '</h1>' .
-          '<p>' . esc_html__('Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wplf') . '</p>',
-          403
+        '<h1>' . esc_html__('You do not have unfiltered_html capability', 'wplf') . '</h1>' .
+        '<p>' . esc_html__('Only Super Admins have unfiltered_html capability by default in WordPress Network.', 'wplf') . '</p>',
+        403
       );
     }
 
     $this->deleteTransients();
     $this->render($form, [], true); // Render in admin context so selectors can do stuff
 
-    $oldFields = $form->getFields(); // Save old fields for reference
     $form->setAddToMediaLibrary((int) ($_POST['wplfAddToMediaLibrary'] ?? 0));
     $form->setSuccessMessage($_POST['wplfSuccessMessage'] ?? __('Success!', 'wplf'));
     $form->setEmailNotification([
@@ -364,9 +365,9 @@ class Plugin {
     // No harm in saving the earlier values, but updating the DB is a no-no.
     if ($weaseledThroughDespiteNotSupposedTo) {
       wp_die(
-          '<h1>' . esc_html__('This is for your own good', 'wplf') . '</h1>' .
-          '<p>' . esc_html__('The form was not allowed to save, but you tried to anyway. The content has been saved, but the fields were not. Go back and fix the problems, then try again. If you ignore this message the form may not be able to receive submissions.', 'wplf') . '</p>',
-          403
+        '<h1>' . esc_html__('This is for your own good', 'wplf') . '</h1>' .
+        '<p>' . esc_html__('The form was not allowed to save, but you tried to anyway. The content has been saved, but the fields were not. Go back and fix the problems, then try again. If you ignore this message the form may not be able to receive submissions.', 'wplf') . '</p>',
+        403
       );
     }
 
@@ -549,8 +550,7 @@ class Plugin {
       $output = ob_get_clean();
       $output = $this->selectors->parse($output, $form, null);
       $output = apply_filters('wplfAfterRender', $output, $form, $options);
-      $output = minifyHtml($output); // Minify after filter, I doubt that anyone want the minified HTML
-
+      $output = minifyHtml($output); // Minify after filter, I doubt that anyone wants the minified HTML
 
       return $output;
     }

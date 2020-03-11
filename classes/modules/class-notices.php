@@ -6,7 +6,9 @@ class Notices extends Module {
   private $items = [];
   private $optionName = 'DismissedNotices';
 
-  public function __construct() {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
+
     add_action('wp', [$this, 'handleDismissal']);
     add_action('admin_notices', [$this, 'render']);
   }

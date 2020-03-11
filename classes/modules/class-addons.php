@@ -5,7 +5,9 @@ namespace WPLF;
 class Addons extends Module {
   private $plugins = [];
 
-  public function __construct() {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
+
     add_action('admin_menu', function () {
       add_submenu_page(
           'edit.php?post_type=' . Plugin::$postType,

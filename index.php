@@ -26,7 +26,7 @@ function libreform(...$params) {
   static $instance;
 
   if (!$instance) {
-    require_once 'classes/class-plugin.php';
+    require_once apply_filters('wplfPluginClassLocation', 'classes/class-plugin.php');
 
     $instance = new WPLF\Plugin(...$params);
   }

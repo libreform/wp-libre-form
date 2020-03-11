@@ -5,6 +5,10 @@ namespace WPLF;
 abstract class Module {
   public $core;
 
+  public function __construct(Plugin $wplf, ...$params) {
+    $this->injectCore($wplf);
+  }
+
   /**
    * Proxy that lets you write $this->settings etc instead of $this->core->settings.
    * Do not use the whitelisted names in the module.
@@ -30,13 +34,7 @@ abstract class Module {
     }
   }
 
-  public function injectCore(Plugin $wplf) {
+  private function injectCore(Plugin $wplf) {
     $this->core = $wplf;
-
-    $this->afterInjectCore($this->core);
-  }
-
-  public function afterInjectCore(Plugin $wplf) {
-    // override this function
   }
 }

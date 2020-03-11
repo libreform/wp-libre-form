@@ -50,8 +50,11 @@ class Settings extends Module {
     ]
   ];
 
-  public function __construct($key = 'Settings') {
+  public function __construct(Plugin $wplf, $key = 'Settings') {
+    parent::__construct($wplf);
+
     $this->key = $key;
+    $this->options = $this->io->getOption($this->key, $this->getDefaultSettings());
 
     add_action('admin_menu', function () {
       add_submenu_page(
@@ -63,10 +66,6 @@ class Settings extends Module {
           [$this, 'render']
       );
     });
-  }
-
-  public function afterInjectCore(Plugin $wplf) {
-    $this->options = $this->io->getOption($this->key, $this->getDefaultSettings());
   }
 
   private function getDefaultSettings() {

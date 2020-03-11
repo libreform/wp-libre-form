@@ -5,10 +5,8 @@ namespace WPLF;
 class RestApi extends Module {
   public $namespace = 'wplf/v2';
 
-  public function __construct() {
-  }
-
-  public function afterInjectCore(Plugin $wplf) {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
     $this->registerEndpoints();
   }
 

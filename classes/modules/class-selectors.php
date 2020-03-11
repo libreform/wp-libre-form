@@ -7,7 +7,9 @@ class Selectors extends Module {
   private $regex = "/##\s([\w_]+)(?(?=\s##)\s##|(\s?[\w\s]+)\s##)/"; // Now supports params after selector; ## USER_NAME Pertti ##"
   private $templateTag = '##';
 
-  public function __construct() {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
+
     $this->createSelector(
         'FORM',
         function (?array $params, ?Form $form) {

@@ -11,7 +11,9 @@ class Io extends Module {
   private $outputType = \ARRAY_A;
   private $readyToUpload = false;
 
-  public function __construct() {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
+
     $this->collate = !empty(\DB_COLLATE) ? \DB_COLLATE : 'utf8mb4_unicode_ci';
   }
 

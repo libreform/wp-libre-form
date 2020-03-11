@@ -7,14 +7,14 @@ class Polylang extends Module {
   protected $changed = false;
   private $optionName = 'PolylangStrings';
 
-  public function __construct() {
+  public function __construct(Plugin $wplf) {
+    parent::__construct($wplf);
+
     add_action('admin_init', array($this, 'registerStrings'));
     add_action('pll_language_defined', [$this, 'onLanguageDefined']);
     add_action('shutdown', [$this, 'saveStrings']);
     // pll_init
-  }
 
-  public function afterInjectCore(Plugin $wplf) {
     $this->strings = $this->io->getOption($this->optionName, []);
 
     $wplf->selectors->createSelector(
