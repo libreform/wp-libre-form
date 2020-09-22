@@ -34,13 +34,22 @@ function libreform(...$params) {
   return $instance;
 }
 
+// add_action('init', function() {
+
+
+// });
+
+
 [$version] = get_file_data(__FILE__, ['Version']);
 
-$wplf = libreform([
-  'dirname' => dirname(plugin_basename(__FILE__)),
-  'url' => plugins_url('', __FILE__),
-  'version' => $version,
-]);
+  $wplf = libreform([
+    'dirname' => dirname(plugin_basename(__FILE__)),
+    'url' => plugins_url('', __FILE__),
+    'version' => $version,
+  ]);
 
+
+// These will not work inside init, they must be top level: https://developer.wordpress.org/reference/functions/register_activation_hook/
 register_activation_hook(__FILE__, [$wplf, 'onActivation']);
 register_deactivation_hook(__FILE__, [$wplf, 'onDeactivation']);
+

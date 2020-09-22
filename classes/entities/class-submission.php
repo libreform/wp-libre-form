@@ -6,17 +6,24 @@ class Submission {
   public $ID;
   private $form;
   private $fields = [];
+  private $meta = [];
+  private $rawData;
 
   public function __construct(Form $form, ?array $data = null) {
     $this->form = $form;
     $this->ID = $data['id'] ?? null;
 
     if ($data) {
-      $this->fields = $data;
+      $this->rawData = $data;
 
-      foreach ($this->fields as $name => $v) {
+      foreach ($this->rawData as $name => $v) {
         if (strpos($name, 'field') === 0) {
+          // All form fields are saved to the database as columns,
+          // using field{$name} as the name.
           $this->fields[$this->form->getFieldOriginalName($name)] = $v;
+        } else {
+          // Other columns in the table are metadata
+          $this->meta[$name] = $v;
         }
       }
     }
@@ -28,6 +35,10 @@ class Submission {
 
   public function getFields() {
     return $this->fields;
+  }
+
+  public function getMeta() {
+    return $this->meta;
   }
 
   public function delete($removeUploads = true) {

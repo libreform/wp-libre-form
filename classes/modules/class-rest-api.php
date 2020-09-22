@@ -34,6 +34,7 @@ class RestApi extends Module {
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'render'],
       'methods' => ['POST'],
+      'permission_callback' => '__return_true',
       // 'permission_callback' => function() { return current_user_can('edit_posts'); },
     ]);
   }
@@ -44,6 +45,7 @@ class RestApi extends Module {
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'handleSubmission'],
       'methods' => ['GET', 'POST'],
+      'permission_callback' => '__return_true',
     ]);
   }
 
@@ -77,7 +79,17 @@ class RestApi extends Module {
     $html = $params['content'] ?? null;
 
     if ($this->polylang && $lang) {
-      switch_to_locale(sanitize_text_field($lang));
+
+      // var_dump(get_locale()); // en_US by default
+      // var_dump(get_available_languages());
+
+
+      // TODO: convert $lang (language code) into a locale (en_US) to support most languages. Though...
+      // In my tests, the language is already en_US and it doesn't seem to work most of the time. It works if the form is configured to FINNISH
+      //  and then overridden here, but a form in ENGLISH doesn't translate.
+      $x = switch_to_locale(sanitize_text_field($lang));
+      // $x = switch_to_locale('en_US');
+      // var_dump($x); // true for success, false for failure
     }
 
     try {
@@ -102,7 +114,9 @@ class RestApi extends Module {
     try {
       $form = new Form(get_post($formId));
       $submission = new Submission($form);
-      $submission->create(array_merge($params, getUploadedFiles() ?? []));
+      // $submission->create(array_merge($params, getUploadedFiles() ?? []));
+      $submission->create(array_merge($params, $request->get_file_params()));
+
 
       if ($useFallback) {
         $referrer = $params['referrer'];

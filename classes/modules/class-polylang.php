@@ -6,6 +6,7 @@ class Polylang extends Module {
   protected $strings = [];
   protected $changed = false;
   private $optionName = 'PolylangStrings';
+  private $lang;
 
   public function __construct(Plugin $wplf) {
     parent::__construct($wplf);
@@ -44,13 +45,21 @@ class Polylang extends Module {
     );
   }
 
+  public function getLanguage() {
+    return $this->lang;
+  }
+
   public function onLanguageDefined() {
+    $this->lang = \pll_current_language();
+
     add_filter('wplfAdminData', [$this, 'addLangToScripts']);
     add_filter('wplfFrontendData', [$this, 'addLangToScripts']);
   }
 
   public function addLangToScripts($localizeScriptData = []) {
-    $localizeScriptData['lang'] = \pll_current_language(); // Necessary to ensure correct language thank you response
+    // $localizeScriptData['lang'] = \pll_current_language(); // Necessary to ensure correct language thank you response
+    $localizeScriptData['lang'] = $this->getLanguage(); // Necessary to ensure correct language thank you response
+
 
     return $localizeScriptData;
   }

@@ -47,9 +47,11 @@ class Plugin {
       $this->loadModule('admin-interface');
     }
 
-    add_action('init', [$this, 'afterInit']);
+    add_action('wp', [$this, 'afterInit']);
     add_action('rest_api_init', [$this, 'afterRestApiInit']);
     add_action('admin_footer', [$this, 'enqueueAdminAssets']);
+
+
     add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
 
     add_shortcode('libreform', [$this, 'shortcode']);
@@ -110,6 +112,7 @@ class Plugin {
     $path = '/' . $this->dirname . '/assets/lang/'; // Why doesn't this work?
     $success = load_plugin_textdomain('libreform', false, $path);
 
+
     if (!$success) {
       $success = load_muplugin_textdomain('libreform', $path);
 
@@ -137,7 +140,7 @@ class Plugin {
 
       // It seems WP sets the lang value to "" in admin, so we can't use that,
       // `language` seems to work fine. Known issue: This seems to work for some languages only in admin.
-      'language' => $this->polylang ? pll_current_language() : null,
+      // 'language' => $this->polylang ? $this->polylang->getLanguage() : null,
       'assetsDir' => $this->url . '/assets',
       'settings' => [
         'autoinit' => $this->settings->get('autoinit'),
@@ -527,13 +530,19 @@ class Plugin {
       }
     }
 
-    $form = new Form(get_post($id));
+    try {
+      $form = new Form(get_post($id));
 
-    return $this->render($form, [
-      'content' => $content,
-      'className' => $className,
-      'attributes' => $attributes,
-    ]);
+      return $this->render($form, [
+        'content' => $content,
+        'className' => $className,
+        'attributes' => $attributes,
+      ]);
+    } catch (Error $e) {
+      return $e->getMessage();
+      // return;
+    }
+
   }
 
   public function render(Form $form, $options = [], $force = false) {

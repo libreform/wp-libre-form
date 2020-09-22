@@ -309,24 +309,64 @@ libreform()->render($form); ?&gt;</code>
 
     if ($form->isPublished()) {
       [$submissions, $pages, $count] = $this->io->getFormSubmissions($form);
+      $fields = $form->getFields();
+      $wpDir = get_home_path();
+      $wpUrl = get_home_url(null, '/');
+
 
       ?>
       <div class="wplf-submissions">
 
         <div class="wplf-submissions__list">
           <?php foreach ($submissions as $submission) {
-            $submission
+            $meta = $submission->getMeta();
+            $historyId = $meta['historyId'];
+            $fieldsAtTheTime = $this->io->getHistoryFieldsByVersion($form, $historyId);
+            $fieldsHaveChanged = serialize($fieldsAtTheTime) !== serialize($fields);
+
+            // echo "<pre>";
+            echo $fieldsHaveChanged ? 'Form has been edited after submission was made' : '';
+
+
             ?>
             <article class="wplfSubmission" data-id="<?=esc_attr($submission->ID)?>">
-              <h3>Submission</h3>
+              <h3>Submission <?=esc_html($submission->ID)?></h3>
 
 
               <table>
               <?php
               foreach ($submission->getFields() as $name => $value) {
-                echo "<tr><th>$name</th><td>$value</td></tr>";
+                $k = array_search($name, array_column($fieldsAtTheTime, 'name'));
+
+                // If there's no key, the field didn't exist in the form
+                // when it was submitted. Skip rendering it.
+                if ($k === false) {
+                  continue;
+                  // return;
+                }
+
+                $field = $fieldsAtTheTime[$k];
+                $type = $field['type'];
+                $name = $name . ($field['required'] ? '*' : '');
+
+                if ($type === 'file') {
+                  $filepaths = explode(', ', $value);
+                  $fileurls = array_map(function($path) use ($wpDir, $wpUrl) {
+
+                    return str_replace($wpDir, $wpUrl, $path);
+                  }, $filepaths);
+
+                  echo "<tr><th>$name</th><td>";
+                  foreach ($fileurls as $url) {
+                    echo "<a href='$url' target='blank'>$url</a> <br>";
+                  }
+                  echo "</td></tr>";
+
+                } else {
+                  echo "<tr><th>$name</th><td>$value</td></tr>";
+                }
+
               }
-              // var_dump($submission->getFields());
               ?>
               </table>
 
@@ -337,8 +377,6 @@ libreform()->render($form); ?&gt;</code>
         </div>
       </div>
       <?php
-
-      // var_dump($submissions);
     } else {
       echo __('Publish the form first.', 'wplf');
     }

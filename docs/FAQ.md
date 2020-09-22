@@ -24,6 +24,7 @@ add_action('wplf_pre_validate_submission', function() {
   header("Access-Control-Allow-Credentials: true");
 });
 ```
+
 Do note that the above code snippet opens your form submissions to the world.
 
 Use our npm package @libreform/wp-libreform to send the forms. ~~You can also use the "official" JS bundle if you want to.~~
@@ -49,6 +50,7 @@ Use our npm package @libreform/wp-libreform to send the forms. ~~You can also us
 ```
 
 ## Uncaught ReferenceError: WPLF is not defined
+
 The form script is enqueued when a form is rendered. If there isn't a form on the page, window.WPLF isn't available. Either install the npm package or make your script depend on wplf-frontend;
 
 ```php
@@ -57,18 +59,17 @@ wp_enqueue_script('yourscript', $pathToScript, ['wplf-frontend'], $version, true
 
 ## Multilingual
 
-You can create multilingual forms using Polylang. WPLF will register and automatically fetch the translation when you use special template tags.
+We've made special efforts to ensure compatibility with Polylang. WPML is not supported.
 
-Example:
-```html
-<input type="text" placeholder="{{ Test string }}" name="test">
-```
+Enable translation of Forms in Polylang settings. You're good to go! If you don't enable it, your forms will not have a language, and translations might not work.
 
-You can also disable this feature, and create your own middleware for WPML, if you'd like.
+![settings](polylang-1.png)
 
-```php
-add_filter('wplf_load_polylang' , __return_false);
-```
+We have a special `## PLL__ YourStringHere ##` selector that you can use in your forms. After using the selector in a form, you should see it in the string translations menu of Polylang.
+
+![settings](polylang-2.png)
+
+Using the selector for all translated content in your form lets you synchronize the same form between all languages, making future edits easier.
 
 ## Adding extra classes to the form element
 
@@ -89,7 +90,7 @@ You can add any custom attributes to the form element easily by adding them to t
 The attribute will render as is on the `<form>` element
 
 ```html
-<form class="wplf libreform-1" data-custom-attr="contactme">
+<form class="wplf libreform-1" data-custom-attr="contactme"></form>
 ```
 
 ## Importing forms from a predefined HTML template

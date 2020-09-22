@@ -62,7 +62,6 @@
       line-height: 20px;
       text-align: center;
       font-weight: 700;
-
     }
   }
 }
@@ -73,7 +72,8 @@
 }
 
 .wplf-editor {
-  .CodeMirror, .wplf-cmEditor {
+  .CodeMirror,
+  .wplf-cmEditor {
     height: 70vh;
     width: calc(100% - 2px);
     margin-bottom: 1rem;
@@ -86,15 +86,16 @@
   @import 'codemirror';
 }
 
-
 // Overrides for admin usage
 .wplf-tabs {
   background: #fff;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
   border: 1px solid #ccd0d4;
 
-  h2, h3, h4 {
-    // WP can fuck off with #poststuff h2 declarations
+  h2,
+  h3,
+  h4 {
+    // WP PLS.
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
@@ -113,16 +114,17 @@
   .wplf-selectors {
     padding: 0;
 
-    p, h2, h3, h4 {
+    p,
+    h2,
+    h3,
+    h4 {
       margin: 1rem 12px;
     }
 
     &__info {
-
     }
 
     &__list {
-
     }
 
     &__selector {
@@ -138,7 +140,6 @@
       &__example {
         margin: 0;
       }
-
 
       &:first-child {
         border-top: 1px solid #000;
@@ -156,7 +157,8 @@
     .wplf-formSettings {
       border: 0;
 
-      .CodeMirror, .wplf-cmEditor {
+      .CodeMirror,
+      .wplf-cmEditor {
         height: 300px;
         width: 100%;
       }
@@ -167,11 +169,12 @@
         background: #32373c;
         color: #f1f1f1;
 
-        &.active, &:focus, &:hover {
+        &.active,
+        &:focus,
+        &:hover {
           background: #0073aa;
         }
       }
     }
   }
 }
-

@@ -20,12 +20,12 @@ const extractFieldDataFromElement = (el) => {
   const required = el.getAttribute('required') !== null ? true : false
   const multiple = el.getAttribute('name').endsWith('[]')
 
-  return ({
+  return {
     name,
     type,
     required,
     multiple,
-  })
+  }
 }
 
 export default class WPLF_Editor {
@@ -83,9 +83,8 @@ export default class WPLF_Editor {
     this.contentEditor.codemirror.on('changes', _.debounce(this.handleContentChange, 1000))
     this.handleContentChange(this.contentEditor.codemirror) // Triggers preview build
 
-
     if (!globalData.settings.hasUnfilteredHtml) {
-      this.tryToPreventEdit();
+      this.tryToPreventEdit()
     }
   }
 
@@ -100,7 +99,7 @@ export default class WPLF_Editor {
 
     this.state = {
       ...currentState,
-      ...newState
+      ...newState,
     }
 
     this.afterStateChange()
@@ -115,8 +114,8 @@ export default class WPLF_Editor {
       if (this.state[key] !== null) {
         const value = this.state[key]
 
-        if (typeof value === "boolean") {
-          el.value = value ? '1' : '0';
+        if (typeof value === 'boolean') {
+          el.value = value ? '1' : '0'
         } else {
           el.value = JSON.stringify(value)
         }
@@ -151,10 +150,10 @@ export default class WPLF_Editor {
    */
   tryToPreventEdit() {
     // Might as well use the jQuery since it's wp-admin
-    $('#title').prop('disabled', true);
-    $('#content').prop('disabled', true);
-    $('#publish').remove();
-    $('#save-post').remove();
+    $('#title').prop('disabled', true)
+    $('#content').prop('disabled', true)
+    $('#publish').remove()
+    $('#save-post').remove()
   }
 
   async handleContentChange(editor) {
@@ -186,7 +185,14 @@ export default class WPLF_Editor {
     body.append('content', content)
     body.append('formId', formId)
 
-    globalData.language && body.append('lang', globalData.language)
+    globalData.lang && body.append('lang', globalData.lang)
+
+    let object = {}
+    body.forEach(function (value, key) {
+      object[key] = value
+    })
+
+    console.log('preview req body', object)
 
     const { data } = await request('/render', {
       method: 'POST',
@@ -200,13 +206,15 @@ export default class WPLF_Editor {
 
     this.previewEl.innerHTML = tmpEl.querySelector('form').innerHTML
 
-    await waitForNextTick();
+    await waitForNextTick()
   }
 
   getDuplicateNames(names) {
-    return _.unique(names.filter(name => {
-      return names.filter(n => n === name).length > 1
-    }))
+    return _.unique(
+      names.filter((name) => {
+        return names.filter((n) => n === name).length > 1
+      })
+    )
   }
 
   createFieldElement(field, errorMessage) {
@@ -215,7 +223,6 @@ export default class WPLF_Editor {
     const n = element.querySelector('strong')
     const t = element.querySelector('.wplf-formFields__field__type em')
     const alert = element.querySelector('.wplf-formFields__field__alert')
-
 
     n.innerText = name
     t.innerText = required ? `required ${type}` : type
@@ -244,18 +251,18 @@ export default class WPLF_Editor {
 
     // Get all inputs with a name attribute, yes, even button.
     const fields = Array.from(el.querySelectorAll('input, textarea, select, button'))
-      .filter(el => el.getAttribute('name'))
+      .filter((el) => el.getAttribute('name'))
       .map(extractFieldDataFromElement)
 
-    const fieldNames = fields.map(field => field.name)
+    const fieldNames = fields.map((field) => field.name)
     const duplicateNames = this.getDuplicateNames(fieldNames)
 
     fieldContainer.innerHTML = ''
 
     const fieldErrors = []
-    fields.forEach(field => {
+    fields.forEach((field) => {
       const { name, type } = field
-      const historyField = Object.values(historyFields).find(field => field.name === name)
+      const historyField = Object.values(historyFields).find((field) => field.name === name)
       let errorMessage = ''
 
       // names like fieldgroup[fieldname] are not supported yet
@@ -288,13 +295,13 @@ export default class WPLF_Editor {
       allowSave = false
     }
 
-    const newFields = fields.filter(field => {
-      const fieldInInitialData = Object.values(historyFields).find(x => x.name === field.name)
+    const newFields = fields.filter((field) => {
+      const fieldInInitialData = Object.values(historyFields).find((x) => x.name === field.name)
 
-      return fieldInInitialData ? false : true;
+      return fieldInInitialData ? false : true
     })
 
-    const deletedFields = Object.values(historyFields).filter(field => {
+    const deletedFields = Object.values(historyFields).filter((field) => {
       return !fieldNames.includes(field.name)
     })
 
@@ -302,10 +309,10 @@ export default class WPLF_Editor {
       fields,
       newFields,
       deletedFields,
-      allowSave
+      allowSave,
     }))
 
-    await waitForNextTick();
+    await waitForNextTick()
   }
 
   async removeProblematicAttributesFromPreview() {
@@ -313,8 +320,8 @@ export default class WPLF_Editor {
     const requiredEls = Array.from(this.previewEl.querySelectorAll('[required]'))
     const nameEls = Array.from(this.previewEl.querySelectorAll('[name]'))
 
-    requiredEls.forEach(el => el.removeAttribute('required'))
-    nameEls.forEach(el => el.removeAttribute('name'))
+    requiredEls.forEach((el) => el.removeAttribute('required'))
+    nameEls.forEach((el) => el.removeAttribute('name'))
 
     await waitForNextTick()
   }

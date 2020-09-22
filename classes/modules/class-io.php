@@ -200,6 +200,10 @@ class Io extends Module {
     $data = $db->get_results($db->prepare($dataQuery, [$limit, $page * $limit]), $this->outputType);
     $count = $this->getFormSubmissionCount($form);
 
+    // echo "<pre>";
+    // echo var_dump($data);
+    // echo "</pre>";
+
     $submissions = array_map(function ($data) use ($form) {
       $submission = new Submission($form, $data);
 
@@ -243,6 +247,22 @@ class Io extends Module {
     }
   }
 
+  function getHistoryFieldsByVersion(Form $form, int $historyVersion) {
+    [$db, $prefix] = db();
+    $tableName = $this->getHistoryTableName($form);
+    $id = (int) $form->ID;
+    $res = $db->get_row("SELECT fields FROM $tableName WHERE formId = $id AND id = $historyVersion", $this->outputType);
+
+    if ($res) {
+      return json_decode($res['fields'], true);
+    } elseif ($db->last_error) {
+      throw new Error($db->last_error, [$form]);
+    }
+  }
+
+  /**
+   * @deprecated
+   */
   public function getHistoryFields(Form $form) {
     [$db, $prefix] = db();
     $tableName = $this->getHistoryTableName($form);
@@ -417,6 +437,8 @@ class Io extends Module {
         $error = getFileUploadError($number);
       } elseif ($number !== 4) { // Or if the error code is something other than 4 (no file uploaded), which is normal
         $error = getFileUploadError($number);
+      } elseif ($number === 4) {
+        return '';
       }
 
       if ($error) {
@@ -450,6 +472,9 @@ class Io extends Module {
     // looking like single uploads.
     $isMultiple = is_array($data['name']);
     $value = "";
+
+    error_log(print_r($data, true));
+    error_log(print_r($isMultiple ? 'is multiple' : 'is not multiple', true));
 
     // Kept for reference, we're doing dirty things to it soon
     $oldSFiles = $_FILES;
@@ -487,7 +512,7 @@ class Io extends Module {
       if ($addUploadsToMediaLibrary) {
         $value = $this->uploadToMediaLibrary($actualName);
       } else {
-        $value = $this->uploadOutsideMediaLibrary($data, $form);
+        $value = $this->uploadOutsideMediaLibrary($actualName, $data, $form);
       }
     }
 
@@ -499,11 +524,13 @@ class Io extends Module {
     $tableName = $this->getFormSubmissionsTableName($form);
     [$data, $placeholders] = $this->mapFieldsToInsertableData($form, $validatedFields);
 
-    foreach ($data as $k => $value) {
-      // Only file uploads show up as arrays AT THIS POINT
-      // as saving the form is not allowed if there are
-      // inputs with names like thisArrayProducingName[thatIForgotAbout]
+    error_log(print_r($data, true));
 
+    foreach ($data as $k => $value) {
+      // There are restrictions in place preventing users from creating forms with input names
+      // like the following; name[subname].
+
+      // That's the only reason we can cut a corner here.
       if (is_array($value)) {
         $data[$k] = $this->uploadFiles($form, $k, $value);
       }
