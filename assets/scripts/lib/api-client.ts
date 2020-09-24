@@ -1,5 +1,6 @@
 import AbortController from 'abort-controller'
 import globalData from './global-data'
+import { List, ApiResponse, ApiResponseKind } from '../types'
 
 /**
  * It's ok to create multiple API clients
@@ -7,11 +8,17 @@ import globalData from './global-data'
  * Usage: const { abort, request, getSignal } = createApiClient()
  */
 function createApiClient() {
-  let controller, signal;
+  let controller: AbortController | null = null
+  let signal: AbortSignal | null = null
+
+  console.log(globalData)
 
   return {
-    controller: null,
-    signal: null,
+    // controller: null,
+    // signal: null,
+
+    controller,
+    signal,
 
     getSignal() {
       return signal
@@ -23,7 +30,11 @@ function createApiClient() {
       }
     },
 
-    async request(target, options = {}) {
+    async request(
+      target: string,
+      options: List<string | number | boolean | FormData | null> = {},
+      responseKind: ApiResponseKind
+    ): Promise<ApiResponse> {
       controller = new AbortController()
       signal = controller.signal
 
@@ -41,6 +52,7 @@ function createApiClient() {
         controller = null
 
         return {
+          kind: responseKind,
           headers,
           status,
           statusText,
@@ -56,8 +68,10 @@ function createApiClient() {
         if (e.name !== 'AbortError') {
           throw e
         }
+
+        return e
       }
-    }
+    },
   }
 }
 

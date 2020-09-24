@@ -66,7 +66,7 @@ class Submission {
   }
 
   public function create($fields) {
-    $update = isset($this->ID);
+    // $update = isset($this->ID);
     $form = $this->form;
 
     $fields = apply_filters('wplfFieldsBeforeValidateSubmission', $fields);

@@ -190,7 +190,7 @@ class Plugin {
     wp_register_script(
         'wplf-frontend',
         $this->url . '/dist/wplf-frontend.js',
-        [], // does not depend on anything, not even jQuery
+        ['react', 'react-dom'], // remove these if not actually using them
         $version,
         true
     );

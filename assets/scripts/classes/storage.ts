@@ -1,13 +1,14 @@
 import log from '../lib/log'
+import { List } from '../types'
 
 class Storage {
-  prefix
+  prefix: string
 
   constructor(prefix = 'wplf') {
     this.prefix = prefix
   }
 
-  get(key, defaultValue) {
+  get(key: string, defaultValue: any) {
     const data = localStorage.getItem(this.prefix + key)
 
     if (data !== null) {
@@ -15,15 +16,20 @@ class Storage {
 
       return value
     } else {
-      log.notice(`No value found for ${key}, falling back to default`, defaultValue)
+      log.notice(
+        `No value found for ${key}, falling back to default`,
+        defaultValue
+      )
 
       return defaultValue
     }
   }
 
-  set(key, value) {
+  set(key: string, value: any) {
     try {
       localStorage.setItem(this.prefix + key, JSON.stringify(value))
+
+      return true
     } catch (e) {
       log.error(e, key, value)
 
@@ -32,5 +38,4 @@ class Storage {
   }
 }
 
-
-export default new Storage
+export default new Storage()

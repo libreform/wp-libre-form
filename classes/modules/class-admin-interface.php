@@ -313,24 +313,36 @@ libreform()->render($form); ?&gt;</code>
       $wpDir = get_home_path();
       $wpUrl = get_home_url(null, '/');
 
-
+      $dateFormat = get_option('date_format') . ' ' . get_option('time_format');
       ?>
       <div class="wplf-submissions">
 
         <div class="wplf-submissions__list">
           <?php foreach ($submissions as $submission) {
+
             $meta = $submission->getMeta();
             $historyId = $meta['historyId'];
+            $referrer = json_decode($meta['referrerData'], true);
+
             $fieldsAtTheTime = $this->io->getHistoryFieldsByVersion($form, $historyId);
             $fieldsHaveChanged = serialize($fieldsAtTheTime) !== serialize($fields);
 
-            // echo "<pre>";
+            $title = $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission);
+
+            echo "<pre>";
+            // var_dump($meta);
+
             echo $fieldsHaveChanged ? 'Form has been edited after submission was made' : '';
+            echo "</pre>";
 
 
             ?>
             <article class="wplfSubmission" data-id="<?=esc_attr($submission->ID)?>">
-              <h3>Submission <?=esc_html($submission->ID)?></h3>
+            <!-- <h3>Submission <?=esc_html($submission->ID)?></h3> -->
+              <h3><?=esc_html($title)?></h3>
+
+              <time><?=date($dateFormat, strtotime($meta['created']))?></time>
+
 
 
               <table>
@@ -370,7 +382,10 @@ libreform()->render($form); ?&gt;</code>
               ?>
               </table>
 
-
+              <h4>Referrer</h4>
+              <?php foreach ($referrer as $k => $v) { ?>
+                <span><?=$k?>: <?=$v?></span> <br > <?php
+              } ?>
             </article>
             <?php
           } ?>
