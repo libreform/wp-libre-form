@@ -358,6 +358,7 @@ export default class WPLF_Editor {
     fieldContainer.innerHTML = ''
 
     const fieldErrors = []
+
     fields.forEach((field) => {
       if (!field) {
         return
@@ -375,7 +376,11 @@ export default class WPLF_Editor {
       }
 
       if (duplicateNames && duplicateNames.includes(name)) {
-        errorMessage = `${errorMessage}${i18n.duplicateFieldName} ${name}\n`
+        // console.log('duplicates', duplicateNames, field)
+
+        if (!field.multiple) {
+          errorMessage = `${errorMessage}${i18n.duplicateFieldName} ${name}\n`
+        }
       }
 
       if (additionalFields.includes(name)) {
