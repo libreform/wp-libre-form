@@ -140,9 +140,6 @@ class Plugin {
         'X-WP-Nonce' =>  wp_create_nonce('wp_rest'),
       ]),
 
-      // It seems WP sets the lang value to "" in admin, so we can't use that,
-      // `language` seems to work fine. Known issue: This seems to work for some languages only in admin.
-      // 'language' => $this->polylang ? $this->polylang->getLanguage() : null,
       'assetsDir' => $this->url . '/assets',
       'settings' => [
         'autoinit' => $this->settings->get('autoinit'),
@@ -182,7 +179,7 @@ class Plugin {
     wp_enqueue_script('wplf-admin', $this->url . '/dist/wplf-admin.js', [], $version, true);
     wp_enqueue_style('wplf-admincss', $this->url . '/dist/wplf-admin.css', [], $version);
 
-    wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm, 'post' => $GLOBALS['post']])));
+    wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm, 'post' => $GLOBALS['post'] ?? null])));
   }
 
   public function enqueueFrontendAssets() {

@@ -76,6 +76,23 @@ export type ApiResponse =
   | GetSubmissionsApiResponse
   | RenderApiResponse
 
+export interface Field {
+  name: string
+  type: string
+  required: boolean
+  multiple: boolean
+}
+
+export interface WPLF_EditorState {
+  historyFields: List<Field>
+  fields: Field[]
+  additionalFields: string[]
+  newFields: Field[]
+  deletedFields: Field[]
+  allowSave: boolean
+  [k: string]: any // and anything else your heart may desire
+}
+
 declare global {
   interface Window {
     // React: React, // @types/react has it handled already
@@ -93,12 +110,18 @@ declare global {
         'X-WP-Nonce': string
         [k: string]: any
       }
+      codeMirror: any
       settings: {
         autoinit: boolean
         debugLevel: string
-        hasUnfiltedHtml: number
+        hasUnfilteredHtml: number
         parseLibreformsShortcodeInRestApi: boolean
       }
     }
+
+    // Some WP globals that we don't have types for
+    jQuery: any // WP uses 1.12.4, there's no @types/jquery@1.12.4
+    // _: any, // @types/underscore@1.8.3
+    wp: any
   }
 }

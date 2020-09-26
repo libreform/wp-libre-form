@@ -2,6 +2,8 @@
 // const _ = window._
 // const wp = window.wp
 
+import WPLF from './wplf'
+
 export default class WPLF_Addons {
-  constructor() {}
+  constructor(wplfInstance: WPLF) {}
 }

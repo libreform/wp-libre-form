@@ -19,7 +19,13 @@ import wplfFrontend from '../../../dist/wplf-frontend'
 const { request } = createApiClient()
 
 const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
-  wplfForm.form.reset()
+  const form = wplfForm.form as HTMLFormElement
+
+  // Since all type guarantees have been thrown out of the window,
+  // it's necessary to check that the element indeed has this method.
+  if (form.reset) {
+    form.reset()
+  }
 }
 
 const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
@@ -49,7 +55,6 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 
   wplfForm.form.insertAdjacentElement('beforebegin', div)
   wplfForm.form.classList.add('submitted')
-  wplfForm.form.reset()
 }
 
 const defaultErrorSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
@@ -62,7 +67,7 @@ const defaultErrorSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 }
 
 export class WPLF_Form {
-  form: HTMLFormElement
+  form: Element
   submitState: SubmitState = SubmitState.Unsubmitted
   submitHandler: SubmitHandler
   callbacks: {
@@ -85,9 +90,10 @@ export class WPLF_Form {
   tabs: WPLF_Tabs[] = []
   key = ''
 
-  constructor(element: HTMLFormElement) {
-    // if (element instanceof HTMLFormElement !== true) {
-    if (element instanceof HTMLFormElement !== true) {
+  // constructor(element: HTMLFormElement) {
+  constructor(element: Element) {
+    if (element instanceof Element !== true) {
+      // if (element instanceof HTMLFormElement !== true) {
       throw new Error('Form element invalid or missing')
     }
     const fallbackInput = element.querySelector('[name="_nojs"]')
@@ -248,7 +254,7 @@ export class WPLF_Form {
 
   async send() {
     const form = this.form
-    const data = new FormData(form)
+    const data = new FormData(form as HTMLFormElement) // FormData can't be made from Element
 
     globalData.lang && data.append('lang', globalData.lang)
     this.submitState = SubmitState.Submitting

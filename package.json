@@ -40,6 +40,7 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.8",
+    "@types/underscore": "^1.8.3",
     "abort-controller": "^3.0.0",
     "postcss-loader": "^4.0.2",
     "regenerator-runtime": "^0.13.7"

@@ -46,7 +46,7 @@ export default class WPLF {
     }, [])
   }
 
-  attach(x: HTMLFormElement | WPLF_Form) {
+  attach(x: Element | WPLF_Form) {
     if (x instanceof WPLF_Form) {
       const wplfForm = x
 
@@ -57,7 +57,7 @@ export default class WPLF {
 
     const element = x
 
-    if (element instanceof HTMLElement !== true) {
+    if (element instanceof Element !== true) {
       // log.console.error('Unable to attach WPLF to element');
 
       throw new Error('Unable to attach WPLF to element')
