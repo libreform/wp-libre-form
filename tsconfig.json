@@ -4,12 +4,18 @@
     "outDir": "./dist/",
     "strictNullChecks": true,
     "moduleResolution": "node",
-    "allowJs": true,
+    "allowJs": false,
     "strict": true,
     "esModuleInterop": true,
     "jsx": "react",
     "baseUrl": "./src",
-    "lib": ["es2015", "dom.iterable", "es2016.array.include", "es2017.object", "dom"],
+    "lib": [
+      "es2015",
+      "dom.iterable",
+      "es2016.array.include",
+      "es2017.object",
+      "dom"
+    ],
 
     "module": "esnext",
     "removeComments": false,
@@ -21,7 +27,8 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "declaration": true
   },
 
   "exclude": ["node_modules", "vendor"]

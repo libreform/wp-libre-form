@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "WP Libre Form clientside bindings",
   "main": "dist/wplf-frontend.js",
+  "types": "dist/wplf-frontend.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --env.NODE_ENV=production",

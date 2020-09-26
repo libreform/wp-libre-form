@@ -14,7 +14,6 @@ import {
   ApiResponseKind,
 } from '../types'
 import isElementish from '../lib/is-elementish'
-import wplfFrontend from '../../../dist/wplf-frontend'
 
 const { request } = createApiClient()
 
