@@ -98,20 +98,15 @@ class RestApi extends Module {
     $formId = $params['form'] ?? null;
     $page = $params['page'] ?? 1;
 
-    // var_dump($this->submissions); var_dump($this); die();
-    // var_dump($this->x); die("submissions shouldnt be null");
-
-
-
     try {
       $form = new Form(get_post($formId));
       [$submissions, $totalPages] = $this->io->getFormSubmissions($form);
 
       $response = new \WP_REST_Response($submissions);
-      // $response::set_headers(array_merge($response::get_headers(), [
-        // 'X-WP-Total' => count($submissions),
-        // 'X-WP-TotalPages' => $totalPages,
-      // ]));
+      $response->set_headers(array_merge($response->get_headers(), [
+        'X-WP-Total' => count($submissions),
+        'X-WP-TotalPages' => $totalPages,
+      ]));
 
       return $response;
     } catch (Error $e) {

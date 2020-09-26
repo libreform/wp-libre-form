@@ -6,8 +6,14 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 export default ({ NODE_ENV: env }) => ({
   mode: env,
   entry: {
-    'wplf-admin': ['regenerator-runtime', path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts')],
-    'wplf-frontend': ['regenerator-runtime', path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts')],
+    'wplf-admin': [
+      'regenerator-runtime',
+      path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts'),
+    ],
+    'wplf-frontend': [
+      'regenerator-runtime',
+      path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts'),
+    ],
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -35,7 +41,7 @@ export default ({ NODE_ENV: env }) => ({
   optimization:
     env === 'production'
       ? {
-          // minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+          minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
         }
       : {},
   plugins: [

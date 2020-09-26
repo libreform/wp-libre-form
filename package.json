@@ -1,8 +1,8 @@
 {
   "name": "wp-libre-form",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "WP Libre Form clientside bindings",
-  "main": "dist/wp-libre-form.js",
+  "main": "dist/wplf-frontend.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --env.NODE_ENV=production",

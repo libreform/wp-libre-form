@@ -1,0 +1,12 @@
+classes
+.github
+assets
+lib
+*.php
+composer.json
+composer.lock
+.babelrc
+.editorconfig
+.gitignore
+.travis.yml
+!dist

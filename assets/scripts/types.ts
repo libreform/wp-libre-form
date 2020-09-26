@@ -93,31 +93,33 @@ export interface WPLF_EditorState {
   [k: string]: any // and anything else your heart may desire
 }
 
+export interface WPLF_LocalizeData {
+  backendUrl: string
+  assetsDir: string
+  // fetchCredentials: string
+  fetchCredentials: 'same-origin' | 'include' | 'omit'
+  i18n: List<string>
+  lang?: string
+  requestHeaders: {
+    'X-WP-Nonce': string
+    [k: string]: any
+  }
+  codeMirror: any
+  settings: {
+    autoinit: boolean
+    debugLevel: string
+    hasUnfilteredHtml: number
+    parseLibreformsShortcodeInRestApi: boolean
+  }
+}
+
 declare global {
   interface Window {
     // React: React, // @types/react has it handled already
     // WPLF: WPLF // We're not going to use our own library from window
 
     // This comes from WordPress
-    wplfData: {
-      backendUrl: string
-      assetsDir: string
-      // fetchCredentials: string
-      fetchCredentials: 'same-origin' | 'include' | 'omit'
-      i18n: List<string>
-      lang?: string
-      requestHeaders: {
-        'X-WP-Nonce': string
-        [k: string]: any
-      }
-      codeMirror: any
-      settings: {
-        autoinit: boolean
-        debugLevel: string
-        hasUnfilteredHtml: number
-        parseLibreformsShortcodeInRestApi: boolean
-      }
-    }
+    wplfData: WPLF_LocalizeData
 
     // Some WP globals that we don't have types for
     jQuery: any // WP uses 1.12.4, there's no @types/jquery@1.12.4
