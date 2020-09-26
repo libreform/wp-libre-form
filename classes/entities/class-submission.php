@@ -4,9 +4,9 @@ namespace WPLF;
 
 class Submission {
   public $ID;
+  public $fields = [];
+  public $meta = [];
   private $form;
-  private $fields = [];
-  private $meta = [];
   private $rawData;
 
   public function __construct(Form $form, ?array $data = null) {
@@ -91,12 +91,13 @@ class Submission {
   public function afterSubmission() {
     $email = $this->form->getEmailNotification();
     $data = apply_filters('wplfEmailNotificationData', $email, $this);
+    $wplf = \libreform(); // There's no access to the core plugin object from this class, but we need to do selector conversion.
 
     if ($data['enabled']) {
-      $to = $data['to'];
-      $from = $data['from'];
-      $subject = $data['subject'];
-      $content = $data['content'];
+      $to = $wplf->selectors->parse($data['to'], $this->form, $this);
+      $from = $wplf->selectors->parse($data['from'], $this->form, $this);
+      $subject = $wplf->selectors->parse($data['subject'], $this->form, $this);
+      $content = $wplf->selectors->parse($data['content'], $this->form, $this);
 
       $headers = apply_filters('wplfEmailNotificationHeaders', [
         'From' => $from,
@@ -104,7 +105,9 @@ class Submission {
       $attachments = apply_filters('wplfEmailNotificationAttachment', [], $this);
 
 
-      $this->sendEmail($to, $subject, $content, $headers, $attachments);
+      if (!$this->sendEmail($to, $subject, $content, $headers, $attachments)) {
+        isDebug() && log("Failed to send email");
+      }
     }
   }
 
@@ -116,6 +119,7 @@ class Submission {
       $actualHeaders[] = "$k: $v";
     }
 
+
     return wp_mail($to, $subject, $content, $actualHeaders, $attachments);
   }
 
@@ -125,7 +129,7 @@ class Submission {
     $error = null;
 
     $honeypotEnabled = apply_filters('wplfEnableHoneypot', true, $form);
-    $requiredEnabled = apply_filters('wplfEnablRequiredValidation', true, $form);
+    $requiredEnabled = apply_filters('wplfEnableRequiredValidation', true, $form);
     $additionalFieldsEnabled = apply_filters('wplfEnableAdditionalFieldsValidation', true, $form);
 
     try {

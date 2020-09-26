@@ -4,8 +4,10 @@ namespace WPLF;
 
 class RestApi extends Module {
   public $namespace = 'wplf/v2';
+  private $x;
 
   public function __construct(Plugin $wplf) {
+    $this->x = $wplf;
     parent::__construct($wplf);
     $this->registerEndpoints();
   }
@@ -14,6 +16,7 @@ class RestApi extends Module {
     $this->registerSubmitEndpoint();
     $this->registerSubmissionsEndpoint();
     $this->registerRenderEndpoint();
+    $this->registerFormEndpoint();
   }
 
   public function registerSubmissionsEndpoint() {
@@ -22,9 +25,11 @@ class RestApi extends Module {
     register_rest_route($this->namespace, $endpoint, [
       'callback' => [$this, 'getSubmissions'],
       'methods' => ['GET'],
-      'permission_callback' => function () {
-        return current_user_can('edit_posts');
-      },
+      // 'permission_callback' => function () {
+      //   return current_user_can('edit_posts');
+      // },
+      'permission_callback' => '__return_true',
+
     ]);
   }
 
@@ -49,20 +54,64 @@ class RestApi extends Module {
     ]);
   }
 
+  public function registerFormEndpoint() {
+    $endpoint = 'form';
+
+    register_rest_route($this->namespace, $endpoint, [
+      'callback' => [$this, 'getForm'],
+      'methods' => ['GET'],
+      // 'permission_callback' => function () {
+      //   return current_user_can('edit_posts');
+      // },
+      'permission_callback' => '__return_true',
+
+    ]);
+  }
+
+  public function getForm($request) {
+    $params = $request->get_params();
+    $formId = $params['form'] ?? null;
+    // $this->x->loadModule('submissions');
+
+    // var_dump($this->submissions);
+
+    try {
+      $form = new Form(get_post($formId));
+      // [$submissions, $totalPages] = $this->submissions->getFormSubmissions($form);
+
+      $response = new \WP_REST_Response($form);
+      $response->set_headers(array_merge($response->get_headers(), [
+        // 'X-WP-Total' => count($submissions),
+        // 'X-WP-TotalPages' => $totalPages,
+      ]));
+
+      return $response;
+    } catch (Error $e) {
+      isDebug() && log($e->getMessage());
+
+      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], ['status' => 500]);
+    }
+  }
+
   public function getSubmissions($request) {
     $params = $request->get_params();
     $formId = $params['form'] ?? null;
     $page = $params['page'] ?? 1;
 
+    // var_dump($this->submissions); var_dump($this); die();
+    // var_dump($this->x); die("submissions shouldnt be null");
+
+
+
     try {
       $form = new Form(get_post($formId));
-      [$submissions, $totalPages] = $this->submissions->getFormSubmissions($form);
+      [$submissions, $totalPages] = $this->io->getFormSubmissions($form);
 
       $response = new \WP_REST_Response($submissions);
-      $response::set_headers(array_merge($response::get_headers(), [
-        'X-WP-Total' => count($submissions),
-        'X-WP-TotalPages' => $totalPages,
-      ]));
+      // $response::set_headers(array_merge($response::get_headers(), [
+        // 'X-WP-Total' => count($submissions),
+        // 'X-WP-TotalPages' => $totalPages,
+      // ]));
 
       return $response;
     } catch (Error $e) {

@@ -33,6 +33,9 @@ class Plugin {
     require_once 'entities/class-form.php';
     require_once 'entities/class-submission.php';
 
+    add_action('rest_api_init', [$this, 'afterRestApiInit']);
+
+
     $this->loadModule('io');
     $this->loadModule('settings');
     $this->loadModule('notices');
@@ -48,7 +51,6 @@ class Plugin {
     }
 
     add_action('wp', [$this, 'afterInit']);
-    add_action('rest_api_init', [$this, 'afterRestApiInit']);
     add_action('admin_footer', [$this, 'enqueueAdminAssets']);
 
 
@@ -58,7 +60,7 @@ class Plugin {
 
     add_action('init', [$this, 'registerPostType']);
     add_action('wp', [$this, 'preventDirectAccess']);
-    add_action('save_post', [$this, 'afterSavePost']); // Save the meta
+    add_action('save_post', [$this, 'afterSavePost'], 10, 3); // Save the meta
     add_filter('content_save_pre', '\WPLF\stripFormTags', 10, 1); // Strip form tags from the content, we add our own
 
 
@@ -180,7 +182,7 @@ class Plugin {
     wp_enqueue_script('wplf-admin', $this->url . '/dist/wplf-admin.js', [], $version, true);
     wp_enqueue_style('wplf-admincss', $this->url . '/dist/wplf-admin.css', [], $version);
 
-    wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm])));
+    wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm, 'post' => $GLOBALS['post']])));
   }
 
   public function enqueueFrontendAssets() {
@@ -315,9 +317,7 @@ class Plugin {
     }
   }
 
-  public function afterSavePost($formId) {
-    $form = get_post($formId);
-
+  public function afterSavePost($formId, $form, $isUpdate) {
     if ($form->post_type !== Plugin::$postType) {
       return;
     }
@@ -329,6 +329,11 @@ class Plugin {
     $isTheRightPostType = $_POST['post_type'] ?? false === self::$postType;
     $weaseledThroughDespiteNotSupposedTo = ($_POST['wplfAllowSave'] ?? '0') === '0';
     $hasUnfilteredHtml = !is_multisite() || current_user_can('unfiltered_html');
+
+    if (!$isUpdate) {
+      // New form, better add version.
+      $form->setVersionCreatedAt($this->version);
+    }
 
     if (!$isTheRightPostType || !$nonceIsValid || !$currentUserCanEdit) {
       return;

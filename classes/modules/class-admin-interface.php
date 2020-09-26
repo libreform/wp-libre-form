@@ -164,6 +164,8 @@ class AdminInterface extends Module {
     if ($form->post_type !== Plugin::$postType) {
       return;
     }
+    $form = new Form($form);
+    $isNewPost = get_post_meta($form->ID, '_edit_last', true) != 1; // New posts don't have this meta field. This is the least hackiest way to get that data here.
 
     $metaSections = [
       'preview' => [
@@ -208,9 +210,11 @@ class AdminInterface extends Module {
           </header>
 
           <?php
+
+          // var_dump($GLOBALS['post']); die();
           foreach ($metaSections as $key => $data) {
             echo "<section class='wplf-tabs__tab wplf-$key' data-name='FormEditActiveTab' data-tab='$key'>";
-            $data['fn']();
+            $data['fn']($form, $isNewPost);
             echo "</section>";
           }
           ?>
@@ -219,16 +223,16 @@ class AdminInterface extends Module {
     </div><?php
   }
 
-  private function renderPreview(): void {
-    $form = get_post(); ?>
+  private function renderPreview(Form $form, bool $isNewPost): void { ?>
     <div class="wplf-editor__preview">
       <!-- Rendered with JS -->
-      <!-- <?=$form->post_content?> -->
+      <!-- <?=$form->getPost()->post_content?> -->
+      <?=$form->render()?>
     </div><?php
   }
 
 
-  private function renderUsage(): void {
+  private function renderUsage(Form $form, bool $isNewPost): void {
     $post = get_post(); ?>
     <p>
       <?=esc_html__('Put this shortcode in a post to use the form.', 'wplf')?>
@@ -249,7 +253,8 @@ libreform()->render($form); ?&gt;</code>
     <?php
   }
 
-  private function renderSelectors(): void {
+
+  private function renderSelectors(Form $form, bool $isNewPost): void {
     $all = $this->selectors->getAll();
 
     ksort($all);
@@ -303,7 +308,7 @@ libreform()->render($form); ?&gt;</code>
     <?php
   }
 
-  private function renderSubmissions(): void {
+  private function renderSubmissions(Form $form, bool $isNewPost): void {
     $form = get_post();
     $form = new Form($form);
 
@@ -315,6 +320,8 @@ libreform()->render($form); ?&gt;</code>
 
       $dateFormat = get_option('date_format') . ' ' . get_option('time_format');
       ?>
+
+      <div class="wplf-formSubmissions"></div>
       <div class="wplf-submissions">
 
         <div class="wplf-submissions__list">
@@ -360,20 +367,22 @@ libreform()->render($form); ?&gt;</code>
                 $field = $fieldsAtTheTime[$k];
                 $type = $field['type'];
                 $name = $name . ($field['required'] ? '*' : '');
+                $value = stringifyFieldValue($value, $type);
+                $isEmpty = empty($value);
 
-                if ($type === 'file') {
-                  $filepaths = explode(', ', $value);
-                  $fileurls = array_map(function($path) use ($wpDir, $wpUrl) {
+                if ($isEmpty) {
+                  // Empty string makes for a terrible visual.
+                  $value = apply_filters('wplfEmptySubmissionFieldValue', __('(empty)', 'wplf'));
+                }
 
-                    return str_replace($wpDir, $wpUrl, $path);
-                  }, $filepaths);
+                if ($type === 'file' && !$isEmpty) {
+                  $fileurls = explode(', ', $value);
 
                   echo "<tr><th>$name</th><td>";
                   foreach ($fileurls as $url) {
                     echo "<a href='$url' target='blank'>$url</a> <br>";
                   }
                   echo "</td></tr>";
-
                 } else {
                   echo "<tr><th>$name</th><td>$value</td></tr>";
                 }
@@ -397,19 +406,20 @@ libreform()->render($form); ?&gt;</code>
     }
   }
 
-  private function renderSettings() {
+  private function renderSettings(Form $form, $isNewPost = false) {
     $form = get_post();
+
     $form = new Form($form);
     // $meta = get_post_meta($post->ID);
-    $siteurl = get_site_url();
+    $siteEmail = str_replace(['https://', 'http://'], '', home_url());
 
     $thankYou = $form->getSuccessMessage();
     $submissionTitleFormat = $form->getSubmissionTitleFormat();
 
     $toPlaceholder = esc_attr(get_option('admin_email'));  // this get_option is ok, the option is autoloaded anyway
-    $fromPlaceholder = 'WordPress <wordpress@example.com>';
-    $subjectPlaceholder = esc_attr__('## SUBMISSION id ##[%submission-id%] Submission from ## FORM title ##', 'wplf');
-    $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM id ##) was submitted with the following values:', 'wplf') . ': ## SUBMISSION ##';
+    $fromPlaceholder = "WordPress <wordpress@$siteEmail>";
+    $subjectPlaceholder = esc_attr__('Submission ### SUBMISSION id ## from form ## FORM title ##', 'wplf');
+    $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM id ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
     $emailCopy = $form->getEmailNotification();
     $emailCopyEnabled = $emailCopy['enabled'] ?? null === 1;
@@ -482,11 +492,7 @@ libreform()->render($form); ?&gt;</code>
         </div>
 
         <p>
-          <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically.', 'wplf'); ?>
-        </p>
-
-        <p>
-          <?=__('Selectors are allowed. No HTML.')?>
+          <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically. Do not use HTML.', 'wplf'); ?>
         </p>
 
         <div class="wplf-formRow">
@@ -591,7 +597,7 @@ libreform()->render($form); ?&gt;</code>
               name="wplfUpdateVersionCreatedAt"
               type="checkbox"
               value="1"
-              <?=checked(apply_filters('wplfUpgradeFormByFefault', false, $form), true, false)?>
+              <?=checked($isNewPost || apply_filters('wplfUpgradeFormByFefault', false, $form), true, false)?>
             >
             <?php esc_html_e('Upgrade form to enable latest features', 'wplf'); ?>
           </label>

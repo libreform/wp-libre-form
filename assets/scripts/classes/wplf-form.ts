@@ -18,6 +18,10 @@ import wplfFrontend from '../../../dist/wplf-frontend'
 
 const { request } = createApiClient()
 
+const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
+  wplfForm.form.reset()
+}
+
 const defaultBeforeSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   if (isElementish(wplfForm.form.parentNode)) {
     const parentNode = wplfForm.form.parentNode
@@ -45,10 +49,6 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
 
   wplfForm.form.insertAdjacentElement('beforebegin', div)
   wplfForm.form.classList.add('submitted')
-  wplfForm.form.reset()
-}
-
-const resetForm = (wplfForm: WPLF_Form, params: List<any>) => {
   wplfForm.form.reset()
 }
 

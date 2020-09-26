@@ -87,6 +87,31 @@ function getFileUploadError(int $errorNumber) {
   return new Error($errors[$errorNumber]);
 }
 
+function stringifyFieldValue($value, string $type) {
+  switch ($type) {
+    case 'file': {
+      // potential micro-optimization here
+      $wpDir = get_home_path();
+      $wpUrl = get_home_url(null, '/');
+
+      $filepaths = explode(', ', $value);
+      $fileurls = array_map(function($path) use ($wpDir, $wpUrl) {
+
+        return str_replace($wpDir, $wpUrl, $path);
+      }, $filepaths);
+
+      return join(', ', $fileurls);
+      // return $value;
+      break;
+    }
+
+    default: {
+      return $value;
+    }
+  }
+
+}
+
 function getUploadedFiles(): ?array {
   $uploads = $_FILES;
 

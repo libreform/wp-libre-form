@@ -5,6 +5,10 @@ namespace WPLF;
 class Form {
   public $ID;
   public $title;
+  public $fields;
+  public $additionalFields; // meta etc
+  public $addToMediaLibrary;
+  public $versionCreatedAt;
 
   private $raw;
 
@@ -30,6 +34,11 @@ class Form {
     $this->ID = $form->ID;
     $this->title = $form->post_title;
     $this->raw = $form;
+
+    $this->fields = $this->getFields();
+    $this->additionalFields = $this->getAdditionalFields();
+    $this->addToMediaLibrary = $this->getAddToMediaLibrary();
+    $this->versionCreatedAt = $this->getVersionCreatedAt();
   }
 
   /**

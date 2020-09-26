@@ -45,6 +45,7 @@ class Selectors extends Module {
             $data = '';
 
             foreach ($fields as $k => $v) {
+              $v = print_r($v, true);
               $data = "{$data}$k: $v\n";
             }
 
