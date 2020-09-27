@@ -147,7 +147,7 @@ class AdminInterface extends Module {
     <input type="hidden" name="wplfDeletedFields" id="wplfDeletedFields">
 
     <!-- All fields that the form "has ever had", according to history table. Used to prevent reusing the same field name for a column with data, but which may not be present in the form at this time. Not saved from this field. -->
-    <input type="hidden" name="wplfHistoryFields" id="wplfHistoryFields" value='<?=json_encode($this->io->getHistoryFields($form)); ?>'>
+    <input type="hidden" name="wplfHistoryFields" id="wplfHistoryFields" value='<?=json_encode($this->io->getAllHistoryFieldsFormHasEverHad($form)); ?>'>
 
     <!-- List of fields that the form MAY NOT have as they are added dynamically -->
     <input type="hidden" name="wplfAdditionalFields" id="wplfAdditionalFields" value='<?=json_encode($form->getAdditionalFields()); ?>'>
@@ -331,7 +331,8 @@ libreform()->render($form); ?&gt;</code>
             $historyId = $meta['historyId'];
             $referrer = json_decode($meta['referrerData'], true);
 
-            $fieldsAtTheTime = $this->io->getHistoryFieldsByVersion($form, $historyId);
+            // $fieldsAtTheTime = $this->io->getHistoryFieldsByVersion($form, $historyId);
+            $fieldsAtTheTime = $form->getFields($historyId);
             $fieldsHaveChanged = serialize($fieldsAtTheTime) !== serialize($fields);
 
             $title = $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission);
@@ -419,7 +420,7 @@ libreform()->render($form); ?&gt;</code>
     $toPlaceholder = esc_attr(get_option('admin_email'));  // this get_option is ok, the option is autoloaded anyway
     $fromPlaceholder = "WordPress <wordpress@$siteEmail>";
     $subjectPlaceholder = esc_attr__('Submission ### SUBMISSION id ## from form ## FORM title ##', 'wplf');
-    $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM id ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
+    $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM ID ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
     $emailCopy = $form->getEmailNotification();
     $emailCopyEnabled = $emailCopy['enabled'] ?? null === 1;

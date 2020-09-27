@@ -5,7 +5,11 @@ namespace WPLF;
 class Form {
   public $ID;
   public $title;
-  public $fields;
+  public $fields = [];
+  public $historyFields = [
+    // 'historyId' => [],
+    // 'historyId2' => [],
+  ];
   public $additionalFields; // meta etc
   public $addToMediaLibrary;
   public $versionCreatedAt;
@@ -39,6 +43,9 @@ class Form {
     $this->additionalFields = $this->getAdditionalFields();
     $this->addToMediaLibrary = $this->getAddToMediaLibrary();
     $this->versionCreatedAt = $this->getVersionCreatedAt();
+
+    // $fields = $this->fields;
+    // error_log($fields);
   }
 
   /**
@@ -83,8 +90,28 @@ class Form {
     $this->setMeta('HistoryId', $value);
   }
 
-  public function getFields(): array {
-    $data = $this->getMeta('Fields');
+  public function getFields(int $historyId = null): array {
+    if (!$historyId) {
+      $data = $this->getMeta('Fields');
+    } else {
+      try {
+        if (isset($this->historyFields[$historyId])) {
+          return $this->historyFields[$historyId];
+        }
+
+        $data = libreform()->io->getHistoryFieldsByVersion($this, $historyId);
+
+        // Save for possible later use
+        $this->historyFields[$historyId] = $data;
+      } catch (Error $e) {
+        // As if this will ever happen, but it doesn't hurt to be safe.
+
+        isDebug() && log($e->getMessage());
+
+        $data = [];
+      }
+    }
+
 
     return is_array($data) ? $data : [];
   }

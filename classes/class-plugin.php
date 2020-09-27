@@ -176,8 +176,8 @@ class Plugin {
     wp_enqueue_script('wp-theme-plugin-editor');
     wp_enqueue_style('wp-codemirror');
 
-    wp_enqueue_script('wplf-admin', $this->url . '/dist/wplf-admin.js', [], $version, true);
-    wp_enqueue_style('wplf-admincss', $this->url . '/dist/wplf-admin.css', [], $version);
+    wp_enqueue_script('wplf-admin', $this->url .( isDebug() ? '/dist/wplf-admin.js' : '/dist/wplf-admin.min.js'), [], $version, true);
+    wp_enqueue_style('wplf-admincss', $this->url . (isDebug() ? '/dist/wplf-admin.css' : '/dist/wplf-admin.min.css'), [], $version);
 
     wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm, 'post' => $GLOBALS['post'] ?? null])));
   }
@@ -188,12 +188,12 @@ class Plugin {
 
     wp_register_script(
         'wplf-frontend',
-        $this->url . '/dist/wplf-frontend.js',
+        $this->url . (isDebug() ? '/dist/wplf-frontend.js' : '/dist/wplf-frontend.min.js'),
         ['react', 'react-dom'], // remove these if not actually using them
         $version,
         true
     );
-    wp_enqueue_style('wplf-frontend', $this->url . '/dist/wplf-frontend.css', [], $version);
+    wp_enqueue_style('wplf-frontend', $this->url . (isDebug() ? '/dist/wplf-frontend.css' : '/dist/wplf-frontend.min.css'), [], $version);
     wp_localize_script('wplf-frontend', 'wplfData', $data);
   }
 

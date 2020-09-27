@@ -65,6 +65,11 @@ class Submission {
     return $this->io->destroySubmission($this);
   }
 
+  /**
+   * $fields is undocumented, pls fix
+   *
+   * also, do I want to create a new submission (hacky?) or mutate this one so it works?
+   */
   public function create($fields) {
     // $update = isset($this->ID);
     $form = $this->form;
@@ -76,8 +81,17 @@ class Submission {
       throw new Error($error->getMessage(), $error->getData());
     }
 
-    $this->fields = apply_filters('wplfFieldsAfterValidateSubmission', $fields);
-    $this->ID = libreform()->io->insertSubmission($form, $fields);
+    $fields = apply_filters('wplfFieldsAfterValidateSubmission', $fields);
+    try {
+      $id = libreform()->io->insertSubmission($form, $fields);
+      $newSub = libreform()->io->getFormSubmissionById($form, $id); // contains fields
+
+      // return $newSub;
+      $this->fields = $newSub->getFields();
+      $this->meta = $newSub->getMeta();
+    } catch (Error $e) {
+      throw $e; //
+    }
 
     do_action('wplfAfterSubmission', $this);
 

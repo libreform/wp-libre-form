@@ -378,6 +378,7 @@ export default class WPLF_Editor {
       if (duplicateNames && duplicateNames.includes(name)) {
         // console.log('duplicates', duplicateNames, field)
 
+        // Allow checkboxes etc to work normally
         if (!field.multiple) {
           errorMessage = `${errorMessage}${i18n.duplicateFieldName} ${name}\n`
         }

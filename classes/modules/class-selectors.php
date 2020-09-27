@@ -42,11 +42,33 @@ class Selectors extends Module {
             return $submission->ID;
           } elseif ($field === null) { // Get all
             $fields = $submission->getFields();
+            $formFields = $form->getFields($form->getHistoryId());
+
             $data = '';
 
-            foreach ($fields as $k => $v) {
-              $v = print_r($v, true);
-              $data = "{$data}$k: $v\n";
+
+            foreach ($fields as $k => $value) {
+              // $key = array_search($k, array_column($formFields, 'name'));
+
+              // $field = $fields[$key];
+              $columns = array_column($formFields, 'name');
+              $key = array_search($k, $columns);
+              $formField = $formFields[$key];
+
+              var_dump($formField['type']);
+
+              $type = $formField['type'];
+
+              $value = stringifyFieldValue($value, $type);
+              $isEmpty = empty($value);
+
+              if ($isEmpty) {
+                // Empty string makes for a terrible visual.
+                $value = apply_filters('wplfEmptySubmissionFieldValue', __('(empty)', 'wplf'));
+              }
+
+              // $v = print_r($v, true);
+              $data = "{$data}$k: $value\n";
             }
 
             return $data;

@@ -261,9 +261,10 @@ class Io extends Module {
   }
 
   /**
-   * @deprecated
+   * Get a (possibly) huge chunk of fields that have existed in the form.
+   * This is mainly useful for comparing current fields to previous ones in order to avoid DB conflicts.
    */
-  public function getHistoryFields(Form $form) {
+  public function getAllHistoryFieldsFormHasEverHad(Form $form) {
     [$db, $prefix] = db();
     $tableName = $this->getHistoryTableName($form);
     $id = (int) $form->ID;
@@ -276,10 +277,6 @@ class Io extends Module {
 
         foreach ($fields as $field) {
           $name = $field['name'];
-
-          // Overwrites the field values in each iteration on purpose, in practise
-          // the code prevents the existence of multiple variations of the same name.
-          // It's only used for validating the form for any values that might cause DB errors.
           $historyFields[$name] = array_replace_recursive($historyFields[$name] ?? [], $field);
         }
       }

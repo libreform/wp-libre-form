@@ -3,17 +3,33 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserJSPlugin = require('terser-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
+const entries = {
+  'wplf-admin': [
+    'regenerator-runtime',
+    path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts'),
+  ],
+  'wplf-frontend': [
+    'regenerator-runtime',
+    path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts'),
+  ],
+}
+
+const minifiedEntries = {
+  'wplf-admin.min': [
+    'regenerator-runtime',
+    path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts'),
+  ],
+  'wplf-frontend.min': [
+    'regenerator-runtime',
+    path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts'),
+  ],
+}
+
 export default ({ NODE_ENV: env }) => ({
   mode: env,
   entry: {
-    'wplf-admin': [
-      'regenerator-runtime',
-      path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts'),
-    ],
-    'wplf-frontend': [
-      'regenerator-runtime',
-      path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts'),
-    ],
+    ...entries,
+    ...(env === 'production' ? minifiedEntries : {}),
   },
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -41,7 +57,14 @@ export default ({ NODE_ENV: env }) => ({
   optimization:
     env === 'production'
       ? {
-          minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+          minimizer: [
+            new TerserJSPlugin({
+              test: /\.min\.m?js(\?.*)?$/i,
+            }),
+            new OptimizeCSSAssetsPlugin({
+              assetNameRegExp: /\.min\.css$/g,
+            }),
+          ],
         }
       : {},
   plugins: [

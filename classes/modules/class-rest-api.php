@@ -158,8 +158,9 @@ class RestApi extends Module {
     try {
       $form = new Form(get_post($formId));
       $submission = new Submission($form);
-      // $submission->create(array_merge($params, getUploadedFiles() ?? []));
-      $submission->create(array_merge($params, $request->get_file_params()));
+      // $submission->create(array_merge($params, getUploadedFiles() ?? [])); // this does not work
+      // $submission->create(array_merge($params, $request->get_file_params())); // this works
+      $submission = $submission->create(array_merge($params, $request->get_file_params()));
 
 
       if ($useFallback) {
