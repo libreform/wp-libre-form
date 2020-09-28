@@ -139,7 +139,7 @@ class Io extends Module {
       throw new Error($db->last_error);
     }
 
-    $form->setTableCreated(true);
+    $form->setSubmissionsTableCreatedValue(true);
     $this->insertHistoryFields($form);
 
     return true;
@@ -153,7 +153,7 @@ class Io extends Module {
       throw new Error($db->last_error);
     }
 
-    $form->setTableCreated(false);
+    $form->setSubmissionsTableCreatedValue(false);
 
     return true;
   }
@@ -463,7 +463,7 @@ class Io extends Module {
   public function uploadFiles(Form $form, $k, $data) {
     $this->readyToUpload || $this->loadUploadStuff();
     $actualName = $form->getFieldOriginalName($k);
-    $addUploadsToMediaLibrary = $form->getAddToMediaLibrary();
+    $addUploadsToMediaLibrary = $form->getAddToMediaLibraryValue();
 
     // Multiple uploads are in a weird format. Let's normalize them into
     // looking like single uploads.

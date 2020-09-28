@@ -35,17 +35,14 @@ class Form {
       throw new Error("Post ID {$this->ID} is not a form");
     }
 
-    $this->ID = $form->ID;
+    $this->ID = (int) $form->ID;
     $this->title = $form->post_title;
     $this->raw = $form;
 
     $this->fields = $this->getFields();
     $this->additionalFields = $this->getAdditionalFields();
-    $this->addToMediaLibrary = $this->getAddToMediaLibrary();
+    $this->addToMediaLibrary = $this->getAddToMediaLibraryValue();
     $this->versionCreatedAt = $this->getVersionCreatedAt();
-
-    // $fields = $this->fields;
-    // error_log($fields);
   }
 
   /**
@@ -56,20 +53,32 @@ class Form {
     return str_replace('field', '', $fieldName);
   }
 
+  /**
+   * Get database column name for the field
+   */
   public function getFieldColumnName(string $fieldName) {
     return 'field' . ($fieldName);
   }
 
+  /**
+   * Get raw WP_Post object that the Form is based on
+   */
   public function getPost() {
     return $this->raw;
   }
 
+  /**
+   * Get WPLF spesific post meta for this form
+   */
   public function getMeta(string $name, $default = null) {
-    // Prefix keys with _ to make them "hidden"
+    // Keys are prefixed with _ to make them "hidden"
 
     return get_post_meta($this->ID, "_wplf" . $name, true) ?? $default;
   }
 
+  /**
+   * Set WPLF spesific post meta for this form
+   */
   public function setMeta(string $name, $data = []): void {
     update_post_meta($this->ID, "_wplf" . $name, $data);
   }
@@ -78,18 +87,29 @@ class Form {
     return $this->getMeta('DBTableCreated');
   }
 
-  public function setTableCreated(bool $value): void {
+  public function setSubmissionsTableCreatedValue(bool $value): void {
     $this->setMeta('DBTableCreated', $value);
   }
 
+  /**
+   * Get current HistoryId of the form
+   */
   public function getHistoryId(): int {
     return (int) $this->getMeta('HistoryId');
   }
 
+  /**
+   * Set current HistoryId of the form
+   */
   public function setHistoryId(int $value): void {
     $this->setMeta('HistoryId', $value);
   }
 
+  /**
+   * Get form fields, optionally for a spesific HistoryId
+   *
+   * @todo Move IO operations
+   */
   public function getFields(int $historyId = null): array {
     if (!$historyId) {
       $data = $this->getMeta('Fields');
@@ -112,36 +132,57 @@ class Form {
       }
     }
 
-
     return is_array($data) ? $data : [];
   }
 
+  /**
+   * Set form fields for the current HistoryId
+   */
   public function setFields(string $json): void {
     $fields = json_decode(stripslashes($json), true);
+
     $this->setMeta('Fields', $fields);
   }
 
-  public function setAddToMediaLibrary(int $status): void {
+  /**
+   * Set whether file uploads should be added to the media library or not.
+   * 0 for no, 1 for yes.
+   */
+  public function setAddToMediaLibraryValue(int $status): void {
     $this->setMeta('AddToMediaLibrary', $status);
   }
 
-  public function getAddToMediaLibrary() {
+  public function getAddToMediaLibraryValue() {
     return $this->getMeta('AddToMediaLibrary') ?? 0;
   }
 
-  public function getDestroyUnusedDatabaseColumns(): int {
+  /**
+   * Get whether or not unused database columns should be destroyed.
+   * 0 for no, 1 for yes.
+   */
+  public function getDestroyUnusedDatabaseColumnsValue(): int {
     return (int) $this->getMeta('DestroyUnusedDatabaseColumns') ?? 0;
   }
 
-  public function setDestroyUnusedDatabaseColumns(int $status): void {
+  /**
+   * Set whether or not unused database columns should be destroyed.
+   * 0 for no, 1 for yes.
+   */
+  public function setDestroyUnusedDatabaseColumnsValue(int $status): void {
     $this->setMeta('DestroyUnusedDatabaseColumns', $status);
   }
 
-  public function getEmailNotification() {
+  /**
+   * Get email data from the form
+   */
+  public function getEmailNotificationData() {
     return $this->getMeta('EmailNotification') ?? [];
   }
 
-  public function setEmailNotification($data = []): void {
+  /**
+   * Set email data for the form
+   */
+  public function setEmailNotificationData($data = []): void {
     $this->setMeta('EmailNotification', $data);
   }
 
@@ -153,18 +194,30 @@ class Form {
     $this->setMeta('SubmissionTitleFormat', $formattedString);
   }
 
+  /**
+   * Get the version of WPLF of which was used when this form was created, or last updated.
+   */
   public function getVersionCreatedAt() {
     return $this->getMeta('VersionCreatedAt');
   }
 
+  /**
+   * Set the version of WPLF of which was used when this form was created, or last updated.
+   */
   public function setVersionCreatedAt(string $version): void {
     $this->setMeta('VersionCreatedAt', $version);
   }
 
+  /**
+   * Get message shown after a succesful submission
+   */
   public function getSuccessMessage() {
     return $this->getMeta('ThankYou') ?: '<p>' . __('Form submitted succesfully.', 'wplf') . '</p>';
   }
 
+    /**
+   * Get message shown after a succesful submission
+   */
   public function setSuccessMessage(string $message): void {
     $this->setMeta('ThankYou', $message);
   }
@@ -173,14 +226,19 @@ class Form {
     return $this->post_status === 'publish';
   }
 
-  public function render($options = []) {
-    // $content = $this->post_content;
-    $content = $options['content'] ?? null;
+  public function render($options = [], Submission $submission = null) {
+    $content = apply_filters('wplfImportFormTemplate', $options['content'] ?? null, $this);
     $printAdditionalFields = (bool) ($options['printAdditionalFields'] ?? true);
     $attributes = $options['attributes'] ?? [];
     $className = $attributes['class'] ?? null;
+    // $useFallbackThankYou = $options['showFallback'];
 
-    $useFallbackThankYou = (int) ($_GET['wplfNoJs'] ?? false) === $this->ID;
+    // $useFallbackThankYou = (int) ($_GET['wplfForm'] ?? false) === $this->ID;
+    // move this shit to class-plugin.php
+    $fallbackFormId = (int) ($_GET['wplfForm'] ?? false);
+    $fallbackSubId = (int) ($_GET['wplfSubmissionId'] ?? false);
+
+    // $useFallbackThankYou = $fallbackFormId && $fallbackSubId;
 
     if (!$content) {
       $content = $this->post_content;
@@ -215,10 +273,9 @@ class Form {
     >
       <?php
 
-      if ($useFallbackThankYou) { ?>
-        <div class="form-notice form-notice__thankyou">
-          Fallback
-          <?=$this->getSuccessMessage($this->post)?>
+      if ($submission) { ?>
+        <div class="form-notice form-notice__thankyou wplf-submitfallback">
+          <?=libreform()->selectors->parse($this->getSuccessMessage(), $this, $submission); ?>
         </div><?php
       }
 

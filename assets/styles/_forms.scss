@@ -30,8 +30,8 @@
     font-size: 1rem;
     padding: 0.5rem;
 
-    &[type="checkbox"],
-    &[type="radio"] {
+    &[type='checkbox'],
+    &[type='radio'] {
       width: 1rem;
       height: 1rem;
       line-height: 0;
@@ -44,7 +44,8 @@
     }
   }
 
-  button, input[type="button"] {
+  button,
+  input[type='button'] {
     flex-grow: 0;
   }
 
@@ -62,12 +63,11 @@
     height: 10rem;
   }
 
-
   @media (min-width: 600px) {
-    max-width: 37.5rem; // 600px
+    // max-width: 37.5rem; // 600px
+    max-width: 100%;
     flex-flow: row nowrap;
     align-items: center;
-
 
     > * {
       margin-right: 1rem;

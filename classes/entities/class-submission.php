@@ -66,12 +66,11 @@ class Submission {
   }
 
   /**
-   * $fields is undocumented, pls fix
+   * $fields is an associative array, using keys for field names and values for the field values.
    *
-   * also, do I want to create a new submission (hacky?) or mutate this one so it works?
+   * @todo move to IO
    */
   public function create($fields) {
-    // $update = isset($this->ID);
     $form = $this->form;
 
     $fields = apply_filters('wplfFieldsBeforeValidateSubmission', $fields);
@@ -87,6 +86,7 @@ class Submission {
       $newSub = libreform()->io->getFormSubmissionById($form, $id); // contains fields
 
       // return $newSub;
+      $this->ID = $id;
       $this->fields = $newSub->getFields();
       $this->meta = $newSub->getMeta();
     } catch (Error $e) {
@@ -103,7 +103,7 @@ class Submission {
   }
 
   public function afterSubmission() {
-    $email = $this->form->getEmailNotification();
+    $email = $this->form->getEmailNotificationData();
     $data = apply_filters('wplfEmailNotificationData', $email, $this);
     $wplf = \libreform(); // There's no access to the core plugin object from this class, but we need to do selector conversion.
 

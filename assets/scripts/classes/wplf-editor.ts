@@ -27,8 +27,8 @@ export default class WPLF_Editor {
   fieldTemplate: Element
 
   // Codemirror instances:
-  contentEditor
-  successMessageEditor
+  contentEditor: any
+  successMessageEditor: any
 
   constructor(wplfInstance: WPLF) {
     const fields = document.querySelector('#wplfFields')
@@ -60,8 +60,7 @@ export default class WPLF_Editor {
       isElementish(publishButton) &&
       isElementish(sidebarFieldTemplate)
     ) {
-      console.log('all fine', fields)
-
+      const editorIsReadonly = $(editorEl).attr('readonly') ? true : false
       const initialState = {
         historyFields: JSON.parse(
           // (historyFields && historyFields.getAttribute('value')) || null
@@ -95,28 +94,35 @@ export default class WPLF_Editor {
 
       this.previewEl = previewEl
       this.publishButton = publishButton
-      this.contentEditor = wp.codeEditor.initialize(
-        $(editorEl),
-        globalData.codeMirror
-      )
+      this.contentEditor = editorIsReadonly
+        ? null
+        : wp.codeEditor.initialize($(editorEl), globalData.codeMirror)
       this.successMessageEditor = wp.codeEditor.initialize(
         $(thankYouEl),
         globalData.codeMirror
       )
       this.handleContentChange = this.handleContentChange.bind(this)
-      this.contentEditor.codemirror.on(
-        'changes',
-        _.debounce(this.handleContentChange, 1000)
-      )
-      this.handleContentChange(this.contentEditor.codemirror) // Triggers preview build
+
+      if (!editorIsReadonly) {
+        // If the editor is in read-only mode, no need to refresh the preview as it can't change anyway.
+
+        this.contentEditor.codemirror.on(
+          'changes',
+          _.debounce(this.handleContentChange, 1000)
+        )
+
+        this.handleContentChange(this.contentEditor.codemirror) // Triggers preview build
+      } else {
+        this.handleContentChange($(editorEl)[0].value)
+      }
 
       if (!globalData.settings.hasUnfilteredHtml) {
         this.tryToPreventEdit()
       }
     } else {
-      console.log('Something is terribly wrong, some WPLF elements are missing')
-      throw new Error('WTF')
-      // return false
+      throw new Error(
+        'Missing some or all of the required elements to run WPLF_Editor'
+      )
     }
   }
 
@@ -192,10 +198,10 @@ export default class WPLF_Editor {
     $('#save-post').remove()
   }
 
-  // `editor` is a CodeMirror instance
-  async handleContentChange(editor: any) {
+  // `editor` is a CodeMirror instance or a string
+  async handleContentChange(editor: string | any) {
     let { wplf, formInstance } = this
-    const content = editor.getValue()
+    const content = typeof editor === 'string' ? editor : editor.getValue()
 
     try {
       if (formInstance) {

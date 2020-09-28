@@ -152,7 +152,8 @@ class RestApi extends Module {
 
   public function handleSubmission($request) {
     $params = $request->get_params();
-    $useFallback = isset($params['_fallbackThankYou']); // field is removed with JS
+    $useFallback = isset($params['_nojs']); // field is removed with JS, if it's, there's no js, fallback
+
     $formId = $params['_formId'] ?? null;
 
     try {
@@ -160,13 +161,15 @@ class RestApi extends Module {
       $submission = new Submission($form);
       // $submission->create(array_merge($params, getUploadedFiles() ?? [])); // this does not work
       // $submission->create(array_merge($params, $request->get_file_params())); // this works
-      $submission = $submission->create(array_merge($params, $request->get_file_params()));
+      $submissionId = $submission->create(array_merge($params, $request->get_file_params()));
 
 
       if ($useFallback) {
-        $referrer = $params['referrer'];
-        $referrerContainsParams = strpos($referrer, '?');
-        $url = $referrer . ($referrerContainsParams ? '&' : '?') . "wplfNoJs=$formId";
+        $referrer = \json_decode($params['_referrerData'], true);
+        $url = $referrer['url'];
+
+        $referrerContainsParams = strpos($url, '?');
+        $url = $url . ($referrerContainsParams ? '&' : '?') . "wplfForm=$formId&wplfSubmissionId=$submissionId";
 
         header("Location: $url");
         return;

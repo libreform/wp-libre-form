@@ -190,13 +190,15 @@ class AdminInterface extends Module {
         'fn' => [$this, 'renderSettings']
       ],
     ];
+    $importedContent = apply_filters('wplfImportFormTemplate', null, $form);
+    $htmlContent = $importedContent ? $importedContent : $form->post_content;
 
     wp_nonce_field('wplfSavePostNonce', 'wplfSavePostNonce');
     ?>
 
     <div class="wplf">
       <div class="wplf-editor">
-        <textarea name="content" class="wplf-cmEditor"><?=($form->post_content)?></textarea>
+        <textarea name="content" class="wplf-cmEditor" <?=$importedContent ? 'readonly' : ''?>><?=($htmlContent)?></textarea>
 
         <div class="wplf-editor__meta wplf-tabs" data-name="FormEditActiveTab" data-default="<?=array_keys($metaSections)[0]?>" data-remember>
           <header>
@@ -422,15 +424,15 @@ libreform()->render($form); ?&gt;</code>
     $subjectPlaceholder = esc_attr__('Submission ### SUBMISSION id ## from form ## FORM title ##', 'wplf');
     $contentPlaceholder = esc_attr__('Form ## FORM title ## (ID ## FORM ID ##) was submitted with the following values:', 'wplf') . "\n\n ## SUBMISSION ##";
 
-    $emailCopy = $form->getEmailNotification();
+    $emailCopy = $form->getEmailNotificationData();
     $emailCopyEnabled = $emailCopy['enabled'] ?? null === 1;
     $to = $emailCopy['to'] ?? $toPlaceholder;
     $from = $emailCopy['from'] ?? $fromPlaceholder;
     $subject = $emailCopy['subject'] ?? $subjectPlaceholder;
     $content = $emailCopy['content'] ?? $contentPlaceholder;
 
-    $wplfDestroyUnusedDatabaseColumnsEnabled = $form->getDestroyUnusedDatabaseColumns();
-    $addToMediaLibraryEnabled = $form->getAddToMediaLibrary();
+    $wplfDestroyUnusedDatabaseColumnsEnabled = $form->getDestroyUnusedDatabaseColumnsValue();
+    $addToMediaLibraryEnabled = $form->getAddToMediaLibraryValue();
     ?>
 
     <div class="wplf-tabs wplf-formSettings" data-name="FormEditSettingsActiveTab" data-default="afterSubmission" data-remember>

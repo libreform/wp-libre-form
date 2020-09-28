@@ -55,7 +55,7 @@ class Selectors extends Module {
               $key = array_search($k, $columns);
               $formField = $formFields[$key];
 
-              var_dump($formField['type']);
+              // var_dump($formField['type']);
 
               $type = $formField['type'];
 

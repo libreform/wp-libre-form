@@ -27,27 +27,7 @@ add_action('wplf_pre_validate_submission', function() {
 
 Do note that the above code snippet opens your form submissions to the world.
 
-Use our npm package @libreform/wp-libreform to send the forms. ~~You can also use the "official" JS bundle if you want to.~~
-
-```javascript
-// window.ajax_object = {
-//   ajax_url: `${WP.url}/wp-admin/admin-ajax.php`,
-//   ajax_credentials: 'include', // different origin
-//   wplf_assets_dir: `${WP.url}/wp-content/plugins/wp-libreform/assets`,
-// }
-
-// await new Promise((resolve, reject) => {
-//   const script = document.createElement('script')
-//   const timeout = setTimeout(reject, 30000)
-//   script.src = `${WP.url}/wp-content/plugins/wp-libreform/assets/scripts/wplf-form.js`
-//   script.onload = (e) => {
-//     clearInterval(timeout)
-//     resolve()
-//   }
-
-//   document.body.appendChild(script)
-})
-```
+Use our npm package @libreform/wp-libre-form to send the forms.
 
 ## Uncaught ReferenceError: WPLF is not defined
 
@@ -71,6 +51,10 @@ We have a special `## PLL__ YourStringHere ##` selector that you can use in your
 
 Using the selector for all translated content in your form lets you synchronize the same form between all languages, making future edits easier.
 
+**Tip:** Use a selector for the success message and enable Custom fields sync in Polylang settings (Under Custom post types and Taxonomies).
+
+_Please note that the selector might not work in the admin preview of the form, and you might see the labels instead of the translations. Don't be alarmed, if the form works on the frontend, everything is fine. This is a harmless bug that we've tried hunting down for ages._
+
 ## Adding extra classes to the form element
 
 You can use the className attribute inside the shortcode to add your own extra classes for CSS.
@@ -93,18 +77,13 @@ The attribute will render as is on the `<form>` element
 <form class="wplf libreform-1" data-custom-attr="contactme"></form>
 ```
 
-## Importing forms from a predefined HTML template
+## Importing forms from a predefined template
 
 Sometimes a project might require static forms which are not supposed to
 be editable in the admin panel.
 
-This plugin allows you to define HTML forms in your project source code
-and import them into the form admin for specific forms.
-
-### Creating a static HTML template
-
-The simplest way is to create a HTML5 file and read its contents. Other
-options include using Twig to render HTML templates.
+We allow you to define HTML forms in your project source code
+and import them into the admin for specific forms.
 
 Remember: WPLF will insert `form` tags on its own, meaning you only have
 to create the markup which sits directly inside the `form` tags.
@@ -112,31 +91,24 @@ to create the markup which sits directly inside the `form` tags.
 ### Importing a template into WPLF
 
 Once you're done creating a form template, you need to inform
-WPLF about it. You can use the `wplf_import_html_template`
-filter hook for this:
+WPLF about it. You can use the `wplfImportFormTemplate` filter for this:
 
 ```php
-<?php
+add_filter('wplfImportFormTemplate', function($template, \WPLF\Form $form) {
 
-add_filter('wplf_import_html_template', function ($template, $form_id) {
-    $some_form_id = 123;
+  if ($form->ID === 666) {
+    return '<input type="text" name="helloworld">';
+  }
 
-    if ($form_id === $some_form_id) {
-        // You can also render Twig templates and similar here
-        return file_get_contents('/path/to/template/file.html');
-    }
-
-    return $template;
+  return $template;
 }, 10, 2);
 ```
 
 The `$template` variable should be a raw HTML string. If it is set to
 `null` no template will be imported.
 
-After a template is imported for a certain form the form's editview will
-be set to read only mode, meaning you must make changes to the static
-HTML template in code instead of editing the form inside the admin
-panel.
+After a template is imported, it can't be edited from the admin. Success message and the like are still configurable from there though.
 
-Otherwise the form should function normally, meaning you can use WPLF
-features as always.
+**After making changes to the form template or importing it for the first time, it's crucial that you go to the form in admin, and press the Update button.** Otherwise your form will not have the database columns necessary to save the data. The form field data is extracted on clientside, and at this point in time, this is the only reliable way to get it done.
+
+_In theory you should be able to call `$form->setFields()` and `libreform()->afterSavePost($form->ID, $form, true)` to get it done, but then you'd have to figure something to only run it once._

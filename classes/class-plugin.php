@@ -246,7 +246,6 @@ class Plugin {
 
   /**
    * Delete all submissions, as the foreign keys prevent the form from being deleted.
-   * Alternatively bails out of the deletion if
    */
   public function beforeDeleteForm(int $postId) {
     $post = get_post($postId);
@@ -345,16 +344,16 @@ class Plugin {
     $this->deleteTransients();
     $this->render($form, [], true); // Render in admin context so selectors can do stuff
 
-    $form->setAddToMediaLibrary((int) ($_POST['wplfAddToMediaLibrary'] ?? 0));
+    $form->setAddToMediaLibraryValue((int) ($_POST['wplfAddToMediaLibrary'] ?? 0));
     $form->setSuccessMessage($_POST['wplfSuccessMessage'] ?? __('Success!', 'wplf'));
-    $form->setEmailNotification([
+    $form->setEmailNotificationData([
       'enabled' => (bool) ($_POST['wplfEmailCopyEnabled'] ?? false), // booleans are ok in postmeta if inside array
       'to' => parseEmailToField($_POST['wplfEmailCopyTo'] ?? ''),
       'from' => sanitize_email($_POST['wplfEmailCopyFrom'] ?? ''),
       'subject' => sanitize_text_field($_POST['wplfEmailCopySubject'] ?? ''),
       'content' => wp_kses_post($_POST['wplfEmailCopyContent'] ?? ''),
     ]);
-    $form->setDestroyUnusedDatabaseColumns((int) ($_POST['wplfDestroyUnusedDatabaseColumns'] ?? 0));
+    $form->setDestroyUnusedDatabaseColumnsValue((int) ($_POST['wplfDestroyUnusedDatabaseColumns'] ?? 0));
     /**
      * Typically the format will include characters like <, >, %. Sanitize functions mess up the value.
      * The value is only displayed in the same input that it came from, where it is escaped at runtime.
@@ -390,7 +389,7 @@ class Plugin {
       // wplfNewFields and wplfDeletedFields are not saved, just used for db mutations
       $newFields = json_decode(stripslashes(($_POST['wplfNewFields'] ?? '[]')), true);
       $deletedFields = json_decode(stripslashes(($_POST['wplfDeletedFields'] ?? '[]')), true);
-      $destroyUnusedDbColumns = $form->getDestroyUnusedDatabaseColumns();
+      $destroyUnusedDbColumns = $form->getDestroyUnusedDatabaseColumnsValue();
 
 
       if ($newFields || $deletedFields) {
@@ -491,7 +490,7 @@ class Plugin {
   public function shortcode($atts, $content = null) {
     $attributes = shortcode_atts([
       'id' => null,
-      'class' => '',
+      'classname' => '',
     ], $atts, 'wplf');
 
     // Allow disabling shortcode parsing in API requests.
@@ -551,12 +550,16 @@ class Plugin {
     // Allow rendering even if the form is not published. The custom preview system
     // doesn't trigger is_preview() but it must be able to render.
     if ($form->isPublished() || !is_preview() || $force) {
+      // $fallbackFormId = (int) ($_GET['wplfForm'] ?? false);
+      $submissionId = (int) ($_GET['wplfSubmissionId'] ?? false);
+      $submission = $this->io->getFormSubmissionById($form, $submissionId);
+
       if (!isRest()) {
         wp_enqueue_script('wplf-frontend');
       }
 
       ob_start();
-      $form->render($options);
+      $form->render($options, $submission);
 
       $output = ob_get_clean();
       $output = $this->selectors->parse($output, $form, null);
