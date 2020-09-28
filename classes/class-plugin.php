@@ -552,7 +552,7 @@ class Plugin {
     if ($form->isPublished() || !is_preview() || $force) {
       // $fallbackFormId = (int) ($_GET['wplfForm'] ?? false);
       $submissionId = (int) ($_GET['wplfSubmissionId'] ?? false);
-      $submission = $this->io->getFormSubmissionById($form, $submissionId);
+      $submission = $submissionId ? $this->io->getFormSubmissionById($form, $submissionId) : null;
 
       if (!isRest()) {
         wp_enqueue_script('wplf-frontend');

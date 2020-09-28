@@ -231,14 +231,6 @@ class Form {
     $printAdditionalFields = (bool) ($options['printAdditionalFields'] ?? true);
     $attributes = $options['attributes'] ?? [];
     $className = $attributes['class'] ?? null;
-    // $useFallbackThankYou = $options['showFallback'];
-
-    // $useFallbackThankYou = (int) ($_GET['wplfForm'] ?? false) === $this->ID;
-    // move this shit to class-plugin.php
-    $fallbackFormId = (int) ($_GET['wplfForm'] ?? false);
-    $fallbackSubId = (int) ($_GET['wplfSubmissionId'] ?? false);
-
-    // $useFallbackThankYou = $fallbackFormId && $fallbackSubId;
 
     if (!$content) {
       $content = $this->post_content;
