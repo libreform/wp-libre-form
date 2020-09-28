@@ -6,22 +6,22 @@ const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const entries = {
   'wplf-admin': [
     'regenerator-runtime',
-    path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts'),
+    path.join(__dirname, 'assets/scripts/wplf-admin.ts'),
   ],
   'wplf-frontend': [
     'regenerator-runtime',
-    path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts'),
+    path.join(__dirname, 'assets/scripts/wplf-frontend.ts'),
   ],
 }
 
 const minifiedEntries = {
   'wplf-admin.min': [
     'regenerator-runtime',
-    path.join(__dirname, 'assets/scripts/wplf-admin-bundle.ts'),
+    path.join(__dirname, 'assets/scripts/wplf-admin.ts'),
   ],
   'wplf-frontend.min': [
     'regenerator-runtime',
-    path.join(__dirname, 'assets/scripts/wplf-frontend-bundle.ts'),
+    path.join(__dirname, 'assets/scripts/wplf-frontend.ts'),
   ],
 }
 
