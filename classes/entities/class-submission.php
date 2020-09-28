@@ -3,7 +3,7 @@
 namespace WPLF;
 
 class Submission {
-  public $ID;
+  public $ID; // todo: maybe switch to UUIDs to prevent enumerating submissions through the fallback
   public $fields = []; // todo: rename to entries
   public $meta = [];
   private $form;

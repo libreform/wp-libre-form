@@ -551,6 +551,10 @@ class Plugin {
     // doesn't trigger is_preview() but it must be able to render.
     if ($form->isPublished() || !is_preview() || $force) {
       // $fallbackFormId = (int) ($_GET['wplfForm'] ?? false);
+
+      // this is insecure as fuck. nothing to prevent enumeration.
+      // mediocre fix: switch to UUID
+      // good fix: switch to UUID, generate JWT that expires from UUID and require that.
       $submissionId = (int) ($_GET['wplfSubmissionId'] ?? false);
       $submission = $submissionId ? $this->io->getFormSubmissionById($form, $submissionId) : null;
 
