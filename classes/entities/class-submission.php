@@ -4,7 +4,7 @@ namespace WPLF;
 
 class Submission {
   public $ID;
-  public $fields = [];
+  public $fields = []; // todo: rename to entries
   public $meta = [];
   private $form;
   private $rawData;
