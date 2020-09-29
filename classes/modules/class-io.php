@@ -234,6 +234,10 @@ class Io extends Module {
     $dataQuery = "SELECT * FROM {$tableName} WHERE id = %s LIMIT 1";
     $data = $db->get_row($db->prepare($dataQuery, [$id]), $this->outputType);
 
+    if (empty($data)) {
+      return null;
+    }
+
     return new Submission($form, $data);
   }
 
@@ -246,6 +250,10 @@ class Io extends Module {
 
     $dataQuery = "SELECT * FROM {$tableName} WHERE uuid = %s LIMIT 1";
     $data = $db->get_row($db->prepare($dataQuery, [$uuid]), $this->outputType);
+
+    if (empty($data)) {
+      return null;
+    }
 
     return new Submission($form, $data);
   }
@@ -318,9 +326,9 @@ class Io extends Module {
 
   public function destroySubmission(Submission $submission) {
     [$db, $prefix] = db();
-    $tableName = $this->getFormSubmissionsTableName($submission->form);
+    $tableName = $this->getFormSubmissionsTableName($submission->getForm());
 
-    if ($db->delete($tableName, ['id' => $submissionm->ID], ['%d'])) {
+    if ($db->delete($tableName, ['id' => $submission->ID], ['%d'])) {
       return true;
     } else {
       throw new Error('Unable to destroy submission!', [$form]);
@@ -477,9 +485,9 @@ class Io extends Module {
    * that but there's nothing we can do about it. It also can't handle multiple files from one input
    * so we have to modify S_FILES ourselves. I seriously hope I'm just using it wrong but with that documentation...
    */
-  public function uploadFiles(Form $form, $k, $data) {
+  public function uploadFiles(Form $form, $fieldName, $data) {
     $this->readyToUpload || $this->loadUploadStuff();
-    $actualName = $form->getFieldOriginalName($k);
+    $actualName = $form->getFieldOriginalName($fieldName);
     $addUploadsToMediaLibrary = $form->getAddToMediaLibraryValue();
 
     // Multiple uploads are in a weird format. Let's normalize them into
@@ -538,15 +546,13 @@ class Io extends Module {
     $tableName = $this->getFormSubmissionsTableName($form);
     [$data, $placeholders] = $this->mapFieldsToInsertableData($form, $validatedFields);
 
-    error_log(print_r($data, true));
-
-    foreach ($data as $k => $value) {
+    foreach ($data as $fieldName => $value) {
       // There are restrictions in place preventing users from creating forms with input names
       // like the following; name[subname].
 
       // That's the only reason we can cut a corner here.
       if (is_array($value)) {
-        $data[$k] = $this->uploadFiles($form, $k, $value);
+        $data[$fieldName] = $this->uploadFiles($form, $fieldName, $value);
       }
     }
 

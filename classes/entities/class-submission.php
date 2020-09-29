@@ -16,7 +16,7 @@ class Submission {
   public function __construct(Form $form, ?array $data = null) {
     $this->form = $form;
     $this->ID = ((int) $data['id']) ?: null;
-    $this->uuid = $data['uuid'];
+    $this->uuid = $data['uuid'] ?? null;
     $this->referrer = json_decode($data['referrerData'], true);
 
     // Unset the values after using to prevent them from ending under meta
@@ -36,6 +36,10 @@ class Submission {
         }
       }
     }
+  }
+
+  public function getForm() {
+    return $this->form;
   }
 
   public function getId() {
@@ -62,20 +66,29 @@ class Submission {
     return $this->meta;
   }
 
+  /**
+   * Broken. Doesn't remove uploads for some reason.
+   *
+   */
   public function delete($removeUploads = true) {
     $fields = $this->getFields();
+    $historyId = (int) $this->getMeta()['historyId'];
+    $formFields = $this->form->getFields($historyId);
 
-    foreach ($fields as $k => $data) {
-      $type = $data['type'];
+    foreach ($fields as $name => $value) {
+      $k = array_search($name, array_column($fields, 'name'));
+      $formField = $formFields[$k] ?? false;
+
+      $type = $formField['type'];
 
       if ($removeUploads && $type === 'file') {
-        $path = $data['path'];
+        $path = $value['path'];
 
         if (!$this->io->deleteFile($path)) {
           isDebug() && log("Unable to delete file $path");
         }
       } elseif ($removeUploads && $type === 'attachment') {
-        $id = $data['id'];
+        $id = $value['id'];
 
         if (!wp_delete_attachment($id, true)) {
           isDebug() && log("Unable to delete attachment $id");
@@ -83,7 +96,7 @@ class Submission {
       }
     }
 
-    return $this->io->destroySubmission($this);
+    return libreform()->io->destroySubmission($this);
   }
 
   /**
