@@ -366,11 +366,14 @@ class Plugin {
      */
     $updateAllowed = $_POST['wplfUpdateVersionCreatedAt'] ?? false === '1';
 
-    // No harm in saving the earlier values, but updating the DB is a no-no.
+    // No real harm in saving the earlier values, but updating our tables is a no-no.
     if ($weaseledThroughDespiteNotSupposedTo) {
       wp_die(
         '<h1>' . esc_html__('This is for your own good', 'wplf') . '</h1>' .
-        '<p>' . esc_html__('The form was not allowed to save, but you tried to anyway. The content has been saved, but the fields were not. Go back and fix the problems, then try again. If you ignore this message the form may not be able to receive submissions.', 'wplf') . '</p>',
+        '<p>' . esc_html__(
+          'The form was not allowed to save, but you tried to anyway. The content has been saved, but the fields were not. Go back and fix the problems, then try again. If you ignore this message the form may not be able to receive submissions.',
+          'wplf'
+        ) . '</p>',
         403
       );
     }
@@ -386,18 +389,20 @@ class Plugin {
         $this->io->createFormSubmissionsTable($form);
       }
 
-      // wplfNewFields and wplfDeletedFields are not saved, just used for db mutations
+      /**
+       * $newFields and $deletedFields are not saved. They are used for
+       * database mutations.
+       */
       $newFields = json_decode(stripslashes(($_POST['wplfNewFields'] ?? '[]')), true);
       $deletedFields = json_decode(stripslashes(($_POST['wplfDeletedFields'] ?? '[]')), true);
       $destroyUnusedDbColumns = $form->getDestroyUnusedDatabaseColumnsValue();
 
 
       if ($newFields || $deletedFields) {
-        if (!$destroyUnusedDbColumns) {
-          isDebug() && log('Preventing deletion of fields');
+        if (!$destroyUnusedDbColumns && $deletedFields) {
+          isDebug() && log('Preventing deletion of fields.');
 
-          $deletedFields = null; // Prevent deletion of fields
-        } else {
+          $deletedFields = null;
         }
 
         $this->io->updateFormSubmissionsTable($form, $newFields, $deletedFields);
@@ -407,7 +412,7 @@ class Plugin {
 
       isDebug() && log("Database error: {$msg}");
 
-      // Maybe the user should be notified?
+      // The user should probably be notified directly, but there's no easy way to do it from this hook, other than wp_die, which I'd rather not use.
     }
   }
 
@@ -523,10 +528,11 @@ class Plugin {
       'classname' => null,
     ));
 
-    // Filter the attributes
+    // Normalize the attributes
     foreach ($attributes as $k => $v) {
       if (is_numeric($k)) {
         unset($attributes[$k]);
+
         $attributes[$v] = null;
       }
     }
@@ -534,40 +540,57 @@ class Plugin {
     try {
       $form = new Form(get_post($id));
 
-      return $this->render($form, [
-        'content' => $content,
+      return $this->render($form, $form->getRenderOptions([
         'className' => $className,
         'attributes' => $attributes,
-      ]);
+      ]));
     } catch (Error $e) {
       return $e->getMessage();
-      // return;
     }
-
   }
 
-  public function render(Form $form, $options = [], $force = false) {
-    // Allow rendering even if the form is not published. The custom preview system
-    // doesn't trigger is_preview() but it must be able to render.
+  public function render(Form $form, $renderOptions = [], $force = false) {
+    /**
+     * Allow rendering even if the form is not published.
+     * The custom preview system doesn't trigger is_preview() but it must be able to render.
+     */
     if ($form->isPublished() || !is_preview() || $force) {
-      // $fallbackFormId = (int) ($_GET['wplfForm'] ?? false);
+      $afterSubmissionOfFormId = (int) ($_GET['wplfAfterSubmissionOfFormId'] ?? 0);
+      $submissionUuid = ($_GET['wplfSubmissionUuid'] ?? false);
 
-      // this is insecure as fuck. nothing to prevent enumeration.
-      // mediocre fix: switch to UUID
-      // good fix: switch to UUID, generate JWT that expires from UUID and require that.
-      $submissionId = (int) ($_GET['wplfSubmissionId'] ?? false);
-      $submission = $submissionId ? $this->io->getFormSubmissionById($form, $submissionId) : null;
+      if ($afterSubmissionOfFormId && $submissionUuid) {
+        /**
+         * These parameters are set by the /submit endpoint if the form was submitted with the _nojs field present, triggering the fallback,
+         * which in turn displays the success message configured for the form.
+         *
+         * The success message can use selectors like ## SUBMISSION ##,
+         * which require the $submission to be present.
+         *
+         * Theoretically, that means you can make yourself vulnerable to an enumeration attack, but the likelihood of an attacker succesfully crafting Gen 4 UUIDs is... small.
+         *
+         * They could create trillions of UUIDs and the chance of collision is still under permille.
+         *
+         * But, if you're concerned, you can either
+         * a) clear the submission by using the wplfFormRenderSubmission filter. This prevents selectors that depend on $submission from working in the render.
+         * b) avoid using selectors like SUBMISSION in the success message. We're not exposing any of your data out of the box, but you might do that yourself.
+         * c) create a pull request that implements JWT authentication based on the submission uuid, making enumeration impossible.
+         */
+        $renderOptions['renderNoJsFallback'] = true;
+        $submission = $this->io->getFormSubmissionByUuid($form, $submissionUuid);
+      } else {
+        $submission = null;
+      }
 
       if (!isRest()) {
         wp_enqueue_script('wplf-frontend');
       }
 
       ob_start();
-      $form->render($options, $submission);
+      $form->render($renderOptions, $submission);
 
       $output = ob_get_clean();
-      $output = $this->selectors->parse($output, $form, null);
-      $output = apply_filters('wplfAfterRender', $output, $form, $options);
+      $output = $this->selectors->parse($output, $form, $submission);
+      $output = apply_filters('wplfAfterRender', $output, $form, $renderOptions);
       $output = minifyHtml($output); // Minify after filter, I doubt that anyone wants the minified HTML
 
       return $output;

@@ -5,9 +5,19 @@
   "license": "GPLv3",
   "authors": [
     {
-      "name": "Antti Kuosmanen",
-      "email": "antti@seravo.fi",
+      "name": "Viljami Kuosmanen",
+      "email": "viljami@viljami.io",
       "homepage": "https://github.com/anttiviljami"
+    },
+    {
+      "name": "Timi Wahalahti",
+      "email": "timi@wahalahti.fi",
+      "homepage": "https://github.com/timiwahalahti"
+    },
+    {
+      "name": "Christian Nikkanen",
+      "email": "hire@kisu.li",
+      "homepage": "https://github.com/k1sul1"
     }
   ],
   "require-dev": {

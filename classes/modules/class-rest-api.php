@@ -162,14 +162,20 @@ class RestApi extends Module {
       // $submission->create(array_merge($params, getUploadedFiles() ?? [])); // this does not work
       // $submission->create(array_merge($params, $request->get_file_params())); // this works
       $submissionId = $submission->create(array_merge($params, $request->get_file_params()));
+      $submissionUuid = $submission->uuid;
 
 
       if ($useFallback) {
-        $referrer = \json_decode($params['_referrerData'], true);
+        $referrer = $submission->getReferrer();
         $url = $referrer['url'];
 
+        /**
+         * @todo Prevent adding the parameters to the URL multiple times by deconstructing and constructing the url properly using http_build_query etc.
+         *
+         * It will only happen if the same user submits the same form multiple times without navigating elsewhere in between.
+         */
         $referrerContainsParams = strpos($url, '?');
-        $url = $url . ($referrerContainsParams ? '&' : '?') . "wplfForm=$formId&wplfSubmissionId=$submissionId";
+        $url = $url . ($referrerContainsParams ? '&' : '?') . "wplfAfterSubmissionOfFormId=$formId&wplfSubmissionUuid=$submissionUuid";
 
         header("Location: $url");
         return;

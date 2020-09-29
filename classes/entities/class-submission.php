@@ -3,23 +3,32 @@
 namespace WPLF;
 
 class Submission {
-  public $ID; // todo: maybe switch to UUIDs to prevent enumerating submissions through the fallback
+  public $ID;
+  public $uuid;
+  public $referrer;
+
   public $fields = []; // todo: rename to entries
   public $meta = [];
+
   private $form;
   private $rawData;
 
   public function __construct(Form $form, ?array $data = null) {
     $this->form = $form;
-    $this->ID = $data['id'] ?? null;
+    $this->ID = ((int) $data['id']) ?: null;
+    $this->uuid = $data['uuid'];
+    $this->referrer = json_decode($data['referrerData'], true);
+
+    // Unset the values after using to prevent them from ending under meta
+    unset($data['id']);
+    unset($data['uuid']);
+    unset($data['referrerData']);
 
     if ($data) {
       $this->rawData = $data;
 
       foreach ($this->rawData as $name => $v) {
         if (strpos($name, 'field') === 0) {
-          // All form fields are saved to the database as columns,
-          // using field{$name} as the name.
           $this->fields[$this->form->getFieldOriginalName($name)] = $v;
         } else {
           // Other columns in the table are metadata
@@ -27,6 +36,18 @@ class Submission {
         }
       }
     }
+  }
+
+  public function getId() {
+    return $this->ID;
+  }
+
+  public function getUuid() {
+    return $this->uuid;
+  }
+
+  public function getReferrer() {
+    return $this->referrer;
   }
 
   public function getField(string $fieldName) {
@@ -87,8 +108,10 @@ class Submission {
 
       // return $newSub;
       $this->ID = $id;
+      $this->uuid = $newSub->getUuid();
       $this->fields = $newSub->getFields();
       $this->meta = $newSub->getMeta();
+      $this->referrer = $newSub->getReferrer();
     } catch (Error $e) {
       throw $e; //
     }

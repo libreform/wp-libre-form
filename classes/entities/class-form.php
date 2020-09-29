@@ -10,6 +10,7 @@ class Form {
     // 'historyId' => [],
     // 'historyId2' => [],
   ];
+  public $content = null;
   public $additionalFields; // meta etc
   public $addToMediaLibrary;
   public $versionCreatedAt;
@@ -37,6 +38,7 @@ class Form {
 
     $this->ID = (int) $form->ID;
     $this->title = $form->post_title;
+    $this->content = $form->post_content;
     $this->raw = $form;
 
     $this->fields = $this->getFields();
@@ -226,11 +228,26 @@ class Form {
     return $this->post_status === 'publish';
   }
 
+  public function getRenderOptions($settings = []) {
+    $defaults = [
+      'attributes' => [],
+      'printAdditionalFields' => true,
+      'content' => apply_filters('wplfImportFormTemplate', $this->content, $this),
+      'className' => null,
+      'renderNoJsFallback' => false, // When true, will show the success message above the form.
+    ];
+
+    return array_replace_recursive($defaults, $settings);
+  }
+
   public function render($options = [], Submission $submission = null) {
-    $content = apply_filters('wplfImportFormTemplate', $options['content'] ?? null, $this);
-    $printAdditionalFields = (bool) ($options['printAdditionalFields'] ?? true);
-    $attributes = $options['attributes'] ?? [];
-    $className = $attributes['class'] ?? null;
+    $options = $this->getRenderOptions($options);
+    $submission = apply_filters('wplfFormRenderSubmission', $submission, $this, $options);
+    $content = $options['content'];
+    $attributes = $options['attributes'];
+    $className = $options['className'];
+    $renderNoJsFallback = $options['renderNoJsFallback'];
+    $printAdditionalFields = $options['printAdditionalFields'];
 
     if (!$content) {
       $content = $this->post_content;
@@ -265,7 +282,7 @@ class Form {
     >
       <?php
 
-      if ($submission) { ?>
+      if ($renderNoJsFallback) { ?>
         <div class="form-notice form-notice__thankyou wplf-submitfallback">
           <?=libreform()->selectors->parse($this->getSuccessMessage(), $this, $submission); ?>
         </div><?php

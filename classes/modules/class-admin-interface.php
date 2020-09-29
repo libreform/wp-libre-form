@@ -328,10 +328,10 @@ libreform()->render($form); ?&gt;</code>
 
         <div class="wplf-submissions__list">
           <?php foreach ($submissions as $submission) {
-
             $meta = $submission->getMeta();
             $historyId = $meta['historyId'];
-            $referrer = json_decode($meta['referrerData'], true);
+            // $referrer = json_decode($meta['referrerData'], true);
+            $referrer = $submission->getReferrer();
 
             // $fieldsAtTheTime = $this->io->getHistoryFieldsByVersion($form, $historyId);
             $fieldsAtTheTime = $form->getFields($historyId);

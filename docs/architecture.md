@@ -9,11 +9,13 @@ WPLF creates `n + 1` tables in your WordPress database, where `n` is the amount 
 `{$prefix}wplf_{$form->ID}_submissions`
 
 ```
-MariaDB [wordpress]> DESCRIBE wp_wplf_35_submissions;
+MariaDB [wordpress]> DESCRIBE wp_wplf_53_submissions;
 +--------------+---------------------+------+-----+---------------------+-------------------------------+
 | Field        | Type                | Null | Key | Default             | Extra
            |
 +--------------+---------------------+------+-----+---------------------+-------------------------------+
+| uuid         | varchar(36)         | YES  | MUL | uuid()              |
+           |
 | id           | bigint(20)          | NO   | PRI | NULL                | auto_increment
            |
 | formId       | bigint(20) unsigned | YES  | MUL | NULL                |
@@ -36,7 +38,7 @@ MariaDB [wordpress]> DESCRIBE wp_wplf_35_submissions;
 | fieldmessage | longtext            | YES  |     | NULL                |
            |
 +--------------+---------------------+------+-----+---------------------+-------------------------------+
-11 rows in set (0.00 sec)
+12 rows in set (0.00 sec)
 
 ```
 
