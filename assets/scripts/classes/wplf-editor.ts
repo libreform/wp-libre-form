@@ -2,12 +2,23 @@ import globalData from '../lib/global-data'
 import createApiClient from '../lib/api-client'
 import log from '../lib/log'
 import { waitForNextTick } from '../lib/wait'
-import { isElement } from 'underscore'
 import isElementish from '../lib/is-elementish'
-import WPLF from './wplf'
+
 import { ApiResponseKind, Field, List, WPLF_EditorState } from '../types'
 import getAttribute from '../lib/get-attribute'
+
+import WPLF from './wplf'
 import { WPLF_Form } from './wplf-form'
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+import SubmissionList from '../react/SubmissionsList'
+
+// const React = window.React
+
+// const { React, ReactDOM } = window
+
+console.log(React, 'test')
 
 const { abort, request, signal } = createApiClient()
 const { i18n } = globalData
@@ -15,6 +26,8 @@ const { i18n } = globalData
 const $ = window.jQuery
 const _ = window._
 const wp = window.wp
+
+// const xyz = (implicitAny) => implicitAny.toString()
 
 export default class WPLF_Editor {
   wplf: WPLF
@@ -37,6 +50,9 @@ export default class WPLF_Editor {
     const deletedFields = document.querySelector('#wplfDeletedFields')
     const historyFields = document.querySelector('#wplfHistoryFields')
     const allowSave = document.querySelector('#wplfAllowSave')
+    const submissionsEl = document.querySelector(
+      '.wplf-editor .wplf-formSubmissions'
+    )
     const editorEl = document.querySelector('.wplf-editor .wplf-cmEditor')
     const thankYouEl = document.querySelector(
       '.wplf-afterSubmission .wplf-cmEditor'
@@ -75,8 +91,6 @@ export default class WPLF_Editor {
         deletedFields: [],
         allowSave: false,
       }
-
-      console.log(initialState)
 
       this.wplf = wplfInstance
       this.state = initialState
@@ -118,6 +132,23 @@ export default class WPLF_Editor {
 
       if (!globalData.settings.hasUnfilteredHtml) {
         this.tryToPreventEdit()
+      }
+
+      if (submissionsEl) {
+        const formId = globalData.post?.ID || null
+
+        if (formId) {
+          ReactDOM.render(
+            React.createElement(
+              SubmissionList,
+              {
+                formId,
+              },
+              null
+            ),
+            submissionsEl
+          )
+        }
       }
     } else {
       throw new Error(
@@ -180,7 +211,7 @@ export default class WPLF_Editor {
           }
         }
 
-        // no default, yet
+        // no default
       }
     })
   }
@@ -235,8 +266,6 @@ export default class WPLF_Editor {
     body.forEach(function (value, key) {
       object[key] = value
     })
-
-    console.log('preview req body', object)
 
     const req = await request(
       '/render',
@@ -358,6 +387,8 @@ export default class WPLF_Editor {
       }, [])
     // .filter((n) => n !== null)
 
+    console.log('howdy', fields)
+
     const fieldNames = fields.map((field) => field.name)
     const duplicateNames = this.getDuplicateNames(fieldNames)
 
@@ -434,7 +465,13 @@ export default class WPLF_Editor {
     })
 
     const newState: Partial<WPLF_EditorState> = {
-      fields: fields as Field[],
+      // fields: fields as Field[],
+      // After clearing the duplicates, an object will suit us better
+      fields: fields.reduce<List<Field>>((acc, field) => {
+        acc[field.name] = field
+
+        return acc
+      }, {}),
       newFields: newFields as Field[],
       deletedFields,
       allowSave,

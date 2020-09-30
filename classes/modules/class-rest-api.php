@@ -89,22 +89,22 @@ class RestApi extends Module {
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], ['status' => 500]);
+      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
     }
   }
 
   public function getSubmissions($request) {
     $params = $request->get_params();
     $formId = $params['form'] ?? null;
-    $page = $params['page'] ?? 1;
+    $page = (int) ($params['page'] ?? 0);
 
     try {
       $form = new Form(get_post($formId));
-      [$submissions, $totalPages] = $this->io->getFormSubmissions($form);
+      [$submissions, $totalPages] = $this->io->getFormSubmissions($form, $page);
 
       $response = new \WP_REST_Response($submissions);
       $response->set_headers(array_merge($response->get_headers(), [
-        'X-WP-Total' => count($submissions),
+        'X-WP-Total' => count($submissions), // Total number of results in this response
         'X-WP-TotalPages' => $totalPages,
       ]));
 
@@ -112,7 +112,7 @@ class RestApi extends Module {
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], ['status' => 500]);
+      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
     }
   }
 
@@ -146,7 +146,7 @@ class RestApi extends Module {
     } catch (Error $e) {
       isDebug() && log($e->getMessage());
 
-      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], ['status' => 500]);
+      return new \WP_REST_Response(['error' => $e->getMessage(), 'data' => $e->getData()], 500);
     }
   }
 
@@ -161,7 +161,11 @@ class RestApi extends Module {
       $submission = new Submission($form);
       // $submission->create(array_merge($params, getUploadedFiles() ?? [])); // this does not work
       // $submission->create(array_merge($params, $request->get_file_params())); // this works
-      $submissionId = $submission->create(array_merge($params, $request->get_file_params()));
+      // for ($i = 0; $i < 100; $i++) {
+        $submissionId = $submission->create(array_merge($params, $request->get_file_params()));
+
+      // }
+
       $submissionUuid = $submission->uuid;
 
 

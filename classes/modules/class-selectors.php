@@ -51,6 +51,7 @@ class Selectors extends Module {
               // $key = array_search($k, array_column($formFields, 'name'));
 
               // $field = $fields[$key];
+              die("datamalli vaihtu, korjaa search pois");
               $columns = array_column($formFields, 'name');
               $key = array_search($k, $columns);
               $formField = $formFields[$key];

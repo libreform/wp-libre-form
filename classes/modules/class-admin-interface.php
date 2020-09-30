@@ -329,21 +329,14 @@ libreform()->render($form); ?&gt;</code>
         <div class="wplf-submissions__list">
           <?php foreach ($submissions as $submission) {
             $meta = $submission->getMeta();
-            $historyId = $meta['historyId'];
-            // $referrer = json_decode($meta['referrerData'], true);
+            $historyId = $submission->getHistoryId();
             $referrer = $submission->getReferrer();
 
-            // $fieldsAtTheTime = $this->io->getHistoryFieldsByVersion($form, $historyId);
             $fieldsAtTheTime = $form->getFields($historyId);
             $fieldsHaveChanged = serialize($fieldsAtTheTime) !== serialize($fields);
 
             $title = $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission);
 
-            echo "<pre>";
-            // var_dump($meta);
-
-            echo $fieldsHaveChanged ? 'Form has been edited after submission was made' : '';
-            echo "</pre>";
 
 
             ?>
@@ -358,16 +351,23 @@ libreform()->render($form); ?&gt;</code>
               <table>
               <?php
               foreach ($submission->getFields() as $name => $value) {
-                $k = array_search($name, array_column($fieldsAtTheTime, 'name'));
+                // $k = array_search($name, array_column($fieldsAtTheTime, 'name'));
 
                 // If there's no key, the field didn't exist in the form
                 // when it was submitted. Skip rendering it.
-                if ($k === false) {
-                  continue;
+                // if ($k === false) {
+                  // continue;
                   // return;
+                // }
+
+                // var_dump($fieldsAtTheTime);
+
+                $field = $fieldsAtTheTime[$name] ?? null;
+
+                if (!$field) {
+                  continue;
                 }
 
-                $field = $fieldsAtTheTime[$k];
                 $type = $field['type'];
                 $name = $name . ($field['required'] ? '*' : '');
                 $value = stringifyFieldValue($value, $type);

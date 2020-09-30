@@ -6,8 +6,10 @@ class Submission {
   public $ID;
   public $uuid;
   public $referrer;
+  public $historyId;
 
-  public $fields = []; // todo: rename to entries
+  public $entries = []; // todo: rename to entries
+  public $formFields = [];
   public $meta = [];
 
   private $form;
@@ -18,18 +20,22 @@ class Submission {
     $this->ID = ((int) $data['id']) ?: null;
     $this->uuid = $data['uuid'] ?? null;
     $this->referrer = json_decode($data['referrerData'], true);
+    $this->historyId = $data['historyId'] ? (int) $data['historyId'] : null;
 
     // Unset the values after using to prevent them from ending under meta
     unset($data['id']);
     unset($data['uuid']);
     unset($data['referrerData']);
+    unset($data['historyId']);
+
+    $this->formFields = $form->getFields($this->historyId);
 
     if ($data) {
       $this->rawData = $data;
 
       foreach ($this->rawData as $name => $v) {
         if (strpos($name, 'field') === 0) {
-          $this->fields[$this->form->getFieldOriginalName($name)] = $v;
+          $this->entries[$this->form->getFieldOriginalName($name)] = $v;
         } else {
           // Other columns in the table are metadata
           $this->meta[$name] = $v;
@@ -40,6 +46,10 @@ class Submission {
 
   public function getForm() {
     return $this->form;
+  }
+
+  public function getHistoryId() {
+    return $this->historyId;
   }
 
   public function getId() {
@@ -55,11 +65,11 @@ class Submission {
   }
 
   public function getField(string $fieldName) {
-    return $this->fields[$fieldName] ?? null;
+    return $this->entries[$fieldName] ?? null;
   }
 
   public function getFields() {
-    return $this->fields;
+    return $this->entries;
   }
 
   public function getMeta() {
@@ -71,12 +81,14 @@ class Submission {
    *
    */
   public function delete($removeUploads = true) {
-    $fields = $this->getFields();
+    $entries = $this->getFields();
     $historyId = (int) $this->getMeta()['historyId'];
     $formFields = $this->form->getFields($historyId);
 
-    foreach ($fields as $name => $value) {
-      $k = array_search($name, array_column($fields, 'name'));
+    foreach ($entries as $name => $value) {
+      die("datamalli vaihtu, korjaa search pois");
+
+      $k = array_search($name, array_column($entries, 'name'));
       $formField = $formFields[$k] ?? false;
 
       $type = $formField['type'];
@@ -100,29 +112,29 @@ class Submission {
   }
 
   /**
-   * $fields is an associative array, using keys for field names and values for the field values.
+   * $entries is an associative array, using keys for field names and values for the field values.
    *
    * @todo move to IO
    */
-  public function create($fields) {
+  public function create($entries) {
     $form = $this->form;
 
-    $fields = apply_filters('wplfFieldsBeforeValidateSubmission', $fields);
-    [$valid, $error] = $this->validate($fields);
+    $entries = apply_filters('wplfFieldsBeforeValidateSubmission', $entries);
+    [$valid, $error] = $this->validate($entries);
 
     if ($error instanceof Error) {
       throw new Error($error->getMessage(), $error->getData());
     }
 
-    $fields = apply_filters('wplfFieldsAfterValidateSubmission', $fields);
+    $entries = apply_filters('wplfFieldsAfterValidateSubmission', $entries);
     try {
-      $id = libreform()->io->insertSubmission($form, $fields);
+      $id = libreform()->io->insertSubmission($form, $entries);
       $newSub = libreform()->io->getFormSubmissionById($form, $id); // contains fields
 
       // return $newSub;
       $this->ID = $id;
       $this->uuid = $newSub->getUuid();
-      $this->fields = $newSub->getFields();
+      $this->entries = $newSub->getFields();
       $this->meta = $newSub->getMeta();
       $this->referrer = $newSub->getReferrer();
     } catch (Error $e) {
@@ -209,10 +221,10 @@ class Submission {
    */
   public function validateFieldsWithRequired($data): void {
     $form = $this->form;
-    $fields = $form->getFields();
+    $entries = $form->getFields();
 
     $missing = [];
-    foreach ($fields as $field) {
+    foreach ($entries as $field) {
       $required = $field['required'];
       $name = $field['name'];
       $value = $data[$name] ?? false;
@@ -240,11 +252,11 @@ class Submission {
    */
   public function validateAdditionalFields($data): void {
     $form = $this->form;
-    $fields = $form->getFields();
+    $entries = $form->getFields();
 
     $formFieldNames = array_map(function ($field) {
       return $field['name'];
-    }, $fields);
+    }, $entries);
     $notAllowed = [];
     $whitelist = apply_filters('wplfAllowedFormFields', array_merge($formFieldNames, $form->getAdditionalFields()), $form);
 

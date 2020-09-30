@@ -176,7 +176,7 @@ class Plugin {
     wp_enqueue_script('wp-theme-plugin-editor');
     wp_enqueue_style('wp-codemirror');
 
-    wp_enqueue_script('wplf-admin', $this->url .( isDebug() ? '/dist/wplf-admin.js' : '/dist/wplf-admin.min.js'), [], $version, true);
+    wp_enqueue_script('wplf-admin', $this->url .( isDebug() ? '/dist/wplf-admin.js' : '/dist/wplf-admin.min.js'), ['react', 'react-dom'], $version, true);
     wp_enqueue_style('wplf-admincss', $this->url . (isDebug() ? '/dist/wplf-admin.css' : '/dist/wplf-admin.min.css'), [], $version);
 
     wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm, 'post' => $GLOBALS['post'] ?? null])));

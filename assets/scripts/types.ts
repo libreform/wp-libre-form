@@ -1,3 +1,4 @@
+import React from 'react'
 import { WPLF_Form } from './classes/wplf-form'
 
 export enum SubmitState {
@@ -38,7 +39,7 @@ export interface RawApiResponse {
 export interface SubmitApiResponse extends RawApiResponse {
   kind: ApiResponseKind.Submission
   data:
-    | { error: string; data: string }
+    | ApiError
     | {
         submission: {
           ID: number
@@ -48,19 +49,13 @@ export interface SubmitApiResponse extends RawApiResponse {
 
 export interface GetSubmissionsApiResponse extends RawApiResponse {
   kind: ApiResponseKind.GetSubmissions
-  data:
-    | { error: string; data: string }
-    | {
-        submission: {
-          ID: number
-        }
-      }
+  data: ApiError | Submission[]
 }
 
 export interface RenderApiResponse extends RawApiResponse {
   kind: ApiResponseKind.Render
   data:
-    | { error: string; data: string }
+    | ApiError
     | {
         html: string
         form: {
@@ -71,10 +66,35 @@ export interface RenderApiResponse extends RawApiResponse {
       }
 }
 
+export interface ApiError {
+  error: string
+  data: string
+}
+
 export type ApiResponse =
   | SubmitApiResponse
   | GetSubmissionsApiResponse
   | RenderApiResponse
+
+export interface Form {
+  ID: number
+  addToMediaLibrary: boolean
+  additionalFields: string[]
+  content: string
+  fields: Field[]
+  historyFields: List<Field[]>
+  postContainsFileInputs: boolean
+  title: string
+  versionCreatedAt: string
+}
+
+export interface Submission {
+  ID: number
+  uuid: string
+  referrer: List<any>
+  fields: List<any>
+  meta: List<any>
+}
 
 export interface Field {
   name: string
@@ -85,7 +105,8 @@ export interface Field {
 
 export interface WPLF_EditorState {
   historyFields: List<Field>
-  fields: Field[]
+  // fields: Field[]
+  fields: List<Field>
   additionalFields: string[]
   newFields: Field[]
   deletedFields: Field[]
@@ -100,6 +121,7 @@ export interface WPLF_LocalizeData {
   fetchCredentials: 'same-origin' | 'include' | 'omit'
   i18n: List<string>
   lang?: string
+  post?: { ID: string; [k: string]: any } // We only care about the ID
   requestHeaders: {
     'X-WP-Nonce': string
     [k: string]: any
@@ -113,9 +135,11 @@ export interface WPLF_LocalizeData {
   }
 }
 
+window['React'] = React
+
 declare global {
   interface Window {
-    // React: React, // @types/react has it handled already
+    // React: React // @types/react has it handled already
     // WPLF: WPLF // We're not going to use our own library from window
 
     // This comes from WordPress

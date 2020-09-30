@@ -119,10 +119,9 @@ class Io extends Module {
     /**
      * Prevents deletion of forms before all submissions have been deleted
      */
-    if (
-        !$db->query("
+    if (!$db->query("
       CREATE TABLE `$tableName` (
-        `uuid` varchar(36) DEFAULT UUID(),
+        `uuid` varchar(36) NOT NULL UNIQUE,
         `id` bigint(20) NOT NULL AUTO_INCREMENT,
         `formId` bigint(20) UNSIGNED COMMENT 'Joins with ID in wp_posts',
         `historyId` bigint(20) COMMENT 'Joins with id in wp_wplf_history',
@@ -132,12 +131,10 @@ class Io extends Module {
         `referrerData` TEXT,
         `usedFallback` boolean,
         PRIMARY KEY (`id`),
-        INDEX (`uuid`),
         FOREIGN KEY (`formId`) REFERENCES {$prefix}posts(ID) ON DELETE RESTRICT,
         FOREIGN KEY (`historyId`) REFERENCES $historyTableName(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE={$this->collate};
-    ")
-    ) {
+    ")) {
       throw new Error($db->last_error);
     }
 
@@ -194,7 +191,7 @@ class Io extends Module {
     return true;
   }
 
-  public function getFormSubmissions(Form $form, $page = 0, $limit = 500) {
+  public function getFormSubmissions(Form $form, int $page = 0, $limit = 100) {
     [$db, $prefix] = db();
     $tableName = $this->getFormSubmissionsTableName($form);
 
@@ -210,8 +207,8 @@ class Io extends Module {
 
     return [
       $submissions,
-      (int) $count / $limit, // return amount of pages with the current limit
-      (int) $count,
+      (int) ($count / $limit), // return amount of pages with the current limit
+      $count,
     ];
   }
 
@@ -384,6 +381,7 @@ class Io extends Module {
     $formFields = $form->getFields();
 
     $fields = [
+      'uuid' => ['value' => uuid(), 'placeholder' => '%s'],
       'formId' => ['value' => $form->ID, 'placeholder' => '%d'],
       'historyId' => ['value' => $form->getHistoryId(), 'placeholder' => '%d'],
       'usedFallback' => ['value' => 0, 'placeholder' => '%d'], // boolean in DB
@@ -545,6 +543,8 @@ class Io extends Module {
     [$db, $prefix] = db();
     $tableName = $this->getFormSubmissionsTableName($form);
     [$data, $placeholders] = $this->mapFieldsToInsertableData($form, $validatedFields);
+
+    // var_dump($data); var_dump($placeholders); die();
 
     foreach ($data as $fieldName => $value) {
       // There are restrictions in place preventing users from creating forms with input names

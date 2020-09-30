@@ -15,6 +15,7 @@ export default ((window): WPLF_LocalizeData =>
         hasUnfilteredHtml: 1,
         debugLevel: 'all',
       },
+      post: null,
       i18n: {
         problems: 'Problems: ',
         duplicateFieldName: 'Duplicate field name: ',
