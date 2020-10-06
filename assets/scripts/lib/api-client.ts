@@ -11,8 +11,6 @@ function createApiClient() {
   let controller: AbortController | null = null
   let signal: AbortSignal | null = null
 
-  console.log(globalData)
-
   return {
     // controller: null,
     // signal: null,

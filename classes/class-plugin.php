@@ -33,9 +33,15 @@ class Plugin {
     require_once 'entities/class-form.php';
     require_once 'entities/class-submission.php';
 
-    add_action('rest_api_init', [$this, 'afterRestApiInit']);
 
 
+
+
+
+
+  }
+
+  public function initialize() {
     $this->loadModule('io');
     $this->loadModule('settings');
     $this->loadModule('notices');
@@ -50,13 +56,29 @@ class Plugin {
       $this->loadModule('admin-interface');
     }
 
+    if (!$this->settings->get('historyTableCreated')) {
+      try {
+        $this->io->createHistoryTable();
+      } catch (Error $e) {
+        log("Unable to create history table: " . $e->getMessage());
+      }
+    }
+
+    add_shortcode('libreform', [$this, 'shortcode']);
+    $this->initializeActions();
+    $this->initializeFilters();
+  }
+
+  private function initializeActions() {
+    add_action('rest_api_init', [$this, 'afterRestApiInit']);
+
+
     add_action('wp', [$this, 'afterInit']);
     add_action('admin_footer', [$this, 'enqueueAdminAssets']);
 
 
     add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
 
-    add_shortcode('libreform', [$this, 'shortcode']);
 
     add_action('init', [$this, 'registerPostType']);
     add_action('wp', [$this, 'preventDirectAccess']);
@@ -66,18 +88,6 @@ class Plugin {
 
     add_action('before_delete_post', [$this, 'beforeDeleteForm']);
     add_action('delete_post', [$this, 'deleteForm']);
-
-    // Change columns in edit.php
-    add_filter('manage_edit-' . self::$postType . '_columns', function ($columns) {
-      // Change columns
-      return [
-        'cb' => $columns['cb'],
-        'title' => $columns['title'],
-        'shortcode' => __('Shortcode', 'wplf'),
-        'submissions' => __('Submissions', 'wplf'),
-        'date' => $columns['date'],
-      ];
-    }, 100, 1);
 
     // Change the contents of the columns we just changed
     add_action('manage_' . self::$postType . '_posts_custom_column', function ($column, $postId) {
@@ -90,7 +100,12 @@ class Plugin {
       }
 
       if ($column === 'submissions') {
-        [$submissions, $pages, $count] = $this->io->getFormSubmissions($form, 0, 1); ?>
+        if ($form->isPublished()) {
+          [$submissions, $pages, $count] = $this->io->getFormSubmissions($form, 0, 1);
+        } else {
+          $count = 0;
+        }
+        ?>
 
         <a href="<?=esc_url_raw(admin_url("post.php?post={$form->ID}&action=edit"))?>">
           <?=$count?>
@@ -98,16 +113,24 @@ class Plugin {
       }
     }, 10, 2);
 
+
+  }
+
+  private function initializeFilters() {
     // If direct access to form is allowed, replace the HTML content with a form
     add_filter('the_content', [$this, 'replaceContentWithFormOnSingleForm'], 0);
 
-    if (!$this->settings->get('historyTableCreated')) {
-      try {
-        $this->io->createHistoryTable();
-      } catch (Error $e) {
-        log("Unable to create history table: " . $e->getMessage());
-      }
-    }
+    // Change columns in edit.php
+    add_filter('manage_edit-' . self::$postType . '_columns', function ($columns) {
+      // Change columns
+      return [
+        'cb' => $columns['cb'],
+        'title' => $columns['title'],
+        'shortcode' => __('Shortcode', 'wplf'),
+        'submissions' => __('Submissions', 'wplf'),
+        'date' => $columns['date'],
+      ];
+    }, 100, 1);
   }
 
   public function afterInit() {
@@ -153,6 +176,12 @@ class Plugin {
         'illegalName' => __("You can't use {name} as a name, as it conflicts with a core field name.", 'wplf'),
         'fieldAlreadyExistsInDb' => __('Field already exists in the database with the type {type}, use a different name or remove the field first.', 'wplf'),
         'groupedNamesNotSupportedYet' => __('Field names like these are not supported yet. Try using camelCasing or under_scores for grouped names instead.', 'wplf'),
+        'noSubmissionsYet' => __('No submissions yet.', 'wplf'),
+        'loading' => __('Loading...', 'wplf'),
+        'delete' => __('Delete', 'wplf'),
+        'edit' => __('Edit', 'wplf'),
+        'export' => __('Export', 'wplf'),
+        'attachment' => __('Attachment', 'wplf'),
       ]
     ], $additional);
 
@@ -179,7 +208,11 @@ class Plugin {
     wp_enqueue_script('wplf-admin', $this->url .( isDebug() ? '/dist/wplf-admin.js' : '/dist/wplf-admin.min.js'), ['react', 'react-dom'], $version, true);
     wp_enqueue_style('wplf-admincss', $this->url . (isDebug() ? '/dist/wplf-admin.css' : '/dist/wplf-admin.min.css'), [], $version);
 
-    wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData(['codeMirror' => $cm, 'post' => $GLOBALS['post'] ?? null])));
+    wp_localize_script('wplf-admin', 'wplfData', apply_filters('wplfAdminData', $this->getLocalizeScriptData([
+      'codeMirror' => $cm,
+      'post' => $GLOBALS['post'] ?? null,
+      'adminUrl' => admin_url(),
+    ])));
   }
 
   public function enqueueFrontendAssets() {
@@ -397,6 +430,8 @@ class Plugin {
       $deletedFields = json_decode(stripslashes(($_POST['wplfDeletedFields'] ?? '[]')), true);
       $destroyUnusedDbColumns = $form->getDestroyUnusedDatabaseColumnsValue();
 
+      // var_dump($newFields); die();
+
 
       if ($newFields || $deletedFields) {
         if (!$destroyUnusedDbColumns && $deletedFields) {
@@ -413,6 +448,9 @@ class Plugin {
       isDebug() && log("Database error: {$msg}");
 
       // The user should probably be notified directly, but there's no easy way to do it from this hook, other than wp_die, which I'd rather not use.
+
+      // But I'll do it anyway, because it's a nightmare to debug otherwise.
+      wp_die($msg, 'WP Libre Form error');
     }
   }
 

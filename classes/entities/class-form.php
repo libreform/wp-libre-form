@@ -214,7 +214,7 @@ class Form {
    * Get message shown after a succesful submission
    */
   public function getSuccessMessage() {
-    return $this->getMeta('ThankYou') ?: '<p>' . __('Form submitted succesfully.', 'wplf') . '</p>';
+    return $this->getMeta('ThankYou') ?: '<p>' . __('Form submitted succesfully. \n\n ## SUBMISSION ##', 'wplf') . '</p>';
   }
 
     /**

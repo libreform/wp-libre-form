@@ -179,15 +179,17 @@
   }
 }
 
-.wplf-submission {
-  display: flex;
-  flex-flow: row nowrap;
+.wplf-submissionList {
+  &__submission {
+    display: flex;
+    flex-flow: row nowrap;
 
-  &__select {
-    flex: 0 0 10%;
-  }
+    &__select {
+      flex: 0 0 10%;
+    }
 
-  &__data {
-    flex: 0 0 90%;
+    &__data {
+      flex: 0 0 90%;
+    }
   }
 }

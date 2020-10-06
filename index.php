@@ -43,17 +43,10 @@ $wplf = libreform([
   'version' => $version,
 ]);
 
+add_action('plugins_loaded', function() use ($wplf) {
+  $wplf->initialize();
+});
+
 // These will not work inside init, they must be top level: https://developer.wordpress.org/reference/functions/register_activation_hook/
 register_activation_hook(__FILE__, [$wplf, 'onActivation']);
 register_deactivation_hook(__FILE__, [$wplf, 'onDeactivation']);
-
-add_action('plugins_loaded', function() {
-  add_filter('wplfImportFormTemplate', function($template, WPLF\Form $form) {
-
-    if ($form->ID === 666) {
-      return '<input type="text" name="helloworld">';
-    }
-
-    return $template;
-  }, 10, 2);
-});

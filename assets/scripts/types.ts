@@ -92,7 +92,11 @@ export interface Submission {
   ID: number
   uuid: string
   referrer: List<any>
-  fields: List<any>
+  historyId: number
+  createdAt: string
+  modifiedAt: string
+  entries: List<any>
+  formFields: List<Field>
   meta: List<any>
 }
 
@@ -120,6 +124,7 @@ export interface WPLF_LocalizeData {
   // fetchCredentials: string
   fetchCredentials: 'same-origin' | 'include' | 'omit'
   i18n: List<string>
+  adminUrl?: string
   lang?: string
   post?: { ID: string; [k: string]: any } // We only care about the ID
   requestHeaders: {

@@ -7,6 +7,8 @@ class Submission {
   public $uuid;
   public $referrer;
   public $historyId;
+  public $createdAt; // UTC
+  public $modifiedAt; // UTC
 
   public $entries = []; // todo: rename to entries
   public $formFields = [];
@@ -21,12 +23,16 @@ class Submission {
     $this->uuid = $data['uuid'] ?? null;
     $this->referrer = json_decode($data['referrerData'], true);
     $this->historyId = $data['historyId'] ? (int) $data['historyId'] : null;
+    $this->createdAt = $data['created'] ? $data['created'] : null;
+    $this->modifiedAt = $data['modified'] ? $data['modified'] : null;
 
     // Unset the values after using to prevent them from ending under meta
     unset($data['id']);
     unset($data['uuid']);
     unset($data['referrerData']);
     unset($data['historyId']);
+    unset($data['created']);
+    unset($data['modified']);
 
     $this->formFields = $form->getFields($this->historyId);
 
@@ -68,7 +74,7 @@ class Submission {
     return $this->entries[$fieldName] ?? null;
   }
 
-  public function getFields() {
+  public function getEntries() {
     return $this->entries;
   }
 
@@ -81,15 +87,12 @@ class Submission {
    *
    */
   public function delete($removeUploads = true) {
-    $entries = $this->getFields();
+    $entries = $this->getEntries();
     $historyId = (int) $this->getMeta()['historyId'];
     $formFields = $this->form->getFields($historyId);
 
     foreach ($entries as $name => $value) {
-      die("datamalli vaihtu, korjaa search pois");
-
-      $k = array_search($name, array_column($entries, 'name'));
-      $formField = $formFields[$k] ?? false;
+      $formField = $formFields[$name];
 
       $type = $formField['type'];
 
@@ -134,7 +137,7 @@ class Submission {
       // return $newSub;
       $this->ID = $id;
       $this->uuid = $newSub->getUuid();
-      $this->entries = $newSub->getFields();
+      $this->entries = $newSub->getEntries();
       $this->meta = $newSub->getMeta();
       $this->referrer = $newSub->getReferrer();
     } catch (Error $e) {
@@ -257,7 +260,7 @@ class Submission {
     $formFieldNames = array_map(function ($field) {
       return $field['name'];
     }, $entries);
-    $notAllowed = [];
+    $additionalFields = [];
     $whitelist = apply_filters('wplfAllowedFormFields', array_merge($formFieldNames, $form->getAdditionalFields()), $form);
 
     foreach ($data as $key => $value) {
@@ -267,13 +270,17 @@ class Submission {
         continue;
       }
 
-      $notAllowed[] = $key;
+      $additionalFields[] = $key;
     }
 
-    if (!empty($notAllowed)) {
-      throw new Error(__('Additional fields are present.', 'wplf'), [
-        'additionalFields' => $notAllowed,
-      ]);
+    if (!empty($additionalFields)) {
+      $additionalFieldsStr = join(', ', $additionalFields); // Stringified for the error message.
+
+      throw new Error(
+        __("Additional fields are present: {$additionalFieldsStr}", 'wplf'),
+        ['additionalFields' => $additionalFields,
+        ]
+      );
     }
   }
 
@@ -284,7 +291,7 @@ class Submission {
     if (!empty($data['_fcaptcha'])) {
       do_action('wplfHoneypotTriggered', $data, $this);
 
-      throw new Error('Captcha was wrong', []);
+      throw new Error(__("Captcha wasn't filled properly.", 'wplf'), []);
     }
   }
 }

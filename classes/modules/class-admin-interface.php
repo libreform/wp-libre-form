@@ -167,6 +167,20 @@ class AdminInterface extends Module {
     $form = new Form($form);
     $isNewPost = get_post_meta($form->ID, '_edit_last', true) != 1; // New posts don't have this meta field. This is the least hackiest way to get that data here.
 
+    $subUuid = $_GET['submissionUuid'] ??  false;
+
+    if ($subUuid) {
+      ?>
+    <div class="wplf">
+      <div class="wplf-singleSubmission">
+        Render submission here
+      </div>
+      </div>
+      <?php
+
+      return;
+    }
+
     $metaSections = [
       'preview' => [
         'text' => 'Preview',
@@ -213,7 +227,6 @@ class AdminInterface extends Module {
 
           <?php
 
-          // var_dump($GLOBALS['post']); die();
           foreach ($metaSections as $key => $data) {
             echo "<section class='wplf-tabs__tab wplf-$key' data-name='FormEditActiveTab' data-tab='$key'>";
             $data['fn']($form, $isNewPost);
@@ -314,16 +327,23 @@ libreform()->render($form); ?&gt;</code>
     $form = get_post();
     $form = new Form($form);
 
+    ?>
+
+    <div class="wplf-submissionList">
+      <!-- SubmissionList.tsx is injected here -->
+    </div>
+
+      <?php
+
     if ($form->isPublished()) {
       [$submissions, $pages, $count] = $this->io->getFormSubmissions($form);
-      $fields = $form->getFields();
+      $currentFields = $form->getFields();
       $wpDir = get_home_path();
       $wpUrl = get_home_url(null, '/');
 
       $dateFormat = get_option('date_format') . ' ' . get_option('time_format');
       ?>
 
-      <div class="wplf-formSubmissions"></div>
       <div class="wplf-submissions">
 
         <div class="wplf-submissions__list">
@@ -332,8 +352,8 @@ libreform()->render($form); ?&gt;</code>
             $historyId = $submission->getHistoryId();
             $referrer = $submission->getReferrer();
 
-            $fieldsAtTheTime = $form->getFields($historyId);
-            $fieldsHaveChanged = serialize($fieldsAtTheTime) !== serialize($fields);
+            $fields = $form->getFields($historyId);
+            $fieldsHaveChanged = serialize($fields) !== serialize($currentFields);
 
             $title = $this->selectors->parse($form->getSubmissionTitleFormat(), $form, $submission);
 
@@ -344,25 +364,14 @@ libreform()->render($form); ?&gt;</code>
             <!-- <h3>Submission <?=esc_html($submission->ID)?></h3> -->
               <h3><?=esc_html($title)?></h3>
 
-              <time><?=date($dateFormat, strtotime($meta['created']))?></time>
+              <time><?=date($dateFormat, strtotime($submission->createdAt))?></time>
 
 
 
               <table>
               <?php
-              foreach ($submission->getFields() as $name => $value) {
-                // $k = array_search($name, array_column($fieldsAtTheTime, 'name'));
-
-                // If there's no key, the field didn't exist in the form
-                // when it was submitted. Skip rendering it.
-                // if ($k === false) {
-                  // continue;
-                  // return;
-                // }
-
-                // var_dump($fieldsAtTheTime);
-
-                $field = $fieldsAtTheTime[$name] ?? null;
+              foreach ($submission->getEntries() as $name => $value) {
+                $field = $fields[$name] ?? null;
 
                 if (!$field) {
                   continue;
@@ -370,7 +379,6 @@ libreform()->render($form); ?&gt;</code>
 
                 $type = $field['type'];
                 $name = $name . ($field['required'] ? '*' : '');
-                $value = stringifyFieldValue($value, $type);
                 $isEmpty = empty($value);
 
                 if ($isEmpty) {
@@ -405,7 +413,7 @@ libreform()->render($form); ?&gt;</code>
       </div>
       <?php
     } else {
-      echo __('Publish the form first.', 'wplf');
+      // echo __('Publish the form first.', 'wplf');
     }
   }
 
@@ -495,7 +503,7 @@ libreform()->render($form); ?&gt;</code>
         </div>
 
         <p>
-          <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically. Do not use HTML.', 'wplf'); ?>
+          <?=__('You may use selectors like ## SUBMISSION ## and ## FORM title ## in the message to add content dynamically. HTML is not supported by default.', 'wplf'); ?>
         </p>
 
         <div class="wplf-formRow">
@@ -576,6 +584,10 @@ libreform()->render($form); ?&gt;</code>
           </label>
         </div>
 
+        <h3>
+          <?=__('Upload settings', 'wplf')?>
+        </h3>
+
         <div class="wplf-formRow">
           <label for="wplfAddToMediaLibrary">
             <input
@@ -589,9 +601,12 @@ libreform()->render($form); ?&gt;</code>
           </label>
         </div>
 
+        <p><?php esc_html_e("Uploads to the media library are slow. If you want the form to submit quickly, don't use this.", 'wplf'); ?></p>
+
         <h3>
-          <?=__('Feature freeze', 'wplf')?>
+          <?=__('Potentially dangerous options', 'wplf')?>
         </h3>
+
 
         <div class="wplf-formRow">
           <label for="wplfUpdateVersionCreatedAt">
@@ -602,13 +617,13 @@ libreform()->render($form); ?&gt;</code>
               value="1"
               <?=checked($isNewPost || apply_filters('wplfUpgradeFormByFefault', false, $form), true, false)?>
             >
-            <?php esc_html_e('Upgrade form to enable latest features', 'wplf'); ?>
+            <?php esc_html_e('Update form version', 'wplf'); ?>
           </label>
         </div>
 
-        <h3>
-          <?=__('Dangerous settings', 'wplf')?>
-        </h3>
+        <p><?php esc_html_e('When you create the form initially, we save the WPLF version used to create it. Some new features might be unavailable before you update the version.', 'wplf'); ?></p>
+
+        <p><?php esc_html_e('This is to ensure your forms keep working after an update.', 'wplf'); ?></p>
 
         <div class="wplf-formRow">
           <label for="wplfDestroyUnusedDatabaseColumns">
@@ -625,6 +640,9 @@ libreform()->render($form); ?&gt;</code>
 
         <p>
           <?=__("This setting WILL cause loss of data if used on a form with submissions. It's useful for reusing the same form after an event or freeing field names in the database. ", 'wplf')?>
+        </p>
+
+        <p>
           <?=__("All field data that doesn't have a field in the current version of the form will be deleted, and form history data will be destroyed.", 'wplf')?>
         </p>
       </section>

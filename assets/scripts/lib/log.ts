@@ -8,8 +8,6 @@ const notice = (message: string, ...params: any[]) =>
 const error = (message: string, ...params: any[]) =>
   debugLevel !== 'none' && console.error(`WPLF error: ${message}`, params)
 
-console.log(globalData)
-
 export default {
   notice,
   error,

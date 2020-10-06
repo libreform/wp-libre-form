@@ -12,13 +12,7 @@ import { WPLF_Form } from './wplf-form'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import SubmissionList from '../react/SubmissionsList'
-
-// const React = window.React
-
-// const { React, ReactDOM } = window
-
-console.log(React, 'test')
+import SubmissionList from '../react/SubmissionList'
 
 const { abort, request, signal } = createApiClient()
 const { i18n } = globalData
@@ -51,7 +45,7 @@ export default class WPLF_Editor {
     const historyFields = document.querySelector('#wplfHistoryFields')
     const allowSave = document.querySelector('#wplfAllowSave')
     const submissionsEl = document.querySelector(
-      '.wplf-editor .wplf-formSubmissions'
+      '.wplf-editor .wplf-submissionList'
     )
     const editorEl = document.querySelector('.wplf-editor .wplf-cmEditor')
     const thankYouEl = document.querySelector(
@@ -70,6 +64,7 @@ export default class WPLF_Editor {
       isElementish(deletedFields) &&
       isElementish(historyFields) &&
       isElementish(allowSave) &&
+      isElementish(submissionsEl) &&
       isElementish(editorEl) &&
       isElementish(thankYouEl) &&
       isElementish(previewEl) &&
@@ -127,28 +122,26 @@ export default class WPLF_Editor {
 
         this.handleContentChange(this.contentEditor.codemirror) // Triggers preview build
       } else {
-        this.handleContentChange($(editorEl)[0].value)
+        this.handleContentChange(editorEl.getAttribute('value'))
       }
 
       if (!globalData.settings.hasUnfilteredHtml) {
         this.tryToPreventEdit()
       }
 
-      if (submissionsEl) {
-        const formId = globalData.post?.ID || null
+      const formId = globalData.post?.ID || null
 
-        if (formId) {
-          ReactDOM.render(
-            React.createElement(
-              SubmissionList,
-              {
-                formId,
-              },
-              null
-            ),
-            submissionsEl
-          )
-        }
+      if (formId) {
+        ReactDOM.render(
+          React.createElement(
+            SubmissionList,
+            {
+              formId,
+            },
+            null
+          ),
+          submissionsEl
+        )
       }
     } else {
       throw new Error(
@@ -246,6 +239,7 @@ export default class WPLF_Editor {
       await this.updatePreview(content)
       await this.updateFormFieldsFromPreview()
       await this.removeProblematicAttributesFromPreview()
+
       this.writeState()
       formInstance = wplf.attach(this.previewEl)
     } catch (e) {
@@ -386,8 +380,6 @@ export default class WPLF_Editor {
         return acc
       }, [])
     // .filter((n) => n !== null)
-
-    console.log('howdy', fields)
 
     const fieldNames = fields.map((field) => field.name)
     const duplicateNames = this.getDuplicateNames(fieldNames)

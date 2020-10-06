@@ -50,13 +50,17 @@ const defaultSuccessCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   const div = document.createElement('div')
 
   div.classList.add('wplf-successMessage')
-  div.insertAdjacentHTML('afterbegin', message)
+  div.insertAdjacentHTML(
+    'afterbegin',
+    // message
+    message.replace(/\n/g, '<br />') // Maybe this shouldn't be modified.
+  )
 
   wplfForm.form.insertAdjacentElement('beforebegin', div)
   wplfForm.form.classList.add('submitted')
 }
 
-const defaultErrorSendCallback = (wplfForm: WPLF_Form, params: List<any>) => {
+const defaultErrorCallback = (wplfForm: WPLF_Form, params: List<any>) => {
   const { error } = params
   const div = document.createElement('div')
 
@@ -82,7 +86,7 @@ export class WPLF_Form {
       clearOnSuccess: resetForm,
     },
     error: {
-      default: defaultErrorSendCallback,
+      default: defaultErrorCallback,
     },
   }
 
@@ -236,17 +240,19 @@ export class WPLF_Form {
         const x = await this.send()
         const { data, ok } = x
 
-        if (ok) {
+        if ('error' in data) {
+          log.error('Invalid submission!', x)
+
+          throw new Error(data.error)
+        } else if (!ok) {
+          throw new Error('Request to submit form failed')
+        } else {
           this.submitState = SubmitState.Success
           this.runCallback('success', { data })
-        } else {
-          console.log('not ok!', x)
-
-          throw new Error('Something went wrong')
         }
-      } catch (e) {
+      } catch (error) {
         this.submitState = SubmitState.Error
-        this.runCallback('error', { error: this.submitState })
+        this.runCallback('error', { error })
       }
     }
   }

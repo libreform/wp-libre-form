@@ -100,6 +100,12 @@ class RestApi extends Module {
 
     try {
       $form = new Form(get_post($formId));
+
+      if (!$form->isPublished()) {
+        throw new Error(__('Form is not published', 'wplf'));
+      }
+
+
       [$submissions, $totalPages] = $this->io->getFormSubmissions($form, $page);
 
       $response = new \WP_REST_Response($submissions);

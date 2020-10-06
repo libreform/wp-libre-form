@@ -14,7 +14,7 @@ MariaDB [wordpress]> DESCRIBE wp_wplf_53_submissions;
 | Field        | Type                | Null | Key | Default             | Extra
            |
 +--------------+---------------------+------+-----+---------------------+-------------------------------+
-| uuid         | varchar(36)         | YES  | MUL | uuid()              |
+| uuid         | varchar(36)         | YES  | MUL | NULL                |
            |
 | id           | bigint(20)          | NO   | PRI | NULL                | auto_increment
            |

@@ -41,35 +41,33 @@ class Selectors extends Module {
           if ($field === 'id') {
             return $submission->ID;
           } elseif ($field === null) { // Get all
-            $fields = $submission->getFields();
+            $entries = $submission->getEntries();
             $formFields = $form->getFields($form->getHistoryId());
-
             $data = '';
 
+            foreach ($entries as $name => $value) {
+              $formField = $formFields[$name] ?? null;
 
-            foreach ($fields as $k => $value) {
-              // $key = array_search($k, array_column($formFields, 'name'));
-
-              // $field = $fields[$key];
-              die("datamalli vaihtu, korjaa search pois");
-              $columns = array_column($formFields, 'name');
-              $key = array_search($k, $columns);
-              $formField = $formFields[$key];
-
-              // var_dump($formField['type']);
+              if (!$formField) {
+                continue;
+              }
 
               $type = $formField['type'];
-
-              $value = stringifyFieldValue($value, $type);
               $isEmpty = empty($value);
+
+              // Avoid leaking file location in the selector:
+              // Return the value using the filter if you want to enable it, or create your own selector.
+              if ($type === 'file') {
+                $str = __('(uploaded)', 'wplf');
+                $value = apply_filters('wplfSubmissionSelectorFileFieldValue', $str, $value, $formField);
+              }
 
               if ($isEmpty) {
                 // Empty string makes for a terrible visual.
                 $value = apply_filters('wplfEmptySubmissionFieldValue', __('(empty)', 'wplf'));
               }
 
-              // $v = print_r($v, true);
-              $data = "{$data}$k: $value\n";
+              $data = "{$data}$name: $value\n";
             }
 
             return $data;
