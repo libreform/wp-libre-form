@@ -26,11 +26,35 @@ function wplf_validate_form_exists( $return ) {
   return $return;
 }
 
+/**
+ *  Check simple honeypot form spam
+ */
+add_filter( 'wplf_validate_submission', 'wplf_validate_check_honeypot', 2 );
+function wplf_validate_check_honeypot( $return ) {
+  // skip this validation if submission has already failed
+  if ( ! $return->ok ) {
+    return $return;
+  }
+
+  // skip this validation if honeypot is turned off
+  if ( ! apply_filters( 'wplf_honeypot', true ) ) {
+    return $return;
+  }
+
+  // check if honeypot exists and has some value, mark as spam if true
+  $honeypot_name = apply_filters( 'wplf_honeypot_field_name', 'send_hugs_to_developers' );
+
+  if ( ! empty( $_POST[ $honeypot_name ] ) && true === (bool) $_POST[ $honeypot_name ] ) {
+    $return->spam = true;
+  }
+
+  return $return;
+}
 
 /**
  * Check for required fields that are empty
  */
-add_filter( 'wplf_validate_submission', 'wplf_validate_required_empty', 2 );
+add_filter( 'wplf_validate_submission', 'wplf_validate_required_empty', 3 );
 function wplf_validate_required_empty( $return ) {
   // skip this validation if submission has already failed
   if ( ! $return->ok ) {
@@ -68,7 +92,7 @@ function wplf_validate_required_empty( $return ) {
 /**
  * Check that submission has only fields that are set in form
  */
-add_filter( 'wplf_validate_submission', 'wplf_validate_additional_fields', 3 );
+add_filter( 'wplf_validate_submission', 'wplf_validate_additional_fields', 4 );
 function wplf_validate_additional_fields( $return ) {
   // skip this validation if submission has already failed
   if ( ! $return->ok ) {
